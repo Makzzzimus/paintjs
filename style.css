@@ -1,0 +1,37 @@
+:root{
+    --background-layer-high: rgb(253, 253, 253);
+    --background-layer-low: rgb(242, 242, 242);
+}
+body{
+    background-color: var(--background-layer-low);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    height: 100vh;
+}
+#TittleBar{
+    height: 80px;
+    background-color:var(--background-layer-high);
+    width: 100%;
+    border-radius: 15px;
+    box-shadow: 3px 0px 5px 0px rgba(0,0,0,0.35);
+    margin-bottom: 5px;
+}
+
+#WindowContent{
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+}
+#CanvasContainer{
+    margin: 0px;
+    width: 100%;
+    flex: 1 1 auto;
+}
+#SideBar{
+    background-color:var(--background-layer-high);
+    width: 550px;
+    border-radius: 15px;
+    box-shadow: 3px 0px 5px 0px rgba(0,0,0,0.35);
+    flex: 1 1 auto;
+}
