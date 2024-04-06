@@ -1,21 +1,29 @@
 :root{
     --background-layer-high: rgb(253, 253, 253);
     --background-layer-low: rgb(242, 242, 242);
+    --accent-dark: rgb(104, 35, 117);
 }
 body{
-    background-color: var(--background-layer-low);
+    background-color: var(--background-layer-high);
     display: flex;
     flex-direction: column;
     margin: 0;
     height: 100vh;
 }
 #TittleBar{
-    height: 80px;
-    background-color:var(--background-layer-high);
+    height: 50px;
+    background-color:var(--accent-dark);
     width: 100%;
-    border-radius: 15px;
-    box-shadow: 3px 0px 5px 0px rgba(0,0,0,0.35);
-    margin-bottom: 5px;
+    margin-bottom: 0px;
+    display: flex;
+    text-align: center;
+}
+h1{
+    margin: auto;
+    color: white;
+    font-family: "Comfortaa", sans-serif;
+    font-weight: 400;
+    font-size: 18pt;
 }
 
 #WindowContent{
@@ -27,11 +35,12 @@ body{
     margin: 0px;
     width: 100%;
     flex: 1 1 auto;
+    box-shadow: inset 3px 3px 5px 0px rgba(0,0,0,0.35);
+    background-color: var(--background-layer-low);
+    border-radius: 15px;
 }
 #SideBar{
     background-color:var(--background-layer-high);
-    width: 550px;
-    border-radius: 15px;
-    box-shadow: 3px 0px 5px 0px rgba(0,0,0,0.35);
-    flex: 1 1 auto;
+    width: 400px;
+    flex: 0 0 auto;
 }
