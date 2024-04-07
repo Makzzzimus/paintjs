@@ -2,6 +2,7 @@
     --background-layer-high: rgb(253, 253, 253);
     --background-layer-low: rgb(242, 242, 242);
     --accent-dark: rgb(104, 35, 117);
+    --light-gray: rgb(154, 148, 155);
 }
 body{
     background-color: var(--background-layer-high);
@@ -43,4 +44,31 @@ h1{
     background-color:var(--background-layer-high);
     width: 400px;
     flex: 0 0 auto;
+}
+#ToolsBox{
+    margin: 15px;
+    height: 185px;
+    padding: 15px;
+    display: flex;
+}
+#ToolSelectionBox{
+    display: flex;
+    flex-direction: column;
+    width: 10%;
+    margin-right: 5%;
+}
+#ToolPreferencesBox{
+    width: 85%;
+    border-radius: 15px;
+    border: dashed var(--light-gray);
+}
+.ToolButton{
+    margin-bottom: 2px;
+    width: 100%;
+    height: 100%;
+    transition: 0.5s all;
+    border-radius: 5px;
+}
+.ToolButton:hover{
+    box-shadow: 0px 0px 5px 2px rgba(104,35,117,0.45);
 }
