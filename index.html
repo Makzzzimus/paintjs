@@ -17,28 +17,50 @@
         <div id="SideBar">
             <div id="ToolsBox">
                 <div id="ToolSelectionBox">
-                    <div class="ToolButton">
-                        <img src="assets/ToolIcons/paintbrush.svg" alt="">
+                    <div class="ToolButton" id="PBrButton" onclick="selectTool(this)"> <!-- PaintBrushButton -->
+                        <svg version="1.1" id="Layer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                        <path class="PBrSvgElement" fill="#9A949B" d="M12.89,20.53l3.91,2.55c0.76,0.5,1.79,0.21,2.18-0.62L26.45,6.7c0.32-0.68,0.09-1.49-0.54-1.91l0,0
+                        	c-0.63-0.41-1.47-0.29-1.96,0.28L12.57,18.29C11.97,18.98,12.12,20.03,12.89,20.53z"/>
+                        <path class="PBrSvgElement" fill="#9A949B" d="M11.81,24.99c0,0,2.51-3.54,2.26-3.65c-0.96-0.46-3.5-1.15-4.94,3.24c0,0-0.95,2.61-0.04,6.07
+	                        c0,0,1.7-3.05,4.51-3.36c0,0,5.26-2.28,1.28-5.43C14.74,21.76,11.95,25.09,11.81,24.99z"/>
+                        </svg>
                     </div>
-                    <div class="ToolButton">
-                        <img src="assets/ToolIcons/paintbrush.svg" alt="">
+                    <div class="ToolButton" id="EraButton" onclick="selectTool(this)">
+                      
                     </div>
-                    <div class="ToolButton">
-                        <img src="assets/ToolIcons/paintbrush.svg" alt="">
+                    <div class="ToolButton" id="SDrButton" onclick="selectTool(this)">
+                       
                     </div>
-                    <div class="ToolButton">
-                        <img src="assets/ToolIcons/paintbrush.svg" alt=""></div>
-                    <div class="ToolButton">
-                        <img src="assets/ToolIcons/paintbrush.svg" alt=""></div>
+                    <div class="ToolButton" id="CPiButton" onclick="selectTool(this)">
+                       
+                    </div>
+                    <div class="ToolButton" id="BucButton" onclick="selectTool(this)">
+                        
+                    </div>
                 </div>
                 <div id="ToolPreferencesBox">
-
+                    <fieldset id="ToolPreferencesFieldset">
+                        <!-- <legend>Tool Settings</legend>
+                        <div>
+                            <label>Selected width: </label><br>
+                            <input id="PBrStrokeSlider" type="range" min="1" max="72" value="12" oninput="changeStrokeSlider(this)">
+                            <input id="PBrStrokeValue" type="number" min="1" max="72" value="12" onchange="changeStrokeNumber(this)"><br>
+                        </div>
+                        <div>
+                            <label>Selected brush type: </label><br>
+                            <select id="SelectBrushType">
+                                <option value="">Square</option>
+                            </select>
+                        </div> --> 
+                    </fieldset>
                 </div>
             </div>
+            
         </div>
         <div id="CanvasContainer">
             <canvas id="Canvas" height="0px" width="0px"></canvas>
         </div>
     </div>
+    <script src="script.js"></script>
 </body>
 </html>
