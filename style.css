@@ -96,6 +96,9 @@ button, select{
     width: 400px;
     flex: 0 0 auto;
 }
+
+
+
 #ToolsBox{
     margin: 15px;
     height: 185px;
@@ -136,7 +139,37 @@ button, select{
     padding: 15px;
     text-align: center;
 }
-
 #PBrStrokeValue, #ShapeWidthValue{
     width: 35px;
+}
+
+
+
+#ColorsBox{
+    display: flex;
+    padding: 15px;
+    margin: 15px;
+    margin-top: 35px;
+    border-top: solid 2px var(--light-gray);
+    height: 150px;
+}
+#SelectedColorBox{
+    height: 100%;
+    width: 25%;
+}
+#ColorLibraryBox{
+    height: 100%;
+    width: 75%;
+}
+#SelectedColorFrame{
+    margin: 15px;
+    height: 70%;
+    width: auto;
+}
+#SelectedColor{
+    margin: 6px;
+    width: 80%;
+    height: 45px;
+    border: none;
+    padding: 0px;
 }
