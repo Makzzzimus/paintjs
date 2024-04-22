@@ -17,7 +17,7 @@ legend{
     font-weight: 400;
     font-size: 10pt;
 }
-input[type=number]{
+input[type=number], input[type=text]{
     border-radius: 5px;
     border: 0.1px solid var(--accent-light);
     border-bottom: 3px solid var(--accent-dark);
@@ -50,7 +50,7 @@ h1{
     font-weight: 400;
     font-size: 18pt;
 }
-label{
+label, p{
     font-family: "Comfortaa", sans-serif;
     font-weight: 400;
     font-size: 12pt;
@@ -66,6 +66,10 @@ button, select{
     font-family: "Comfortaa", sans-serif;
     padding: 3px;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.3);
+}
+p{
+    color: var(--light-gray);
+    font-size: 11pt;
 }
 
 
@@ -132,7 +136,7 @@ button, select{
 }
 #ToolPreferencesFieldset{
     max-height: 100%;
-    height: 100%;
+
     overflow-y: none;
     border-radius: 8px;
     border: dashed var(--light-gray);
@@ -156,20 +160,34 @@ button, select{
 #SelectedColorBox{
     height: 100%;
     width: 25%;
+    border: dashed 3px var(--light-gray);
+    border-radius: 7px;
+    text-align: center;
+    margin-right: 5px;
+}
+#SelectedColor{
+    margin: 7px;
+    width: 55px;
+    height: 55px;
+    border: none;
+    padding: 0px;
 }
 #ColorLibraryBox{
     height: 100%;
     width: 75%;
 }
-#SelectedColorFrame{
-    margin: 15px;
-    height: 70%;
-    width: auto;
+.SavedColorBox{
+    border-radius: 5px;
+    width: 30px;
+    height: 30px;
+    /* border: solid 1.7px var(--light-gray); */
+    box-shadow: 0px 0px 8px 1px rgba(104,35,117,0.35);
+    transition: all 0.3s;
 }
-#SelectedColor{
-    margin: 6px;
-    width: 80%;
-    height: 45px;
-    border: none;
-    padding: 0px;
+.SavedColorBox:hover{
+    box-shadow: 0px 0px 10px 1px rgba(104,35,117,0.95);
+    transform: scale(1.1);
+}
+#ColorLibraryTable{
+    border-spacing: 5px;
 }

@@ -43,8 +43,8 @@
                         <!-- <legend>Tool Settings</legend>
                         <div>
                             <label>Selected width: </label><br>
-                            <input id="PBrStrokeSlider" type="range" min="1" max="72" value="12" oninput="changeStrokeSlider(this)">
-                            <input id="PBrStrokeValue" type="number" min="1" max="72" value="12" onchange="changeStrokeNumber(this)"><br>
+                            <input id="PBrStrokeSlider" type="range" min="1" max="72" value="12" oninput="changeStroke(this)">
+                            <input id="PBrStrokeValue" type="number" min="1" max="72" value="12" onchange="changeStroke(this)"><br>
                         </div>
                         <div>
                             <label>Selected brush type: </label><br>
@@ -55,14 +55,52 @@
                     </fieldset>
                 </div>
             </div>
-            <div style="background-color: antiquewhite;" id="ColorsBox">
-                <div style="background-color: whitesmoke;" id="SelectedColorBox">
-                    <div style="background-color: bisque;" id="SelectedColorFrame">
-                        <input type="color" id="SelectedColor">
-                    </div>
+            <div id="ColorsBox">
+                <div id="SelectedColorBox">
+                    <input type="color" id="SelectedColor">
+                    <input type="text" id="SelectedColorHex" style="width: 60px; margin-bottom: 5px; font-size: 10pt;" value="#000000"><br>
+                    <button>Copy</button>
                 </div>
-                <div style="background-color: beige;" id="ColorLibraryBox">
-
+                <div id="ColorLibraryBox">
+                    <table id="ColorLibraryTable">
+                        <tr>
+                            <td class="SavedColorBox" id="DefaultColor1-1" hex-data="#ff0000" style="background-color: red;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor1-2" hex-data="#ffa500" style="background-color: orange;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor1-3" hex-data="#ffff00" style="background-color: yellow;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor1-4" hex-data="#008000" style="background-color: green;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor1-5" hex-data="#87ceeb" style="background-color: skyblue;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor1-6" hex-data="#0000ff" style="background-color: blue;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor1-7" hex-data="#800080" style="background-color: purple;" onclick="setColorFromLibrary(this)"></td>
+                        </tr>
+                        <tr>
+                            <td class="SavedColorBox" id="DefaultColor2-1" hex-data="#dc143c" style="background-color: crimson;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor2-2" hex-data="#a52a2a" style="background-color: brown;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor2-3" hex-data="#d2691e" style="background-color: chocolate;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor2-4" hex-data="#9acd32" style="background-color: yellowgreen;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor2-5" hex-data="#add8e6" style="background-color: lightblue;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor2-6" hex-data="#ee82ee" style="background-color: violet;" onclick="setColorFromLibrary(this)"></td>
+                            <td class="SavedColorBox" id="DefaultColor2-7" hex-data="#8a2be2" style="background-color: blueviolet;" onclick="setColorFromLibrary(this)"></td>
+                        </tr>
+                        <tr>
+                            <td class="SavedColorBox" id="UserColor1-1" style="background-color: black;"></td>
+                            <td class="SavedColorBox" id="UserColor1-2" style="background-color: gray;"></td>
+                            <td class="SavedColorBox" id="UserColor1-3" style="background-color: darkgray;"></td>
+                            <td class="SavedColorBox" id="UserColor1-4" style="background-color: lightgray;"></td>
+                            <td class="SavedColorBox" id="UserColor1-5" style="background-color: white;"></td>
+                            <td class="SavedColorBox" id="UserColor1-6" style="background-color: white;"></td>
+                            <td class="SavedColorBox" id="UserColor1-7" style="background-color: white;"></td>
+                        </tr>
+                        <tr>
+                            <td class="SavedColorBox" id="UserColor2-1" style="background-color: white;"></td>
+                            <td class="SavedColorBox" id="UserColor2-2" style="background-color: white;"></td>
+                            <td class="SavedColorBox" id="UserColor2-3" style="background-color: white;"></td>
+                            <td class="SavedColorBox" id="UserColor2-4" style="background-color: white;"></td>
+                            <td class="SavedColorBox" id="UserColor2-5" style="background-color: white;"></td>
+                            <td class="SavedColorBox" id="UserColor2-6" style="background-color: white;"></td>
+                            <td class="SavedColorBox" id="UserColor2-7" style="background-color: white;"></td>
+                        </tr>
+                    </table>
+                    <p id="UserColorHint">Hint: Right-click on any color of 2 bottom rows to save your color</p>
                 </div>
             </div>
         </div>
