@@ -1,7 +1,7 @@
 let selectedTool = null;
 let paintBrushStroke = 12;
 let selectedColorPicker = document.getElementById("SelectedColor");
-let selectedColorValue = document.getElementById("SelectedColorHex");
+let selectedColorHexInput = document.getElementById("SelectedColorHex");
 function selectTool(t){
     if (selectedTool === null){
         document.getElementById("ToolPreferencesBox").style.opacity = 1;
@@ -46,5 +46,14 @@ function reverseToolButtonColor(){
 
 function setColorFromLibrary(t){
     selectedColorPicker.value = t.getAttribute("hex-data");
-    selectedColorValue.value = t.getAttribute("hex-data");
+    selectedColorHexInput.value = t.getAttribute("hex-data");
+}
+function setWithColorPicker(){
+    selectedColorHexInput.value = selectedColorPicker.value;
+}
+function setColorWithHex(){
+    selectedColorPicker.value = selectedColorHexInput.value;
+}
+function copyHex(){
+    navigator.clipboard.writeText(selectedColorHexInput.value);
 }

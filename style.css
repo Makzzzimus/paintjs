@@ -66,6 +66,11 @@ button, select{
     font-family: "Comfortaa", sans-serif;
     padding: 3px;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+button:hover, select:hover{
+    transform: scale(1.07);
+    box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.4);
 }
 p{
     color: var(--light-gray);
