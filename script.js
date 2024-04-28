@@ -2,6 +2,10 @@ let selectedTool = null;
 let paintBrushStroke = 12;
 let selectedColorPicker = document.getElementById("SelectedColor");
 let selectedColorHexInput = document.getElementById("SelectedColorHex");
+let canvas = document.getElementById("Canvas");
+let ctx = canvas.getContext("2d");
+
+
 function selectTool(t){
     if (selectedTool === null){
         document.getElementById("ToolPreferencesBox").style.opacity = 1;
@@ -56,4 +60,18 @@ function setColorWithHex(){
 }
 function copyHex(){
     navigator.clipboard.writeText(selectedColorHexInput.value);
+}
+
+function openCreateFilePopup(){
+    document.getElementById("BackgroundDim").style.display = "flex";
+    document.getElementById("FileCreationPopup").style.display = "block"
+}
+function createCanvas(){
+    canvas.width = document.getElementById("WidthInput").value;
+    canvas.height = document.getElementById("HeightInput").value;
+    closeFileCreationPopup();
+}
+function closeFileCreationPopup(){
+    document.getElementById("BackgroundDim").style.display = "none";
+    document.getElementById("FileCreationPopup").style.display = "none"
 }

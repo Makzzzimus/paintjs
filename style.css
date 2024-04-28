@@ -3,7 +3,8 @@
     --background-layer-low: rgb(242, 242, 242);
     --accent-dark: rgb(104, 35, 117);
     --accent-light: rgb(193, 105, 211);
-    --light-gray: rgb(154, 148, 155);
+    --gray: rgb(154, 148, 155);
+    --light-gray: rgba(208, 205, 209, 0.65);
 }
 body{
     background-color: var(--background-layer-high);
@@ -50,6 +51,11 @@ h1{
     font-weight: 400;
     font-size: 18pt;
 }
+h2{
+    font-family: "Comfortaa", sans-serif;
+    font-weight: 400;
+    font-size: 22pt;
+}
 label, p{
     font-family: "Comfortaa", sans-serif;
     font-weight: 400;
@@ -73,7 +79,7 @@ button:hover, select:hover{
     box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.4);
 }
 p{
-    color: var(--light-gray);
+    color: var(--gray);
     font-size: 11pt;
 }
 
@@ -99,11 +105,17 @@ p{
     box-shadow: inset 3px 3px 5px 0px rgba(0,0,0,0.35);
     background-color: var(--background-layer-low);
     border-radius: 15px;
+    overflow-y: scroll;
+    overflow-x: scroll;
 }
 #SideBar{
     background-color:var(--background-layer-high);
     width: 400px;
     flex: 0 0 auto;
+}
+#Canvas{
+    box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.35);
+    cursor: crosshair;
 }
 
 
@@ -144,7 +156,7 @@ p{
 
     overflow-y: none;
     border-radius: 8px;
-    border: dashed var(--light-gray);
+    border: dashed var(--gray);
     padding: 15px;
     text-align: center;
 }
@@ -165,7 +177,7 @@ p{
 #SelectedColorBox{
     height: 100%;
     width: 25%;
-    border: dashed 3px var(--light-gray);
+    border: dashed 3px var(--gray);
     border-radius: 7px;
     text-align: center;
     margin-right: 5px;
@@ -195,4 +207,74 @@ p{
 }
 #ColorLibraryTable{
     border-spacing: 5px;
+}
+
+
+
+#FileInteractionBox{
+    margin: 15px;
+    margin-top: 85px;
+}
+#FileInteractionFieldset{
+    border-radius: 8px;
+    border: dashed var(--accent-light);
+    padding: 15px;
+    text-align: center;
+}
+#FileActionsLegend{
+    color: var(--accent-dark);
+}
+.FileButton{
+    margin-bottom: 2px;
+    width: 45px;
+    height: 45px;
+    border-radius: 5px;
+    background-color: var(--background-layer-high);
+    transition: 0.4s all;
+    border-bottom: solid 0px var(--accent-dark);
+    box-shadow: 0px 0px 0px 0px;
+}
+.FileButton:hover{
+    border: 1px solid var(--accent-dark);
+    border-bottom: solid 3px var(--accent-dark);
+    box-shadow: 0px 0px 0px ;
+    transform: scale(1.1);
+}
+
+
+
+#BackgroundDim{
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0,0,0,0.65);
+    /* display: flex; */
+}
+#FileCreationPopup{
+    display: none;
+}
+.PopupWindow{
+    padding: 20px;
+    border-radius: 15px;
+    background-color: var(--background-layer-high);
+    margin: auto;
+    text-align: center;
+    box-shadow: 0px 0px 55px 15px rgba(0,0,0,0.55);
+}
+.InputBox{
+    margin-bottom: 12px;
+}
+.PopupContentGroup{
+    margin: auto;
+}
+.PopupOptions{
+    display: flex;
+}
+.FinishPopupButton{
+    font-size: 16pt;
+}
+.CancelButton{
+    margin-top: 5px;
+    background-color: var(--gray);
+    font-size: 10pt;
 }

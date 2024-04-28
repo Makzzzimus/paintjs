@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Concert+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700" rel="stylesheet">
 </head>
 <body>
     <div id="TittleBar">
@@ -18,7 +18,7 @@
             <div id="ToolsBox">
                 <div id="ToolSelectionBox">
                     <div class="ToolButton" id="PBrButton" onclick="selectTool(this)"> <!-- PaintBrushButton -->
-                        <svg version="1.1" id="Layer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path class="PBrSvgElement" fill="#9A949B" d="M12.89,20.53l3.91,2.55c0.76,0.5,1.79,0.21,2.18-0.62L26.45,6.7c0.32-0.68,0.09-1.49-0.54-1.91l0,0c-0.63-0.41-1.47-0.29-1.96,0.28L12.57,18.29C11.97,18.98,12.12,20.03,12.89,20.53z"/>
                             <path class="PBrSvgElement" fill="#9A949B" d="M11.81,24.99c0,0,2.51-3.54,2.26-3.65c-0.96-0.46-3.5-1.15-4.94,3.24c0,0-0.95,2.61-0.04,6.07c0,0,1.7-3.05,4.51-3.36c0,0,5.26-2.28,1.28-5.43C14.74,21.76,11.95,25.09,11.81,24.99z"/>
                         </svg>
@@ -105,9 +105,57 @@
                     <p id="UserColorHint">Hint: Right-click on any color of 2 bottom rows to save your color</p>
                 </div>
             </div>
+            <div id="FileInteractionBox">
+                <fieldset id="FileInteractionFieldset">
+                    <legend id="FileActionsLegend">File actions</legend>
+                    <button class="FileButton" id="NewFileButton" onclick="openCreateFilePopup()">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                            <path fill="#682375" d="M21.7,32H8.8c-1.1,0-2-0.9-2-2V5.2c0-1.1,0.9-2,2-2h11.7l7.8,7.7v14.5h-2V11.7l-6.6-6.5H8.8l0,24.8l12.9,0V32z"/>
+                            <polyline fill="#682375" points="20.1,4.2 20.1,11.4 27.3,11.3 	"/>
+                            <polygon fill="#682375" points="19.1,12.4 19.1,4.2 21.1,4.2 21.1,10.4 27.3,10.3 27.3,12.3 	"/>
+                            <rect fill="#682375" x="23.7" y="30" width="7.2" height="2"/>
+                            <rect fill="#682375" x="26.3" y="27.4" width="2" height="7.2"/>
+                        </svg>
+                    </button>
+                    <button class="FileButton" id="OpenFileButton">
+                        
+                    </button>
+                    <button class="FileButton" id="SaveAsButton">
+                        
+                    </button>
+                </fieldset>
+            </div>
         </div>
         <div id="CanvasContainer">
             <canvas id="Canvas" height="0px" width="0px"></canvas>
+        </div>
+    </div>
+    <div id="BackgroundDim">
+        <div id="FileCreationPopup" class="PopupWindow" style="width: 420px; height: 280px;">
+            <h2>New File</h2>
+            <div class="PopupOptions">
+                <div id="SizeInputs" class="PopupContentGroup">
+                    <div class="InputBox">
+                        <label>Canvas Width</label><br>
+                        <input type="number" id="WidthInput" min="1" value="800">
+                    </div>
+                    <div class="InputBox">
+                        <label>Canvas Height</label><br>
+                        <input type="number" id="HeightInput" min="1" value="600">
+                    </div>
+                </div>
+                <div id="Other" class="PopupContentGroup">
+                    <div class="InputBox">
+                        <label>Measure units</label><br>
+                        <select id="UnitSelection">
+                            <option value="">pixels</option>
+                        </select>
+                    </div>
+                    <button>🔀</button>
+                </div>
+            </div>
+            <button class="FinishPopupButton" onclick="createCanvas()">Create</button><br>
+            <button class="CancelButton" onclick="closeFileCreationPopup()">Cancel</button>
         </div>
     </div>
     <script src="script.js"></script>
