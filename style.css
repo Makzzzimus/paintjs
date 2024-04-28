@@ -99,12 +99,12 @@ p{
     height: 100vh;
 }
 #CanvasContainer{
+    display: flex;
     margin: 0px;
     width: 100%;
     flex: 1 1 auto;
     box-shadow: inset 3px 3px 5px 0px rgba(0,0,0,0.35);
     background-color: var(--background-layer-low);
-    border-radius: 15px;
     overflow-y: scroll;
     overflow-x: scroll;
 }
@@ -114,7 +114,8 @@ p{
     flex: 0 0 auto;
 }
 #Canvas{
-    box-shadow: 3px 3px 5px 0px rgba(0,0,0,0.35);
+    margin: auto;
+    box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.45);
     cursor: crosshair;
 }
 
@@ -177,7 +178,7 @@ p{
 #SelectedColorBox{
     height: 100%;
     width: 25%;
-    border: dashed 3px var(--gray);
+    border: dashed 3px black;
     border-radius: 7px;
     text-align: center;
     margin-right: 5px;

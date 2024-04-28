@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700" rel="stylesheet">
 </head>
-<body>
+<body onmouseup="mouseUp()">
     <div id="TittleBar">
         <h1>PaintJS</h1>
     </div>
@@ -125,9 +125,10 @@
                     </button>
                 </fieldset>
             </div>
+            <input type="text" id="CursorLocationInput" readonly>
         </div>
         <div id="CanvasContainer">
-            <canvas id="Canvas" height="0px" width="0px"></canvas>
+            <canvas id="Canvas" height="0px" width="0px" onmousemove="getCursorLocation(event)" onmousedown="mouseDown()"></canvas>
         </div>
     </div>
     <div id="BackgroundDim">
@@ -151,7 +152,7 @@
                             <option value="">pixels</option>
                         </select>
                     </div>
-                    <button>🔀</button>
+                    <button onclick="swapValues()">🔀</button>
                 </div>
             </div>
             <button class="FinishPopupButton" onclick="createCanvas()">Create</button><br>
