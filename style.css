@@ -279,3 +279,8 @@ p{
     background-color: var(--gray);
     font-size: 10pt;
 }
+#CursorLocationInput{
+    margin: 15px;
+    margin-left: 95px;
+    margin-right: 95px;
+}
