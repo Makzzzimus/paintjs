@@ -2,6 +2,7 @@ let selectedTool = null;
 let paintBrushStroke = 6;
 let paintBrushShape = "square";
 let eraserStroke = 6;
+let eraserShape = "square";
 const selectedColorPicker = document.getElementById("SelectedColor");
 const selectedColorHexInput = document.getElementById("SelectedColorHex");
 const cursorLocationInput = document.getElementById("CursorLocationInput")
@@ -23,8 +24,18 @@ function selectTool(t){
     selectedTool = t.id.slice(0,3);
     changeToolButtonColor(t);
     if(selectedTool == "PBr"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool Settings</legend> <div> <label>Selected width: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrushStroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrushStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected brush shape: </label><br> <select id="SelectBrushShape" onchange="changeBrushShape(this)"> <option value="square" selected>Square</option> <option value="round">Rounded</option> </select> </div>`;
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Selected width: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrushStroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrushStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option id="square" value="square">Square</option> <option id="rounded" value="round">Rounded</option> </select> </div>`;
+        ctx.globalCompositeOperation="source-over";
         ctx.lineWidth = paintBrushStroke;
+        changeShape(null);
+        document.getElementById("SelectBrushShape").value = paintBrushShape;
+    }
+    if(selectedTool == "Era"){
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Selected width: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraserStroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraserStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option id="square" value="square">Square</option> <option id="rounded" value="round">Rounded</option> </select> </div>`;
+        ctx.globalCompositeOperation="destination-out";
+        ctx.lineWidth = eraserStroke;
+        changeShape(null);
+        document.getElementById("SelectEraserShape").value = eraserShape;
     }
 }
 
@@ -39,18 +50,37 @@ function changeStroke(t){
         paintBrushStroke = t.value
         ctx.lineWidth = paintBrushStroke;
     }
+    if (selectedTool == "Era"){
+        eraserStroke = t.value
+        ctx.lineWidth = eraserStroke;
+    }
 }
-function changeBrushShape(t){
-    if (t != null){
-        paintBrushShape = t.value;
+function changeShape(t){
+    if (selectedTool == "PBr"){
+        if (t != null){
+            paintBrushShape = t.value;
+        }
+        if (paintBrushShape == "square"){
+            ctx.lineCap = "butt";
+            ctx.lineJoin = "bevel";
+        }
+        else if(paintBrushShape == "round"){
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+        }
     }
-    if (paintBrushShape == "square"){
-        ctx.lineCap = "butt";
-        ctx.lineJoin = "bevel";
-    }
-    else if(paintBrushShape == "round"){
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
+    else if (selectedTool == "Era"){
+        if (t != null){
+            eraserShape = t.value;
+        }
+        if (eraserShape == "square"){
+            ctx.lineCap = "butt";
+            ctx.lineJoin = "bevel";
+        }
+        else if(eraserShape == "round"){
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+        }
     }
 }
 function changeToolButtonColor(t){
@@ -101,7 +131,7 @@ function createCanvas(){
         ctx.lineWidth = paintBrushStroke;
         ctx.strokeStyle = selectedColorPicker.value;
     }
-    changeBrushShape(null);
+    changeShape(null);
     closeFileCreationPopup();
 }
 function closeFileCreationPopup(){
@@ -128,7 +158,7 @@ function getCursorLocation(event){
     cursorY = Math.round(event.clientY - rect.top);
     cursorLocationInput.value = `${cursorX}, ${cursorY}`;
     if (isMouseDown == true){
-        if (selectedTool == "PBr"){
+        if (selectedTool == "PBr" || selectedTool == "Era"){
             ctx.lineTo(cursorX, cursorY);
             ctx.stroke();
         }
