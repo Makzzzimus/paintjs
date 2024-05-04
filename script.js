@@ -12,8 +12,10 @@ let ctx = canvas.getContext("2d");
 let cursorX = 0;
 let cursorY = 0;
 let isMouseDown = false;
-let actionsList = [];
-let actionPropertiesList = [];
+let undoActionsList = [];
+let redoActionList = [];
+let undoActionPropertiesList = [];
+let redoActionPropertiesList = [];
 let lineList = [];
 
 function selectTool(t){
@@ -127,7 +129,7 @@ function openCreateFilePopup(){
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("FileCreationPopup").style.display = "block"
 }
-function createCanvas(){
+function createCanvas(clearHistory){
     canvas.width = document.getElementById("WidthInput").value;
     canvas.height = document.getElementById("HeightInput").value;
     if (selectedTool == "PBr"){
@@ -136,10 +138,18 @@ function createCanvas(){
     }
     changeShape(null);
     closeFileCreationPopup();
+    if (clearHistory !== false){
+        undoActionsList = [];
+        redoActionList = [];
+        undoActionPropertiesList = [];
+        redoActionPropertiesList = [];
+        undoButtonColorChange("off");
+        redoButtonColorChange("off");
+    }
 }
 function closeFileCreationPopup(){
     document.getElementById("BackgroundDim").style.display = "none";
-    document.getElementById("FileCreationPopup").style.display = "none"
+    document.getElementById("FileCreationPopup").style.display = "none";
 }
 function swapValues(){
     let temp = document.getElementById("HeightInput").value;
@@ -155,29 +165,97 @@ function saveFile(){
     link.click();
 }
 
+
+function undoButtonColorChange(status){
+    const ELEMENTS_ARRAY = document.querySelectorAll(`.UndoSvgElement`);
+    const undoButton = document.getElementById("UndoButton");
+    if (status == "on"){
+        for(i=0; i<ELEMENTS_ARRAY.length; i++){
+            ELEMENTS_ARRAY[i].style.fill = "#682375";
+        }
+        undoButton.onclick = function(){undoLastAction()};
+    }
+    else if(status == "off"){
+        for(i=0; i<ELEMENTS_ARRAY.length; i++){
+            ELEMENTS_ARRAY[i].style.fill = "#9A949B";
+        }
+       undoButton.onclick = undefined;
+    }
+}
+function redoButtonColorChange(status){
+    const ELEMENTS_ARRAY = document.querySelectorAll(`.RedoSvgElement`);
+    const redoButton = document.getElementById("RedoButton");
+    if (status == "on"){
+        for(i=0; i<ELEMENTS_ARRAY.length; i++){
+            ELEMENTS_ARRAY[i].style.fill = "#682375";
+        }
+        redoButton.onclick = function(){redoLastAction()};
+    }
+    else if(status == "off"){
+        for(i=0; i<ELEMENTS_ARRAY.length; i++){
+            ELEMENTS_ARRAY[i].style.fill = "#9A949B";
+        }
+        redoButton.onclick = undefined;
+    }
+}
 function undoLastAction(){
-    createCanvas();
-    for(i=0; i<actionsList.length-1; i++){
-        ctx.strokeStyle = actionPropertiesList[i][0];
-        ctx.lineCap = actionPropertiesList[i][1];
-        ctx.lineJoin = actionPropertiesList[i][2];
-        ctx.lineWidth = actionPropertiesList[i][3];
-        ctx.globalCompositeOperation = actionPropertiesList[i][4];
+    createCanvas(false);
+    for(i=0; i<undoActionsList.length-1; i++){
+        ctx.strokeStyle = undoActionPropertiesList[i][0];
+        ctx.lineCap = undoActionPropertiesList[i][1];
+        ctx.lineJoin = undoActionPropertiesList[i][2];
+        ctx.lineWidth = undoActionPropertiesList[i][3];
+        ctx.globalCompositeOperation = undoActionPropertiesList[i][4];
         ctx.beginPath();
-        for(j=0; j<actionsList[i].length; j++){
-            let cursorLocations = actionsList[i][j].split("; ");
+        for(j=0; j<undoActionsList[i].length; j++){
+            let cursorLocations = undoActionsList[i][j].split("; ");
             ctx.lineTo(cursorLocations[0], cursorLocations[1]);
             ctx.stroke();
         }
     }
-    actionsList.splice(-1);
-    const beforeUndoToolProperties = actionPropertiesList.pop();
+    redoActionList.push(undoActionsList.pop());
+    const beforeUndoToolProperties = undoActionPropertiesList.pop();
     ctx.strokeStyle = beforeUndoToolProperties[0];
     ctx.lineCap = beforeUndoToolProperties[1];
     ctx.lineJoin = beforeUndoToolProperties[2];
     ctx.lineWidth = beforeUndoToolProperties[3];
     ctx.globalCompositeOperation = beforeUndoToolProperties[4];
+    redoActionPropertiesList.push(beforeUndoToolProperties);
+    if (undoActionsList.length == 0){
+        undoButtonColorChange("off");
+    }
+    if (redoActionList.length != 0){
+        redoButtonColorChange("on");
+    }
 }
+function redoLastAction(){
+    ctx.strokeStyle = redoActionPropertiesList[redoActionPropertiesList.length - 1][0];
+    ctx.lineCap = redoActionPropertiesList[redoActionPropertiesList.length - 1][1];
+    ctx.lineJoin = redoActionPropertiesList[redoActionPropertiesList.length - 1][2];
+    ctx.lineWidth = redoActionPropertiesList[redoActionPropertiesList.length - 1][3];
+    ctx.globalCompositeOperation = redoActionPropertiesList[redoActionPropertiesList.length - 1][4];
+    ctx.beginPath();
+    for(j=0; j<redoActionList[redoActionList.length - 1].length; j++){
+        let cursorLocations = redoActionList[redoActionList.length - 1][j].split("; ");
+        ctx.lineTo(cursorLocations[0], cursorLocations[1]);
+        ctx.stroke();
+    }
+    undoActionsList.push(redoActionList.pop());
+    const beforeRedoToolProperties = redoActionPropertiesList.pop();
+    ctx.strokeStyle = beforeRedoToolProperties[0];
+    ctx.lineCap = beforeRedoToolProperties[1];
+    ctx.lineJoin = beforeRedoToolProperties[2];
+    ctx.lineWidth = beforeRedoToolProperties[3];
+    ctx.globalCompositeOperation = beforeRedoToolProperties[4];
+    undoActionPropertiesList.push(beforeRedoToolProperties);
+    if (redoActionList.length == 0){
+        redoButtonColorChange("off");
+    }
+    if (undoActionsList.length != 0){
+        undoButtonColorChange("on");
+    }
+}
+
 
 function getCursorLocation(event){
     let rect = event.target.getBoundingClientRect();
@@ -198,12 +276,18 @@ function mouseDown(){
 }
 function mouseUp(){
     if (isMouseDown == true){
-        let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation];
-        actionPropertiesList.push(lastActionProperties);
-        console.log("Tool properties saved");
-        actionsList.push(lineList);
-        lineList = [];
-        console.log("Action saved");
+        if (selectedTool != null && canvas.height > 0){
+            let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation];
+            undoActionPropertiesList.push(lastActionProperties);
+            console.log("Tool properties saved");
+            undoActionsList.push(lineList);
+            lineList = [];
+            console.log("Action saved");
+            undoButtonColorChange("on");
+            redoActionList = []
+            redoActionPropertiesList = [];
+            redoButtonColorChange("off");
+        }
     }
     isMouseDown = false;
 }
