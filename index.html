@@ -57,6 +57,20 @@
                     </fieldset>
                 </div>
             </div>
+            <div id="ActionBox">
+                <button class="ActionButton" id="UndoButton" onclick="undoLastAction()">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                        <path fill="#682375" d="M15.18,32.22c-0.54,0-0.99-0.43-1-0.98c-0.01-0.55,0.42-1.01,0.98-1.02c5.83-0.13,10.58-4.99,10.58-10.83c0-5.92-4.64-10.68-10.55-10.83c-0.55-0.01-0.99-0.47-0.97-1.02c0.01-0.55,0.45-1.02,1.02-0.97c7.01,0.18,12.5,5.81,12.5,12.83c0,6.92-5.62,12.67-12.53,12.83C15.19,32.22,15.19,32.22,15.18,32.22z"/>
+                        <path fill="#682375" d="M15.21,8.56H8.27c-0.55,0-1-0.45-1-1s0.45-1,1-1h6.94c0.55,0,1,0.45,1,1S15.76,8.56,15.21,8.56z"/>
+                        <path fill="#682375" d="M12.08,12.34c-0.26,0-0.51-0.1-0.71-0.29L7.59,8.27c-0.39-0.39-0.39-1.02,0-1.41s1.02-0.39,1.41,0l3.78,3.78c0.39,0.39,0.39,1.02,0,1.41C12.59,12.25,12.33,12.34,12.08,12.34z"/>
+                        <path fill="#682375" d="M8.27,8.56c-0.26,0-0.51-0.1-0.71-0.29c-0.39-0.39-0.39-1.02,0-1.41l3.78-3.78c0.39-0.39,1.02-0.39,1.41,0s0.39,1.02,0,1.41L8.97,8.27C8.78,8.46,8.52,8.56,8.27,8.56z"/>
+                    </svg>
+                </button>
+                <button class="ActionButton" id="UndoButton">
+                    <!-- <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                    </svg> -->
+                </button>
+            </div>
             <div id="ColorsBox">
                 <div id="SelectedColorBox">
                     <input type="color" id="SelectedColor" onchange="setWithColorPicker()">

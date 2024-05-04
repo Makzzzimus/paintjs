@@ -12,6 +12,9 @@ let ctx = canvas.getContext("2d");
 let cursorX = 0;
 let cursorY = 0;
 let isMouseDown = false;
+let actionsList = [];
+let actionPropertiesList = [];
+let lineList = [];
 
 function selectTool(t){
     if (selectedTool === null){
@@ -152,6 +155,30 @@ function saveFile(){
     link.click();
 }
 
+function undoLastAction(){
+    createCanvas();
+    for(i=0; i<actionsList.length-1; i++){
+        ctx.strokeStyle = actionPropertiesList[i][0];
+        ctx.lineCap = actionPropertiesList[i][1];
+        ctx.lineJoin = actionPropertiesList[i][2];
+        ctx.lineWidth = actionPropertiesList[i][3];
+        ctx.globalCompositeOperation = actionPropertiesList[i][4];
+        ctx.beginPath();
+        for(j=0; j<actionsList[i].length; j++){
+            let cursorLocations = actionsList[i][j].split("; ");
+            ctx.lineTo(cursorLocations[0], cursorLocations[1]);
+            ctx.stroke();
+        }
+    }
+    actionsList.splice(-1);
+    const beforeUndoToolProperties = actionPropertiesList.pop();
+    ctx.strokeStyle = beforeUndoToolProperties[0];
+    ctx.lineCap = beforeUndoToolProperties[1];
+    ctx.lineJoin = beforeUndoToolProperties[2];
+    ctx.lineWidth = beforeUndoToolProperties[3];
+    ctx.globalCompositeOperation = beforeUndoToolProperties[4];
+}
+
 function getCursorLocation(event){
     let rect = event.target.getBoundingClientRect();
     cursorX = Math.round(event.clientX - rect.left);
@@ -161,6 +188,7 @@ function getCursorLocation(event){
         if (selectedTool == "PBr" || selectedTool == "Era"){
             ctx.lineTo(cursorX, cursorY);
             ctx.stroke();
+            lineList.push(`${cursorX}; ${cursorY}`);
         }
     }
 }
@@ -169,5 +197,13 @@ function mouseDown(){
     ctx.beginPath();
 }
 function mouseUp(){
+    if (isMouseDown == true){
+        let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation];
+        actionPropertiesList.push(lastActionProperties);
+        console.log("Tool properties saved");
+        actionsList.push(lineList);
+        lineList = [];
+        console.log("Action saved");
+    }
     isMouseDown = false;
 }
