@@ -1,8 +1,10 @@
 let selectedTool = null;
 let paintBrushStroke = 6;
 let paintBrushShape = "square";
+let paintBrushQuality = "high"
 let eraserStroke = 6;
 let eraserShape = "square";
+let eraserQuality = "medium"
 const selectedColorPicker = document.getElementById("SelectedColor");
 const selectedColorHexInput = document.getElementById("SelectedColorHex");
 const cursorLocationInput = document.getElementById("CursorLocationInput")
@@ -17,6 +19,7 @@ let redoActionList = [];
 let undoActionPropertiesList = [];
 let redoActionPropertiesList = [];
 let lineList = [];
+let cooldown = 0;
 
 function selectTool(t){
     if (selectedTool === null){
@@ -29,18 +32,22 @@ function selectTool(t){
     selectedTool = t.id.slice(0,3);
     changeToolButtonColor(t);
     if(selectedTool == "PBr"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Selected width: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrushStroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrushStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option id="square" value="square">Square</option> <option id="rounded" value="round">Rounded</option> </select> </div>`;
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Brush size: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrushStroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrushStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Brush shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <div> <label>Brush stroke quality: </label><br> <select id="SelectBrushQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
         ctx.globalCompositeOperation="source-over";
         ctx.lineWidth = paintBrushStroke;
         changeShape(null);
         document.getElementById("SelectBrushShape").value = paintBrushShape;
+        document.getElementById("SelectBrushQuality").value = paintBrushQuality;
+        cooldown = 0;
     }
     if(selectedTool == "Era"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Selected width: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraserStroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraserStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option id="square" value="square">Square</option> <option id="rounded" value="round">Rounded</option> </select> </div>`;
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Selected width: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraserStroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraserStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option id="square" value="square">Square</option> <option id="rounded" value="round">Rounded</option> </select> </div> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
         ctx.globalCompositeOperation="destination-out";
         ctx.lineWidth = eraserStroke;
         changeShape(null);
         document.getElementById("SelectEraserShape").value = eraserShape;
+        document.getElementById("SelectEraserQuality").value = eraserQuality;
+        cooldown = 0;
     }
 }
 
@@ -86,6 +93,16 @@ function changeShape(t){
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
         }
+    }
+}
+function changeQuality(t){
+    if (selectedTool == "PBr"){
+        paintBrushQuality = t.value;
+        cooldown = 0;
+    }
+    else if (selectedTool == "Era"){
+        eraserQuality = t.value;
+        cooldown = 0;
     }
 }
 function changeToolButtonColor(t){
@@ -256,17 +273,80 @@ function redoLastAction(){
     }
 }
 
-
+function drawStroke(X,Y){
+    ctx.lineTo(X, Y);
+    ctx.stroke();
+    lineList.push(`${X}; ${Y}`);
+}
 function getCursorLocation(event){
     let rect = event.target.getBoundingClientRect();
     cursorX = Math.round(event.clientX - rect.left);
     cursorY = Math.round(event.clientY - rect.top);
     cursorLocationInput.value = `${cursorX}, ${cursorY}`;
     if (isMouseDown == true){
-        if (selectedTool == "PBr" || selectedTool == "Era"){
-            ctx.lineTo(cursorX, cursorY);
-            ctx.stroke();
-            lineList.push(`${cursorX}; ${cursorY}`);
+        if (selectedTool == "PBr"){
+            if (paintBrushQuality == "original"){
+                drawStroke(cursorX, cursorY);
+            }
+            if (paintBrushQuality == "high"){
+                if (cooldown == 1){
+                    drawStroke(cursorX, cursorY);
+                    cooldown = 0;
+                }
+                else{
+                    cooldown++;
+                }
+            }
+            if (paintBrushQuality == "medium"){
+                if (cooldown == 3){
+                    drawStroke(cursorX, cursorY);
+                    cooldown = 0;
+                }
+                else{
+                    cooldown++;
+                }
+            }
+            if (paintBrushQuality == "low"){
+                if (cooldown == 5){
+                    drawStroke(cursorX, cursorY);
+                    cooldown = 0;
+                }
+                else{
+                    cooldown++;
+                }
+            }
+        }
+        if (selectedTool == "Era"){
+            if (eraserQuality == "original"){
+                drawStroke(cursorX, cursorY);
+            }
+            if (eraserQuality == "high"){
+                if (cooldown == 1){
+                    drawStroke(cursorX, cursorY);
+                    cooldown = 0;
+                }
+                else{
+                    cooldown++;
+                }
+            }
+            if (eraserQuality == "medium"){
+                if (cooldown == 3){
+                    drawStroke(cursorX, cursorY);
+                    cooldown = 0;
+                }
+                else{
+                    cooldown++;
+                }
+            }
+            if (eraserQuality == "low"){
+                if (cooldown == 5){
+                    drawStroke(cursorX, cursorY);
+                    cooldown = 0;
+                }
+                else{
+                    cooldown++;
+                }
+            }
         }
     }
 }
@@ -276,17 +356,19 @@ function mouseDown(){
 }
 function mouseUp(){
     if (isMouseDown == true){
-        if (selectedTool != null && canvas.height > 0){
-            let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation];
-            undoActionPropertiesList.push(lastActionProperties);
-            console.log("Tool properties saved");
-            undoActionsList.push(lineList);
-            lineList = [];
-            console.log("Action saved");
-            undoButtonColorChange("on");
-            redoActionList = []
-            redoActionPropertiesList = [];
-            redoButtonColorChange("off");
+        if (selectedTool != null && canvas.height > 0){  
+            if (lineList.length != 0){
+                undoActionsList.push(lineList);
+                lineList = [];
+                console.log("Action saved");
+                undoButtonColorChange("on");
+                redoActionList = []
+                redoActionPropertiesList = [];
+                redoButtonColorChange("off");
+                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation];
+                undoActionPropertiesList.push(lastActionProperties);
+                console.log("Tool properties saved");
+            }
         }
     }
     isMouseDown = false;
