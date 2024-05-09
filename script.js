@@ -5,12 +5,18 @@ let paintBrushQuality = "high"
 let eraserStroke = 6;
 let eraserShape = "square";
 let eraserQuality = "medium"
+let shapeToolStroke = 6;
+let shapeToolShape = "rectangle"
+let shapeToolCornerShape = "square"
+let fillShape = false;
+let shapeFillColor = "#000000";
+let shapePoints = [];
 const selectedColorPicker = document.getElementById("SelectedColor");
 const selectedColorHexInput = document.getElementById("SelectedColorHex");
 const cursorLocationInput = document.getElementById("CursorLocationInput")
 const selectedColorBox = document.getElementById("SelectedColorBox");
 const canvas = document.getElementById("Canvas");
-let ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d");
 let cursorX = 0;
 let cursorY = 0;
 let isMouseDown = false;
@@ -41,13 +47,24 @@ function selectTool(t){
         cooldown = 0;
     }
     if(selectedTool == "Era"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Selected width: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraserStroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraserStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option id="square" value="square">Square</option> <option id="rounded" value="round">Rounded</option> </select> </div> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Eraser size: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraserStroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraserStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Eraser shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
         ctx.globalCompositeOperation="destination-out";
         ctx.lineWidth = eraserStroke;
         changeShape(null);
         document.getElementById("SelectEraserShape").value = eraserShape;
         document.getElementById("SelectEraserQuality").value = eraserQuality;
         cooldown = 0;
+    }
+    if(selectedTool == "STo"){
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeToolStroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="0" max="72" value="${shapeToolStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape?: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
+        ctx.globalCompositeOperation="source-over";
+        ctx.lineWidth = shapeToolStroke;
+        shapePoints = [];
+        document.getElementById("SelectShapeToolShape").value = shapeToolShape;
+        document.getElementById("CheckboxShapeFill").checked = fillShape;
+        document.getElementById("InputFillColor").value = shapeFillColor;
+        ctx.lineCap = "butt";
+        ctx.lineJoin = "bevel";
     }
 }
 
@@ -65,6 +82,10 @@ function changeStroke(t){
     if (selectedTool == "Era"){
         eraserStroke = t.value
         ctx.lineWidth = eraserStroke;
+    }
+    if (selectedTool == "STo"){
+        shapeToolStroke = t.value
+        ctx.lineWidth = shapeToolStroke;
     }
 }
 function changeShape(t){
@@ -94,6 +115,28 @@ function changeShape(t){
             ctx.lineJoin = "round";
         }
     }
+    else if (selectedTool == "STo"){
+        if (t != null){
+            shapeToolCornerShape = t.value;
+        }
+        ctx.lineCap = "butt";
+        if (shapeToolCornerShape == "sharp"){
+            ctx.lineJoin = "miter";
+        }
+        else if (shapeToolCornerShape == "cut"){
+            ctx.lineJoin = "bevel";
+        }
+        else if (shapeToolCornerShape == "rounded"){
+            ctx.lineJoin = "round";
+        }
+    }
+}
+function setShapeToolShape(){
+    if (selectedTool == "STo"){
+        if (t != null){
+            shapeToolShape = t.value;
+        }
+    }
 }
 function changeQuality(t){
     if (selectedTool == "PBr"){
@@ -105,17 +148,23 @@ function changeQuality(t){
         cooldown = 0;
     }
 }
+function changeIsFillShape(t){
+    if (t.checked == true){
+        fillShape = true;
+    }
+    else{
+        fillShape = false;
+    }
+}
 function changeToolButtonColor(t){
     const ELEMENTS_ARRAY = document.querySelectorAll(`.${t.id.slice(0,3)}SvgElement`);
     for(i=0; i<ELEMENTS_ARRAY.length; i++){
-        console.log(ELEMENTS_ARRAY)
         ELEMENTS_ARRAY[i].style.fill = "#682375";
     }
 }
 function reverseToolButtonColor(){
     const ELEMENTS_ARRAY = document.querySelectorAll(`.${selectedTool}SvgElement`);
     for(i=0; i<ELEMENTS_ARRAY.length; i++){
-        console.log(ELEMENTS_ARRAY)
         ELEMENTS_ARRAY[i].style.fill = "#9A949B";
     }
 }
@@ -139,6 +188,13 @@ function setColorWithHex(){
 }
 function copyHex(){
     navigator.clipboard.writeText(selectedColorHexInput.value);
+}
+function setFillColor(t){
+    shapeFillColor = t.value;
+    ctx.fillStyle = t.value;
+}
+function setFillColorFromPrimary(){
+    document.getElementById("InputFillColor").value = selectedColorPicker.value;
 }
 
 
@@ -352,7 +408,31 @@ function getCursorLocation(event){
 }
 function mouseDown(){
     isMouseDown = true;
-    ctx.beginPath();
+    if (selectedTool == "PBr" || selectedTool == "Era"){
+        ctx.beginPath();
+    }
+    if (selectedTool == "STo"){
+        if (shapeToolShape == "rectangle"){
+            if (shapePoints.length != 1){
+                let cursorAxises = cursorLocationInput.value.split(", ");
+                shapePoints.push(cursorAxises);
+            }
+            else{
+                let cursorAxises = cursorLocationInput.value.split(", ");
+                shapePoints.push(cursorAxises);
+                const shape = new Path2D();
+                shape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
+                shape.closePath();
+                //console.log(`${shapePoints[0][0]-shapePoints[1][0]}   ${shapePoints[0][1]-shapePoints[1][1]}`)
+                
+                ctx.stroke(shape);
+                if (fillShape == true){
+                    ctx.fill(shape);
+                }
+                shapePoints = [];
+            }
+        }
+    }
 }
 function mouseUp(){
     if (isMouseDown == true){
