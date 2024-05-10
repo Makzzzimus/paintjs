@@ -66,7 +66,7 @@ function selectTool(t){
         document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape?: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
         ctx.globalCompositeOperation="source-over";
         ctx.lineCap = "butt";
-        ctx.lineWidth = 6;
+        ctx.lineWidth = shapeTool.stroke;
         shapePoints = [];
         document.getElementById("SelectShapeToolShape").value = shapeTool.shape;
         document.getElementById("CheckboxShapeFill").checked = shapeTool.fillShape;
@@ -202,6 +202,7 @@ function setFillColor(t){
 }
 function setFillColorFromPrimary(){
     document.getElementById("InputFillColor").value = selectedColorPicker.value;
+    shapeTool.shapeFillColor = document.getElementById("InputFillColor").value;
 }
 
 
@@ -297,11 +298,26 @@ function undoLastAction(){
         ctx.lineJoin = undoActionPropertiesList[i][2];
         ctx.lineWidth = undoActionPropertiesList[i][3];
         ctx.globalCompositeOperation = undoActionPropertiesList[i][4];
-        ctx.beginPath();
-        for(j=0; j<undoActionsList[i].length; j++){
-            let cursorLocations = undoActionsList[i][j].split("; ");
-            ctx.lineTo(cursorLocations[0], cursorLocations[1]);
-            ctx.stroke();
+        let actionType = undoActionPropertiesList[i][5];
+        if (actionType == "PBr" || actionType == "Era"){
+            ctx.beginPath();
+            for(j=0; j<undoActionsList[i].length; j++){
+                let cursorLocations = undoActionsList[i][j].split("; ");
+                ctx.lineTo(cursorLocations[0], cursorLocations[1]);
+                ctx.stroke();
+            }
+        }
+        else if(actionType == "STo"){
+            if (undoActionPropertiesList[i][6] == "rectangle"){
+                let undoShapePoints = undoActionsList[i];
+                const shape = new Path2D()
+                shape.rect(undoShapePoints[0][0], undoShapePoints[0][1], undoShapePoints[1][0]-undoShapePoints[0][0], undoShapePoints[1][1]-undoShapePoints[0][1])
+                ctx.stroke(shape);
+                if (undoActionPropertiesList[i][7] == true){
+                    ctx.fillStyle = undoActionPropertiesList[i][8];
+                    ctx.fill(shape);
+                }
+            }
         }
     }
     redoActionList.push(undoActionsList.pop());
@@ -311,6 +327,7 @@ function undoLastAction(){
     ctx.lineJoin = beforeUndoToolProperties[2];
     ctx.lineWidth = beforeUndoToolProperties[3];
     ctx.globalCompositeOperation = beforeUndoToolProperties[4];
+    ctx.fillStyle = beforeUndoToolProperties[8];
     redoActionPropertiesList.push(beforeUndoToolProperties);
     if (undoActionsList.length == 0){
         undoButtonColorChange("off");
@@ -325,12 +342,28 @@ function redoLastAction(){
     ctx.lineJoin = redoActionPropertiesList[redoActionPropertiesList.length - 1][2];
     ctx.lineWidth = redoActionPropertiesList[redoActionPropertiesList.length - 1][3];
     ctx.globalCompositeOperation = redoActionPropertiesList[redoActionPropertiesList.length - 1][4];
-    ctx.beginPath();
-    for(j=0; j<redoActionList[redoActionList.length - 1].length; j++){
-        let cursorLocations = redoActionList[redoActionList.length - 1][j].split("; ");
-        ctx.lineTo(cursorLocations[0], cursorLocations[1]);
-        ctx.stroke();
+    let actionType = redoActionPropertiesList[redoActionPropertiesList.length - 1][5]
+    if (actionType == "PBr" || actionType == "Era"){
+        ctx.beginPath();
+        for(j=0; j<redoActionList[redoActionList.length - 1].length; j++){
+            let cursorLocations = redoActionList[redoActionList.length - 1][j].split("; ");
+            ctx.lineTo(cursorLocations[0], cursorLocations[1]);
+            ctx.stroke();
+        }
     }
+    else if (actionType == "STo"){
+        if (redoActionPropertiesList[redoActionPropertiesList.length - 1][6] == "rectangle"){
+            let redoShapePoints = redoActionList[redoActionList.length - 1];
+            const shape = new Path2D()
+            shape.rect(redoShapePoints[0][0], redoShapePoints[0][1], redoShapePoints[1][0]-redoShapePoints[0][0], redoShapePoints[1][1]-redoShapePoints[0][1])
+            ctx.stroke(shape);
+            if (redoActionPropertiesList[redoActionPropertiesList.length - 1][7] == true){
+                ctx.fillStyle = redoActionPropertiesList[redoActionPropertiesList.length - 1][8];
+                ctx.fill(shape);
+            }
+        }
+    }
+    
     undoActionsList.push(redoActionList.pop());
     const beforeRedoToolProperties = redoActionPropertiesList.pop();
     ctx.strokeStyle = beforeRedoToolProperties[0];
@@ -338,6 +371,7 @@ function redoLastAction(){
     ctx.lineJoin = beforeRedoToolProperties[2];
     ctx.lineWidth = beforeRedoToolProperties[3];
     ctx.globalCompositeOperation = beforeRedoToolProperties[4];
+    ctx.fillStyle = beforeRedoToolProperties[8]
     undoActionPropertiesList.push(beforeRedoToolProperties);
     if (redoActionList.length == 0){
         redoButtonColorChange("off");
@@ -445,7 +479,7 @@ function mouseDown(){
                 
                 ctx.stroke(shape);
                 if (shapeTool.fillShape == true){
-                    ctx.fillStyle = document.getElementById("InputFillColor").value;
+                    ctx.fillStyle = shapeTool.shapeFillColor;
                     ctx.fill(shape);
                 }
                 shapePoints = [];
@@ -456,15 +490,21 @@ function mouseDown(){
 function mouseUp(){
     if (isMouseDown == true){
         if (selectedTool != null && canvas.height > 0){  
-            if (lineList.length != 0){
-                undoActionsList.push(lineList);
-                lineList = [];
-                console.log("Action saved");
+            if (lineList.length != 0 || (selectedTool == "STo" && shapePoints.length == 1)){
+                if (selectedTool == "PBr" || selectedTool == "Era"){
+                    undoActionsList.push(lineList);
+                    lineList = [];
+                    console.log("Action saved");
+                }
+                else if(selectedTool == "STo"){
+                    undoActionsList.push(shapePoints);
+                    console.log("Action saved");
+                }
                 undoButtonColorChange("on");
                 redoActionList = []
                 redoActionPropertiesList = [];
                 redoButtonColorChange("off");
-                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation];
+                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, selectedTool, shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor];
                 undoActionPropertiesList.push(lastActionProperties);
                 console.log("Tool properties saved");
             }
