@@ -1,15 +1,21 @@
 let selectedTool = null;
-let paintBrushStroke = 6;
-let paintBrushShape = "square";
-let paintBrushQuality = "high"
-let eraserStroke = 6;
-let eraserShape = "square";
-let eraserQuality = "medium"
-let shapeToolStroke = 6;
-let shapeToolShape = "rectangle"
-let shapeToolCornerShape = "square"
-let fillShape = false;
-let shapeFillColor = "#000000";
+const paintBrush = {
+    stroke: 6,
+    strokeShape: "square",
+    strokeQuality: "high",
+};
+const eraser = {
+    stroke: 6,
+    strokeShape: "square",
+    strokeQuality: "medium",
+};
+const shapeTool = {
+    stroke: 6,
+    strokeShape: "sharp",
+    shape: "rectangle",
+    fillShape: false,
+    shapeFillColor: "#000000"
+};
 let shapePoints = [];
 const selectedColorPicker = document.getElementById("SelectedColor");
 const selectedColorHexInput = document.getElementById("SelectedColorHex");
@@ -17,6 +23,7 @@ const cursorLocationInput = document.getElementById("CursorLocationInput")
 const selectedColorBox = document.getElementById("SelectedColorBox");
 const canvas = document.getElementById("Canvas");
 const ctx = canvas.getContext("2d");
+
 let cursorX = 0;
 let cursorY = 0;
 let isMouseDown = false;
@@ -38,33 +45,33 @@ function selectTool(t){
     selectedTool = t.id.slice(0,3);
     changeToolButtonColor(t);
     if(selectedTool == "PBr"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Brush size: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrushStroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrushStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Brush shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <div> <label>Brush stroke quality: </label><br> <select id="SelectBrushQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Brush size: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrush.stroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrush.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Brush shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <div> <label>Brush stroke quality: </label><br> <select id="SelectBrushQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
         ctx.globalCompositeOperation="source-over";
-        ctx.lineWidth = paintBrushStroke;
+        ctx.lineWidth = paintBrush.stroke;
         changeShape(null);
-        document.getElementById("SelectBrushShape").value = paintBrushShape;
-        document.getElementById("SelectBrushQuality").value = paintBrushQuality;
+        document.getElementById("SelectBrushShape").value = paintBrush.strokeShape;
+        document.getElementById("SelectBrushQuality").value = paintBrush.strokeQuality;
         cooldown = 0;
     }
     if(selectedTool == "Era"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Eraser size: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraserStroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraserStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Eraser shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Eraser size: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraser.stroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraser.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Eraser shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
         ctx.globalCompositeOperation="destination-out";
-        ctx.lineWidth = eraserStroke;
+        ctx.lineWidth = eraser.stroke;
         changeShape(null);
-        document.getElementById("SelectEraserShape").value = eraserShape;
-        document.getElementById("SelectEraserQuality").value = eraserQuality;
+        document.getElementById("SelectEraserShape").value = eraser.strokeShape;
+        document.getElementById("SelectEraserQuality").value = eraser.strokeQuality;
         cooldown = 0;
     }
     if(selectedTool == "STo"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeToolStroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="0" max="72" value="${shapeToolStroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape?: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape?: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
         ctx.globalCompositeOperation="source-over";
-        ctx.lineWidth = shapeToolStroke;
-        shapePoints = [];
-        document.getElementById("SelectShapeToolShape").value = shapeToolShape;
-        document.getElementById("CheckboxShapeFill").checked = fillShape;
-        document.getElementById("InputFillColor").value = shapeFillColor;
         ctx.lineCap = "butt";
-        ctx.lineJoin = "bevel";
+        ctx.lineWidth = 6;
+        shapePoints = [];
+        document.getElementById("SelectShapeToolShape").value = shapeTool.shape;
+        document.getElementById("CheckboxShapeFill").checked = shapeTool.fillShape;
+        document.getElementById("InputFillColor").value = shapeTool.shapeFillColor;
+        changeShape(null);
     }
 }
 
@@ -76,84 +83,84 @@ function changeStroke(t){
         document.getElementById(`${selectedTool}StrokeValue`).value = t.value;
     }
     if (selectedTool == "PBr"){
-        paintBrushStroke = t.value
-        ctx.lineWidth = paintBrushStroke;
+        paintBrush.stroke = t.value
+        ctx.lineWidth = paintBrush.stroke;
     }
     if (selectedTool == "Era"){
-        eraserStroke = t.value
-        ctx.lineWidth = eraserStroke;
+        eraser.stroke = t.value
+        ctx.lineWidth = eraser.stroke;
     }
     if (selectedTool == "STo"){
-        shapeToolStroke = t.value
-        ctx.lineWidth = shapeToolStroke;
+        shapeTool.stroke = t.value
+        ctx.lineWidth = shapeTool.stroke;
     }
 }
 function changeShape(t){
     if (selectedTool == "PBr"){
         if (t != null){
-            paintBrushShape = t.value;
+            paintBrush.strokeShape = t.value;
         }
-        if (paintBrushShape == "square"){
+        if (paintBrush.strokeShape == "square"){
             ctx.lineCap = "butt";
             ctx.lineJoin = "bevel";
         }
-        else if(paintBrushShape == "round"){
+        else if(paintBrush.strokeShape == "round"){
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
         }
     }
     else if (selectedTool == "Era"){
         if (t != null){
-            eraserShape = t.value;
+            eraser.strokeShape = t.value;
         }
-        if (eraserShape == "square"){
+        if (eraser.strokeShape == "square"){
             ctx.lineCap = "butt";
             ctx.lineJoin = "bevel";
         }
-        else if(eraserShape == "round"){
+        else if(eraser.strokeShape == "round"){
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
         }
     }
     else if (selectedTool == "STo"){
         if (t != null){
-            shapeToolCornerShape = t.value;
+            shapeTool.strokeShape = t.value;
         }
         ctx.lineCap = "butt";
-        if (shapeToolCornerShape == "sharp"){
+        if (shapeTool.strokeShape == "sharp"){
             ctx.lineJoin = "miter";
         }
-        else if (shapeToolCornerShape == "cut"){
+        else if (shapeTool.strokeShape == "cut"){
             ctx.lineJoin = "bevel";
         }
-        else if (shapeToolCornerShape == "rounded"){
+        else if (shapeTool.strokeShape == "rounded"){
             ctx.lineJoin = "round";
         }
     }
 }
-function setShapeToolShape(){
+function setShapeToolShape(t){
     if (selectedTool == "STo"){
         if (t != null){
-            shapeToolShape = t.value;
+            shapeTool.shape = t.value;
         }
     }
 }
 function changeQuality(t){
     if (selectedTool == "PBr"){
-        paintBrushQuality = t.value;
+        paintBrush.strokeQuality = t.value;
         cooldown = 0;
     }
     else if (selectedTool == "Era"){
-        eraserQuality = t.value;
+        eraser.strokeQuality = t.value;
         cooldown = 0;
     }
 }
 function changeIsFillShape(t){
     if (t.checked == true){
-        fillShape = true;
+        shapeTool.fillShape = true;
     }
     else{
-        fillShape = false;
+        shapeTool.fillShape = false;
     }
 }
 function changeToolButtonColor(t){
@@ -190,7 +197,7 @@ function copyHex(){
     navigator.clipboard.writeText(selectedColorHexInput.value);
 }
 function setFillColor(t){
-    shapeFillColor = t.value;
+    shapeTool.shapeFillColor = t.value;
     ctx.fillStyle = t.value;
 }
 function setFillColorFromPrimary(){
@@ -206,8 +213,19 @@ function createCanvas(clearHistory){
     canvas.width = document.getElementById("WidthInput").value;
     canvas.height = document.getElementById("HeightInput").value;
     if (selectedTool == "PBr"){
-        ctx.lineWidth = paintBrushStroke;
+        ctx.lineWidth = paintBrush.stroke;
         ctx.strokeStyle = selectedColorPicker.value;
+        changeShape(null);
+    }
+    if (selectedTool == "Era"){
+        ctx.lineWidth = eraser.stroke;
+        ctx.strokeStyle = selectedColorPicker.value;
+        changeShape(null);
+    }
+    if (selectedTool == "STo"){
+        ctx.lineWidth = shapeTool.stroke;
+        ctx.strokeStyle = selectedColorPicker.value;
+        changeShape(null);
     }
     changeShape(null);
     closeFileCreationPopup();
@@ -341,10 +359,10 @@ function getCursorLocation(event){
     cursorLocationInput.value = `${cursorX}, ${cursorY}`;
     if (isMouseDown == true){
         if (selectedTool == "PBr"){
-            if (paintBrushQuality == "original"){
+            if (paintBrush.strokeQuality == "original"){
                 drawStroke(cursorX, cursorY);
             }
-            if (paintBrushQuality == "high"){
+            if (paintBrush.strokeQuality == "high"){
                 if (cooldown == 1){
                     drawStroke(cursorX, cursorY);
                     cooldown = 0;
@@ -353,7 +371,7 @@ function getCursorLocation(event){
                     cooldown++;
                 }
             }
-            if (paintBrushQuality == "medium"){
+            if (paintBrush.strokeQuality == "medium"){
                 if (cooldown == 3){
                     drawStroke(cursorX, cursorY);
                     cooldown = 0;
@@ -362,7 +380,7 @@ function getCursorLocation(event){
                     cooldown++;
                 }
             }
-            if (paintBrushQuality == "low"){
+            if (paintBrush.strokeQuality == "low"){
                 if (cooldown == 5){
                     drawStroke(cursorX, cursorY);
                     cooldown = 0;
@@ -373,10 +391,10 @@ function getCursorLocation(event){
             }
         }
         if (selectedTool == "Era"){
-            if (eraserQuality == "original"){
+            if (eraser.strokeQuality == "original"){
                 drawStroke(cursorX, cursorY);
             }
-            if (eraserQuality == "high"){
+            if (eraser.strokeQuality == "high"){
                 if (cooldown == 1){
                     drawStroke(cursorX, cursorY);
                     cooldown = 0;
@@ -385,7 +403,7 @@ function getCursorLocation(event){
                     cooldown++;
                 }
             }
-            if (eraserQuality == "medium"){
+            if (eraser.strokeQuality == "medium"){
                 if (cooldown == 3){
                     drawStroke(cursorX, cursorY);
                     cooldown = 0;
@@ -394,7 +412,7 @@ function getCursorLocation(event){
                     cooldown++;
                 }
             }
-            if (eraserQuality == "low"){
+            if (eraser.strokeQuality == "low"){
                 if (cooldown == 5){
                     drawStroke(cursorX, cursorY);
                     cooldown = 0;
@@ -412,7 +430,7 @@ function mouseDown(){
         ctx.beginPath();
     }
     if (selectedTool == "STo"){
-        if (shapeToolShape == "rectangle"){
+        if (shapeTool.shape == "rectangle"){
             if (shapePoints.length != 1){
                 let cursorAxises = cursorLocationInput.value.split(", ");
                 shapePoints.push(cursorAxises);
@@ -426,7 +444,8 @@ function mouseDown(){
                 //console.log(`${shapePoints[0][0]-shapePoints[1][0]}   ${shapePoints[0][1]-shapePoints[1][1]}`)
                 
                 ctx.stroke(shape);
-                if (fillShape == true){
+                if (shapeTool.fillShape == true){
+                    ctx.fillStyle = document.getElementById("InputFillColor").value;
                     ctx.fill(shape);
                 }
                 shapePoints = [];
