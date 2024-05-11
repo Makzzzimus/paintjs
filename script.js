@@ -17,6 +17,7 @@ const shapeTool = {
     shapeFillColor: "#000000"
 };
 let shapePoints = [];
+let lastRadius = 0;
 const selectedColorPicker = document.getElementById("SelectedColor");
 const selectedColorHexInput = document.getElementById("SelectedColorHex");
 const cursorLocationInput = document.getElementById("CursorLocationInput")
@@ -33,6 +34,10 @@ let undoActionPropertiesList = [];
 let redoActionPropertiesList = [];
 let lineList = [];
 let cooldown = 0;
+
+function pythagoras(a, b){
+    return Math.sqrt(a*a+b*b);
+}
 
 function selectTool(t){
     if (selectedTool === null){
@@ -143,6 +148,7 @@ function setShapeToolShape(t){
         if (t != null){
             shapeTool.shape = t.value;
         }
+        shapePoints = [];
     }
 }
 function changeQuality(t){
@@ -299,6 +305,7 @@ function undoLastAction(){
         ctx.lineWidth = undoActionPropertiesList[i][3];
         ctx.globalCompositeOperation = undoActionPropertiesList[i][4];
         let actionType = undoActionPropertiesList[i][5];
+        let actionShape = undoActionPropertiesList[i][6];
         if (actionType == "PBr" || actionType == "Era"){
             ctx.beginPath();
             for(j=0; j<undoActionsList[i].length; j++){
@@ -308,10 +315,16 @@ function undoLastAction(){
             }
         }
         else if(actionType == "STo"){
-            if (undoActionPropertiesList[i][6] == "rectangle"){
+            if (actionShape == "rectangle" || actionShape == "circle"){
                 let undoShapePoints = undoActionsList[i];
-                const shape = new Path2D()
-                shape.rect(undoShapePoints[0][0], undoShapePoints[0][1], undoShapePoints[1][0]-undoShapePoints[0][0], undoShapePoints[1][1]-undoShapePoints[0][1])
+                const shape = new Path2D();
+                if (actionShape == "rectangle"){
+                    shape.rect(undoShapePoints[0][0], undoShapePoints[0][1], undoShapePoints[1][0]-undoShapePoints[0][0], undoShapePoints[1][1]-undoShapePoints[0][1])
+                }
+                else if (actionShape == "circle"){
+                    let radius = undoActionPropertiesList[i][9];
+                    shape.arc(undoShapePoints[0][0], undoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+                }
                 ctx.stroke(shape);
                 if (undoActionPropertiesList[i][7] == true){
                     ctx.fillStyle = undoActionPropertiesList[i][8];
@@ -342,7 +355,8 @@ function redoLastAction(){
     ctx.lineJoin = redoActionPropertiesList[redoActionPropertiesList.length - 1][2];
     ctx.lineWidth = redoActionPropertiesList[redoActionPropertiesList.length - 1][3];
     ctx.globalCompositeOperation = redoActionPropertiesList[redoActionPropertiesList.length - 1][4];
-    let actionType = redoActionPropertiesList[redoActionPropertiesList.length - 1][5]
+    let actionType = redoActionPropertiesList[redoActionPropertiesList.length - 1][5];
+    let actionShape = redoActionPropertiesList[redoActionPropertiesList.length - 1][6];
     if (actionType == "PBr" || actionType == "Era"){
         ctx.beginPath();
         for(j=0; j<redoActionList[redoActionList.length - 1].length; j++){
@@ -352,10 +366,16 @@ function redoLastAction(){
         }
     }
     else if (actionType == "STo"){
-        if (redoActionPropertiesList[redoActionPropertiesList.length - 1][6] == "rectangle"){
+        if (actionShape == "rectangle" || actionShape == "circle"){
             let redoShapePoints = redoActionList[redoActionList.length - 1];
-            const shape = new Path2D()
-            shape.rect(redoShapePoints[0][0], redoShapePoints[0][1], redoShapePoints[1][0]-redoShapePoints[0][0], redoShapePoints[1][1]-redoShapePoints[0][1])
+            const shape = new Path2D();
+            if (actionShape == "rectangle"){
+                shape.rect(redoShapePoints[0][0], redoShapePoints[0][1], redoShapePoints[1][0]-redoShapePoints[0][0], redoShapePoints[1][1]-redoShapePoints[0][1]);
+            }
+            else if (actionShape == "circle"){
+                let radius = redoActionPropertiesList[redoActionPropertiesList.length - 1][9];
+                shape.arc(redoShapePoints[0][0], redoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+            }
             ctx.stroke(shape);
             if (redoActionPropertiesList[redoActionPropertiesList.length - 1][7] == true){
                 ctx.fillStyle = redoActionPropertiesList[redoActionPropertiesList.length - 1][8];
@@ -464,7 +484,7 @@ function mouseDown(){
         ctx.beginPath();
     }
     if (selectedTool == "STo"){
-        if (shapeTool.shape == "rectangle"){
+        if (shapeTool.shape == "rectangle" || shapeTool.shape == "circle"){
             if (shapePoints.length != 1){
                 let cursorAxises = cursorLocationInput.value.split(", ");
                 shapePoints.push(cursorAxises);
@@ -473,8 +493,15 @@ function mouseDown(){
                 let cursorAxises = cursorLocationInput.value.split(", ");
                 shapePoints.push(cursorAxises);
                 const shape = new Path2D();
-                shape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
-                shape.closePath();
+                if (shapeTool.shape == "rectangle"){
+                    shape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
+                }
+                else if (shapeTool.shape == "circle"){
+                    let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]));
+                    lastRadius = radius;
+                    console.log(radius);
+                    shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false);  
+                }
                 //console.log(`${shapePoints[0][0]-shapePoints[1][0]}   ${shapePoints[0][1]-shapePoints[1][1]}`)
                 
                 ctx.stroke(shape);
@@ -482,7 +509,6 @@ function mouseDown(){
                     ctx.fillStyle = shapeTool.shapeFillColor;
                     ctx.fill(shape);
                 }
-                shapePoints = [];
             }
         }
     }
@@ -490,7 +516,7 @@ function mouseDown(){
 function mouseUp(){
     if (isMouseDown == true){
         if (selectedTool != null && canvas.height > 0){  
-            if (lineList.length != 0 || (selectedTool == "STo" && shapePoints.length == 1)){
+            if (lineList.length != 0 || (selectedTool == "STo" && shapePoints.length == 2)){
                 if (selectedTool == "PBr" || selectedTool == "Era"){
                     undoActionsList.push(lineList);
                     lineList = [];
@@ -499,12 +525,13 @@ function mouseUp(){
                 else if(selectedTool == "STo"){
                     undoActionsList.push(shapePoints);
                     console.log("Action saved");
+                    shapePoints = [];
                 }
                 undoButtonColorChange("on");
                 redoActionList = []
                 redoActionPropertiesList = [];
                 redoButtonColorChange("off");
-                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, selectedTool, shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor];
+                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, selectedTool, shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius];
                 undoActionPropertiesList.push(lastActionProperties);
                 console.log("Tool properties saved");
             }
