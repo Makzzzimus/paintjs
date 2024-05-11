@@ -24,6 +24,8 @@ const cursorLocationInput = document.getElementById("CursorLocationInput")
 const selectedColorBox = document.getElementById("SelectedColorBox");
 const canvas = document.getElementById("Canvas");
 const ctx = canvas.getContext("2d");
+const previewCanvas = document.getElementById("PreviewCanvas");
+const pctx = previewCanvas.getContext("2d");
 
 let cursorX = 0;
 let cursorY = 0;
@@ -217,8 +219,16 @@ function openCreateFilePopup(){
     document.getElementById("FileCreationPopup").style.display = "block"
 }
 function createCanvas(clearHistory){
-    canvas.width = document.getElementById("WidthInput").value;
-    canvas.height = document.getElementById("HeightInput").value;
+    let canvasContainer = document.getElementById("CanvasContainer");
+    let width = document.getElementById("WidthInput").value;
+    let height = document.getElementById("HeightInput").value;
+    canvasContainer.style.width = width+"px";
+    canvasContainer.style.height = height+"px";
+    canvas.width = width;
+    canvas.height = height;
+    previewCanvas.width = width;
+    previewCanvas.height = height;
+    pctx.strokeStyle = "rgba(255,255,255,0.5)"
     if (selectedTool == "PBr"){
         ctx.lineWidth = paintBrush.stroke;
         ctx.strokeStyle = selectedColorPicker.value;
@@ -244,6 +254,12 @@ function createCanvas(clearHistory){
         undoButtonColorChange("off");
         redoButtonColorChange("off");
     }
+}
+function clearPreviewCanvas(){
+    let width = document.getElementById("WidthInput").value;
+    let height = document.getElementById("HeightInput").value;
+    previewCanvas.width = width;
+    previewCanvas.height = height;
 }
 function closeFileCreationPopup(){
     document.getElementById("BackgroundDim").style.display = "none";
@@ -477,6 +493,18 @@ function getCursorLocation(event){
             }
         }
     }
+    if (selectedTool == "STo" && shapePoints.length == 1){
+        let shape = new Path2D;
+        if (shapeTool.shape == "rectangle"){
+            clearPreviewCanvas();
+            shape.rect(shapePoints[0][0], shapePoints[0][1], cursorX-shapePoints[0][0], cursorY-shapePoints[0][1]);
+        }
+        else if (shapeTool.shape == "circle"){
+            clearPreviewCanvas();
+            shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(pythagoras(Math.abs(shapePoints[0][0]-cursorX), Math.abs(shapePoints[0][1]-cursorY))), 0, 2*Math.PI);
+        }
+        pctx.stroke(shape);
+    }
 }
 function mouseDown(){
     isMouseDown = true;
@@ -509,6 +537,7 @@ function mouseDown(){
                     ctx.fillStyle = shapeTool.shapeFillColor;
                     ctx.fill(shape);
                 }
+                clearPreviewCanvas();
             }
         }
     }

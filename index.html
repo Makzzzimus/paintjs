@@ -163,8 +163,11 @@
             </div>
             <input type="text" id="CursorLocationInput" readonly>
         </div>
-        <div id="CanvasContainer">
-            <canvas id="Canvas" height="0px" width="0px" onmousemove="getCursorLocation(event)" onmousedown="mouseDown()"></canvas>
+        <div id="CanvasBox">
+            <div id="CanvasContainer">
+                <canvas id="Canvas" height="0px" width="0px" onmousemove="getCursorLocation(event)" onmousedown="mouseDown()"></canvas>
+                <canvas id="PreviewCanvas" height="0px" width="0px"></canvas>
+            </div>
         </div>
     </div>
     <div id="BackgroundDim">

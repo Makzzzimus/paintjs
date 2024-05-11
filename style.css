@@ -98,7 +98,7 @@ p{
     flex-direction: row;
     height: 100vh;
 }
-#CanvasContainer{
+#CanvasBox{
     display: flex;
     margin: 0px;
     width: 100%;
@@ -113,10 +113,19 @@ p{
     width: 400px;
     flex: 0 0 auto;
 }
-#Canvas{
+#CanvasContainer{
     margin: auto;
     box-shadow: 0px 0px 7px 0px rgba(0,0,0,0.45);
     cursor: crosshair;
+}
+#Canvas{
+    z-index: 0;
+    position: absolute;
+}
+#PreviewCanvas{
+    z-index: 1;
+    position: absolute;
+    pointer-events: none;
 }
 
 
@@ -142,7 +151,7 @@ p{
 .ToolButton{
     margin-bottom: 2px;
     width: 100%;
-    height: 100%;
+    height: 35px;
     transition: 0.4s all;
     border-radius: 5px;
     border-left: solid 0px var(--accent-dark);
