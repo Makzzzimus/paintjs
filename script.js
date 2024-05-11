@@ -72,7 +72,6 @@ function selectTool(t){
     if(selectedTool == "STo"){
         document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape?: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
         ctx.globalCompositeOperation="source-over";
-        ctx.lineCap = "butt";
         ctx.lineWidth = shapeTool.stroke;
         shapePoints = [];
         document.getElementById("SelectShapeToolShape").value = shapeTool.shape;
@@ -133,14 +132,16 @@ function changeShape(t){
         if (t != null){
             shapeTool.strokeShape = t.value;
         }
-        ctx.lineCap = "butt";
         if (shapeTool.strokeShape == "sharp"){
+            ctx.lineCap = "butt";
             ctx.lineJoin = "miter";
         }
         else if (shapeTool.strokeShape == "cut"){
+            ctx.lineCap = "butt";
             ctx.lineJoin = "bevel";
         }
         else if (shapeTool.strokeShape == "rounded"){
+            ctx.lineCap = "round";
             ctx.lineJoin = "round";
         }
     }
@@ -331,7 +332,7 @@ function undoLastAction(){
             }
         }
         else if(actionType == "STo"){
-            if (actionShape == "rectangle" || actionShape == "circle"){
+            if (actionShape == "rectangle" || actionShape == "circle" || actionShape == "line"){
                 let undoShapePoints = undoActionsList[i];
                 const shape = new Path2D();
                 if (actionShape == "rectangle"){
@@ -340,6 +341,10 @@ function undoLastAction(){
                 else if (actionShape == "circle"){
                     let radius = undoActionPropertiesList[i][9];
                     shape.arc(undoShapePoints[0][0], undoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+                }
+                else if (actionShape == "line"){
+                    shape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1])
+                    shape.lineTo(undoShapePoints[1][0], undoShapePoints[1][1]);
                 }
                 ctx.stroke(shape);
                 if (undoActionPropertiesList[i][7] == true){
@@ -382,7 +387,7 @@ function redoLastAction(){
         }
     }
     else if (actionType == "STo"){
-        if (actionShape == "rectangle" || actionShape == "circle"){
+        if (actionShape == "rectangle" || actionShape == "circle" || actionShape == "line"){
             let redoShapePoints = redoActionList[redoActionList.length - 1];
             const shape = new Path2D();
             if (actionShape == "rectangle"){
@@ -391,6 +396,10 @@ function redoLastAction(){
             else if (actionShape == "circle"){
                 let radius = redoActionPropertiesList[redoActionPropertiesList.length - 1][9];
                 shape.arc(redoShapePoints[0][0], redoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+            }
+            else if (actionShape == "line"){
+                shape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1]);
+                shape.lineTo(redoShapePoints[1][0], redoShapePoints[1][1]);
             }
             ctx.stroke(shape);
             if (redoActionPropertiesList[redoActionPropertiesList.length - 1][7] == true){
@@ -503,6 +512,11 @@ function getCursorLocation(event){
             clearPreviewCanvas();
             shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(pythagoras(Math.abs(shapePoints[0][0]-cursorX), Math.abs(shapePoints[0][1]-cursorY))), 0, 2*Math.PI);
         }
+        else if (shapeTool.shape == "line"){
+            clearPreviewCanvas();
+            shape.moveTo(shapePoints[0][0],shapePoints[0][1])
+            shape.lineTo(cursorX, cursorY)
+        }
         pctx.stroke(shape);
     }
 }
@@ -512,7 +526,7 @@ function mouseDown(){
         ctx.beginPath();
     }
     if (selectedTool == "STo"){
-        if (shapeTool.shape == "rectangle" || shapeTool.shape == "circle"){
+        if (shapeTool.shape == "rectangle" || shapeTool.shape == "circle" || shapeTool.shape == "line"){
             if (shapePoints.length != 1){
                 let cursorAxises = cursorLocationInput.value.split(", ");
                 shapePoints.push(cursorAxises);
@@ -530,6 +544,10 @@ function mouseDown(){
                     console.log(radius);
                     shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false);  
                 }
+                else if (shapeTool.shape == "line"){
+                    shape.moveTo(shapePoints[0][0],shapePoints[0][1]);
+                    shape.lineTo(shapePoints[1][0],shapePoints[1][1]);
+                }
                 //console.log(`${shapePoints[0][0]-shapePoints[1][0]}   ${shapePoints[0][1]-shapePoints[1][1]}`)
                 
                 ctx.stroke(shape);
@@ -539,6 +557,9 @@ function mouseDown(){
                 }
                 clearPreviewCanvas();
             }
+        }
+        else if (shapeTool.shape == ""){
+
         }
     }
 }
