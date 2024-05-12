@@ -37,6 +37,7 @@ let redoActionPropertiesList = [];
 let lineList = [];
 let cooldown = 0;
 let polygon = new Path2D();
+let backgroundImage;
 
 function pythagoras(a, b){
     return Math.sqrt(a*a+b*b);
@@ -289,6 +290,19 @@ function saveFile(){
     link.download = `${adjective[Math.round(Math.random()*17)]} ${subject[Math.round(Math.random()*11)]}.png`;
     link.click();
 }
+function openFile(e, t){
+    const uploadedImage = t.files[0];
+    console.log(uploadedImage);
+    const img = new Image();
+    img.src = URL.createObjectURL(uploadedImage);
+    img.onload = function(){
+        document.getElementById("WidthInput").value = img.width;
+        document.getElementById("HeightInput").value = img.height;
+        createCanvas(true);
+        ctx.drawImage(img, 0 ,0);
+        backgroundImage = img;
+    };
+}
 
 
 function undoButtonColorChange(status){
@@ -325,6 +339,10 @@ function redoButtonColorChange(status){
 }
 function undoLastAction(){
     createCanvas(false);
+    if (backgroundImage != null){
+        console.log(1)
+        ctx.drawImage(backgroundImage, 0, 0);
+    }
     for(i=0; i<undoActionsList.length-1; i++){
         ctx.strokeStyle = undoActionPropertiesList[i][0];
         ctx.lineCap = undoActionPropertiesList[i][1];
@@ -530,7 +548,7 @@ function getCursorLocation(event){
         }
     }
     if ((selectedTool == "STo" && shapePoints.length == 1) || (selectedTool == "STo" && shapeTool.shape == "polygon" && shapePoints.length > 0 && shapePoints.length != document.getElementById("InputCorners").value)){
-        let shape = new Path2D;
+        let shape = new Path2D();
         if (shapeTool.shape == "rectangle"){
             clearPreviewCanvas();
             shape.rect(shapePoints[0][0], shapePoints[0][1], cursorX-shapePoints[0][0], cursorY-shapePoints[0][1]);
