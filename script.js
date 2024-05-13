@@ -58,6 +58,7 @@ function selectTool(t){
         ctx.globalCompositeOperation="source-over";
         ctx.lineWidth = paintBrush.stroke;
         changeShape(null);
+        clearPreviewCanvas();
         document.getElementById("SelectBrushShape").value = paintBrush.strokeShape;
         document.getElementById("SelectBrushQuality").value = paintBrush.strokeQuality;
         cooldown = 0;
@@ -67,6 +68,7 @@ function selectTool(t){
         ctx.globalCompositeOperation="destination-out";
         ctx.lineWidth = eraser.stroke;
         changeShape(null);
+        clearPreviewCanvas();
         document.getElementById("SelectEraserShape").value = eraser.strokeShape;
         document.getElementById("SelectEraserQuality").value = eraser.strokeQuality;
         cooldown = 0;
@@ -83,6 +85,7 @@ function selectTool(t){
             document.getElementById("InputCorners").style.display = "inline";
         }
         changeShape(null);
+        clearPreviewCanvas();
     }
 }
 
@@ -290,17 +293,30 @@ function saveFile(){
     link.download = `${adjective[Math.round(Math.random()*17)]} ${subject[Math.round(Math.random()*11)]}.png`;
     link.click();
 }
-function openFile(e, t){
+function openFile(action, t){
     const uploadedImage = t.files[0];
+    if (uploadedImage == null){
+        alert("File wasn't selected");
+    }
     console.log(uploadedImage);
     const img = new Image();
     img.src = URL.createObjectURL(uploadedImage);
     img.onload = function(){
-        document.getElementById("WidthInput").value = img.width;
-        document.getElementById("HeightInput").value = img.height;
-        createCanvas(true);
-        ctx.drawImage(img, 0 ,0);
-        backgroundImage = img;
+        if (action == "open"){
+            document.getElementById("WidthInput").value = img.width;
+            document.getElementById("HeightInput").value = img.height;
+            createCanvas(true);
+            ctx.drawImage(img, 0 ,0);
+            backgroundImage = img;
+        }
+        if (action == "insert" && canvas.height < img.height || canvas.width < img.width){
+            alert("Image resolution is higher than canvas size");
+        }
+        else{
+            ctx.drawImage(img, 0 ,0);
+            backgroundImage = img;
+        }
+        
     };
 }
 

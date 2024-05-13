@@ -41,24 +41,12 @@
                     <div class="ToolButton" id="CPiButton" onclick="selectTool(this)">
                        
                     </div>
-                    <div class="ToolButton" id="BucButton" onclick="selectTool(this)">
+                    <div class="ToolButton" id="SelButton" onclick="selectTool(this)">
                         
                     </div>
                 </div>
                 <div id="ToolPreferencesBox">
                     <fieldset id="ToolPreferencesFieldset">
-                        <!-- <legend>Tool Settings</legend>
-                        <div>
-                            <label>Selected width: </label><br>
-                            <input id="PBrStrokeSlider" type="range" min="1" max="72" value="12" oninput="changeStroke(this)">
-                            <input id="PBrStrokeValue" type="number" min="1" max="72" value="12" onchange="changeStroke(this)"><br>
-                        </div>
-                        <div>
-                            <label>Selected brush type: </label><br>
-                            <select id="SelectBrushType">
-                                <option value="">Square</option>
-                            </select>
-                        </div> --> 
                     </fieldset>
                 </div>
             </div>
@@ -140,8 +128,20 @@
                             <rect fill="#682375" x="26.3" y="27.4" width="2" height="7.2"/>
                         </svg>
                     </button>
-                    <input class="FileButton" id="FileDialogCaller" type="file" onchange="openFile(event, this)" style="display: none;">
-                    <button class="FileButton" id="OpenFileButton" onclick="document.getElementById('FileDialogCaller').click()">
+                    <input class="FileButton" id="FileOpenDialogCaller" type="file" onchange="openFile('open', this)" style="display: none;">
+                    <button class="FileButton" id="OpenFileButton" onclick="document.getElementById('FileOpenDialogCaller').click()">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                            <path fill="#682375" d="M23.81,23.48H5.39c-1.43,0-2.59-1.16-2.59-2.59V7.23c0-0.69,0.27-1.35,0.76-1.84C4.05,4.9,4.7,4.64,5.39,4.64c0,0,0,0,0.01,0l18.42,0.04c1.43,0,2.59,1.17,2.59,2.59v13.62C26.41,22.32,25.24,23.48,23.81,23.48z M5.39,6.64c-0.16,0-0.31,0.06-0.42,0.17C4.86,6.92,4.8,7.07,4.8,7.23v13.66c0,0.33,0.27,0.59,0.59,0.59h18.42c0.33,0,0.59-0.27,0.59-0.59V7.27c0-0.33-0.27-0.59-0.59-0.59L5.39,6.64C5.39,6.64,5.39,6.64,5.39,6.64z"/>
+	                        <circle fill="#682375" cx="9.09" cy="10.31" r="1.53"/>
+	                        <path fill="#682375" d="M9.09,12.83c-1.39,0-2.52-1.13-2.52-2.52c0-1.39,1.13-2.53,2.52-2.53s2.52,1.13,2.52,2.53C11.61,11.7,10.48,12.83,9.09,12.83z M9.09,9.78c-0.29,0-0.52,0.24-0.52,0.53s0.24,0.52,0.52,0.52s0.52-0.24,0.52-0.52S9.38,9.78,9.09,9.78z"/>
+                            <polyline fill="#682375" points="6.07,20.48 6.07,18.03 9.93,14.17 11.93,16.17 18.06,10.04 22.98,14.96 22.98,20.48 6.07,20.48 "/>
+                            <rect fill="#682375"  x="19.9" y="25.5" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -11.3423 25.9545)" width="11.5" height="2.4"/>
+                            <rect fill="#682375"  x="30.4" y="19.9" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -5.8419 28.2325)" width="1.6" height="2.4"/>
+                            <polygon fill="#682375" points="19.7,30.9 21.4,32.7 19.7,32.7 "/>
+                        </svg>
+                    </button>
+                    <input class="FileButton" id="FileInsertDialogCaller" type="file" onchange="openFile('insert', this)" style="display: none;">
+                    <button class="FileButton" id="InsertFileButton" onclick="document.getElementById('FileInsertDialogCaller').click()">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path fill="#682375" d="M23.81,23.48H5.39c-1.43,0-2.59-1.16-2.59-2.59V7.23c0-0.69,0.27-1.35,0.76-1.84C4.05,4.9,4.7,4.64,5.39,4.64c0,0,0,0,0.01,0l18.42,0.04c1.43,0,2.59,1.17,2.59,2.59v13.62C26.41,22.32,25.24,23.48,23.81,23.48z M5.39,6.64c-0.16,0-0.31,0.06-0.42,0.17C4.86,6.92,4.8,7.07,4.8,7.23v13.66c0,0.33,0.27,0.59,0.59,0.59h18.42c0.33,0,0.59-0.27,0.59-0.59V7.27c0-0.33-0.27-0.59-0.59-0.59L5.39,6.64C5.39,6.64,5.39,6.64,5.39,6.64z"/>
 	                        <circle fill="#682375" cx="9.09" cy="10.31" r="1.53"/>
