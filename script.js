@@ -17,15 +17,17 @@ const shapeTool = {
     shapeFillColor: "#000000"
 };
 let shapePoints = [];
+let selectionBoxPoints = [];
 let lastRadius = 0;
 const selectedColorPicker = document.getElementById("SelectedColor");
 const selectedColorHexInput = document.getElementById("SelectedColorHex");
 const cursorLocationInput = document.getElementById("CursorLocationInput")
 const selectedColorBox = document.getElementById("SelectedColorBox");
 const canvas = document.getElementById("Canvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d", { willReadFrequently: true });
 const previewCanvas = document.getElementById("PreviewCanvas");
-const pctx = previewCanvas.getContext("2d");
+const pctx = previewCanvas.getContext("2d", { willReadFrequently: true });
+const canvasContainer = document.getElementById("CanvasContainer");
 
 let cursorX = 0;
 let cursorY = 0;
@@ -38,12 +40,16 @@ let lineList = [];
 let cooldown = 0;
 let polygon = new Path2D();
 let backgroundImage;
+let movedCanvasFragment;
+let isMovingFragment = false;
+let distanceXY = [];
 
 function pythagoras(a, b){
     return Math.sqrt(a*a+b*b);
 }
 
 function selectTool(t){
+    canvasContainer.style.cursor = "crosshair";
     if (selectedTool === null){
         document.getElementById("ToolPreferencesBox").style.opacity = 1;
         document.getElementById("ToolPreferencesBox").style.transform = "scale(1)";
@@ -85,6 +91,11 @@ function selectTool(t){
             document.getElementById("InputCorners").style.display = "inline";
         }
         changeShape(null);
+        clearPreviewCanvas();
+    }
+    if(selectedTool == "Sel"){
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
+        selectionBoxPoints = [];
         clearPreviewCanvas();
     }
 }
@@ -234,7 +245,6 @@ function openCreateFilePopup(){
     document.getElementById("FileCreationPopup").style.display = "block"
 }
 function createCanvas(clearHistory){
-    let canvasContainer = document.getElementById("CanvasContainer");
     let width = document.getElementById("WidthInput").value;
     let height = document.getElementById("HeightInput").value;
     canvasContainer.style.width = width+"px";
@@ -243,7 +253,6 @@ function createCanvas(clearHistory){
     canvas.height = height;
     previewCanvas.width = width;
     previewCanvas.height = height;
-    pctx.strokeStyle = "rgba(255,255,255,0.5)"
     if (selectedTool == "PBr"){
         ctx.lineWidth = paintBrush.stroke;
         ctx.strokeStyle = selectedColorPicker.value;
@@ -403,6 +412,15 @@ function undoLastAction(){
                 ctx.fill(shape);
             }
         }
+        else if(actionType == "Sel"){
+            canvasContainer.style.cursor = "crosshair";
+            selectionBoxPoints = [];
+            const clearRect = new Path2D();
+            ctx.globalCompositeOperation = "destination-out";
+            clearRect.rect(undoActionsList[i][2][0], undoActionsList[i][2][1], undoActionsList[i][2][2], undoActionsList[i][2][3])
+            ctx.fill(clearRect);
+            ctx.putImageData(undoActionsList[i][0], undoActionsList[i][1][0], undoActionsList[i][1][1]);
+        }
     }
     redoActionList.push(undoActionsList.pop());
     const beforeUndoToolProperties = undoActionPropertiesList.pop();
@@ -463,6 +481,15 @@ function redoLastAction(){
                 ctx.fillStyle = redoActionPropertiesList[redoActionPropertiesList.length - 1][8];
                 ctx.fill(shape);
             }
+    }
+    else if(actionType == "Sel"){
+        canvasContainer.style.cursor = "crosshair";
+        selectionBoxPoints = [];
+        const clearRect = new Path2D();
+        ctx.globalCompositeOperation = "destination-out";
+        clearRect.rect(redoActionList[redoActionList.length - 1][2][0], redoActionList[redoActionList.length - 1][2][1], redoActionList[redoActionList.length - 1][2][2], redoActionList[redoActionList.length - 1][2][3])
+        ctx.fill(clearRect);
+        ctx.putImageData(redoActionList[redoActionList.length - 1][0], redoActionList[redoActionList.length - 1][1][0], redoActionList[redoActionList.length - 1][1][1]);
     }
     
     undoActionsList.push(redoActionList.pop());
@@ -583,7 +610,71 @@ function getCursorLocation(event){
             shape.moveTo(shapePoints[shapePoints.length - 1][0],shapePoints[shapePoints.length - 1][1])
             shape.lineTo(cursorX, cursorY)
         }
+        pctx.setLineDash([]);
+        pctx.strokeStyle = "rgba(0,0,0,0.7)"
         pctx.stroke(shape);
+    }
+    if (selectedTool == "Sel" && selectionBoxPoints.length == 1){
+        clearPreviewCanvas();
+        const selectionBox = new Path2D();
+        selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], cursorX-selectionBoxPoints[0][0], cursorY-selectionBoxPoints[0][1])
+        pctx.strokeStyle = "rgba(0,0,75,0.7)"
+        pctx.setLineDash([8, 5]);
+        pctx.stroke(selectionBox);
+    }
+    if (selectedTool == "Sel" && selectionBoxPoints.length == 2 && isMovingFragment == false){
+        let greaterCoordinates = [];
+        let lesserCoordinates = [];
+        if (Number(selectionBoxPoints[0][0])>Number(selectionBoxPoints[1][0])){
+            greaterCoordinates.push(selectionBoxPoints[0][0]);
+            lesserCoordinates.push(selectionBoxPoints[1][0])
+        }
+        else{
+            greaterCoordinates.push(selectionBoxPoints[1][0]);
+            lesserCoordinates.push(selectionBoxPoints[0][0])
+        }
+        if (Number(selectionBoxPoints[0][1])>Number(selectionBoxPoints[1][1])){
+            greaterCoordinates.push(selectionBoxPoints[0][1]);
+            lesserCoordinates.push(selectionBoxPoints[1][1])
+        }
+        else{
+            greaterCoordinates.push(selectionBoxPoints[1][1]);
+            lesserCoordinates.push(selectionBoxPoints[0][1])
+        }
+        //console.log(`(${cursorX}>${lesserCoordinates[0]} && ${cursorX}<${greaterCoordinates[0]}) && (${cursorY}>${lesserCoordinates[1]} && ${cursorY}<${greaterCoordinates[1]}) ${(cursorX>lesserCoordinates[0] && cursorX<greaterCoordinates[0]) && (cursorY>lesserCoordinates[1] && cursorY<greaterCoordinates[1])}`);
+        if ((cursorX>lesserCoordinates[0] && cursorX<greaterCoordinates[0]) && (cursorY>lesserCoordinates[1] && cursorY<greaterCoordinates[1])){
+            canvasContainer.style.cursor = "grab";
+        }
+        else{
+            canvasContainer.style.cursor = "crosshair";
+        }
+    }
+    if (isMouseDown == true && canvasContainer.style.cursor == "grab" && selectedTool == "Sel"){
+        isMovingFragment = true;
+    }
+    if (isMovingFragment == true && isMouseDown == true && movedCanvasFragment != undefined){
+        clearPreviewCanvas();
+        //console.log(movedCanvasFragment)
+        pctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
+    }
+    if(isMovingFragment == true && isMouseDown == false && movedCanvasFragment != undefined){
+        isMovingFragment = false;
+        clearPreviewCanvas();
+        ctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
+
+        undoActionsList.push([movedCanvasFragment, [cursorX-distanceXY[0], cursorY-distanceXY[1]], [selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]]]);
+        let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, selectedTool, shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius];
+        undoActionPropertiesList.push(lastActionProperties);
+        movedCanvasFragment = undefined;
+
+        const selectionBox = new Path2D();
+        selectionBox.rect(cursorX-distanceXY[0], cursorY-distanceXY[1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
+        pctx.strokeStyle = "rgba(0,0,75,0.7)"
+        pctx.setLineDash([8, 5]);
+        pctx.stroke(selectionBox);
+
+        selectionBoxPoints = [[cursorX-distanceXY[0], cursorY-distanceXY[1]], [(cursorX-distanceXY[0])+(selectionBoxPoints[1][0]-selectionBoxPoints[0][0]), (cursorY-distanceXY[1])+(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])]];
+        distanceXY = [];
     }
 }
 function mouseDown(){
@@ -647,6 +738,30 @@ function mouseDown(){
                 polygon = new Path2D();
             }
         }
+    }
+    if (selectedTool == "Sel" && canvasContainer.style.cursor != "grab"){
+        if (selectionBoxPoints.length != 1){
+            selectionBoxPoints = [];
+            selectionBoxPoints.push(cursorAxises);
+        }
+        else{
+            selectionBoxPoints.push(cursorAxises);
+            const selectionBox = new Path2D();
+            selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
+            pctx.strokeStyle = "rgba(0,0,75,0.8)"
+            pctx.setLineDash([8, 5]);
+            pctx.stroke(selectionBox);
+        }
+    }
+    if (selectedTool == "Sel" && canvasContainer.style.cursor == "grab"){
+        movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+        console.log(movedCanvasFragment)
+        ctx.globalCompositeOperation = "destination-out";
+        const eraseRect = new Path2D();
+        eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+        distanceXY[0] = cursorX-selectionBoxPoints[0][0];
+        distanceXY[1] = cursorY-selectionBoxPoints[0][1];
+        ctx.fill(eraseRect);
     }
 }
 function mouseUp(){
