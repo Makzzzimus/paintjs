@@ -28,6 +28,8 @@ const ctx = canvas.getContext("2d", { willReadFrequently: true });
 const previewCanvas = document.getElementById("PreviewCanvas");
 const pctx = previewCanvas.getContext("2d", { willReadFrequently: true });
 const canvasContainer = document.getElementById("CanvasContainer");
+const tempCanvas = document.createElement("canvas");
+const tctx = tempCanvas.getContext("2d");
 
 let cursorX = 0;
 let cursorY = 0;
@@ -50,6 +52,8 @@ function pythagoras(a, b){
 
 function selectTool(t){
     canvasContainer.style.cursor = "crosshair";
+    changeActionButtonStatus("Copy", "off")
+        changeActionButtonStatus("Cut", "off")
     if (selectedTool === null){
         document.getElementById("ToolPreferencesBox").style.opacity = 1;
         document.getElementById("ToolPreferencesBox").style.transform = "scale(1)";
@@ -275,8 +279,8 @@ function createCanvas(clearHistory){
         redoActionList = [];
         undoActionPropertiesList = [];
         redoActionPropertiesList = [];
-        undoButtonColorChange("off");
-        redoButtonColorChange("off");
+        changeActionButtonStatus("Undo", "off");
+        changeActionButtonStatus("Redo", "off");
     }
 }
 function clearPreviewCanvas(){
@@ -305,7 +309,7 @@ function saveFile(){
 function openFile(action, t){
     const uploadedImage = t.files[0];
     if (uploadedImage == null){
-        alert("File wasn't selected");
+        alert("❌File wasn't selected");
     }
     console.log(uploadedImage);
     const img = new Image();
@@ -319,7 +323,7 @@ function openFile(action, t){
             backgroundImage = img;
         }
         if (action == "insert" && canvas.height < img.height || canvas.width < img.width){
-            alert("Image resolution is higher than canvas size");
+            alert("❌Image resolution is higher than canvas size");
         }
         else{
             ctx.drawImage(img, 0 ,0);
@@ -330,38 +334,95 @@ function openFile(action, t){
 }
 
 
-function undoButtonColorChange(status){
-    const ELEMENTS_ARRAY = document.querySelectorAll(`.UndoSvgElement`);
-    const undoButton = document.getElementById("UndoButton");
+const Fragment = {
+    canvasFragment: undefined,
+    copy(){
+        this.canvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+        tempCanvas.height = this.canvasFragment.height;
+        tempCanvas.width = this.canvasFragment.width;
+        tctx.putImageData(this.canvasFragment, 0, 0);
+        tempCanvas.toBlob(function(blob){
+            navigator.clipboard.write([
+                new ClipboardItem({
+                    'image/png': blob
+                })
+            ]);
+        });
+        this.canvasFragment = undefined;
+    },
+    async paste(){
+        const clipboardContents = await navigator.clipboard.read();
+        for (const item of clipboardContents) {
+            const blob = await item.getType("image/png");
+            const img = new Image();
+            img.src = URL.createObjectURL(blob);
+            img.onload = () => {
+                const canvasRefreshLine = new Path2D();
+                canvasRefreshLine.lineTo(0, 1);
+                ctx.stroke(canvasRefreshLine);
+                ctx.drawImage(img, 0, 0);
+                clearPreviewCanvas();
+                const selectionBox = new Path2D();
+                selectionBox.rect(0, 0, img.width, img.height);
+                pctx.strokeStyle = "rgba(0,0,75,0.7)"
+                pctx.setLineDash([8, 5]);
+                pctx.stroke(selectionBox);
+                selectionBoxPoints = [[0, 0], [img.width, img.height]];
+            }
+        }
+    },
+    cut(){
+        this.canvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+        tempCanvas.height = this.canvasFragment.height
+        tempCanvas.width = this.canvasFragment.width
+        tctx.putImageData(this.canvasFragment, 0, 0);
+        tempCanvas.toBlob(function(blob){
+            navigator.clipboard.write([
+                new ClipboardItem({
+                    'image/png': blob
+                })
+            ]);
+        });
+        this.canvasFragment = undefined;
+        
+        ctx.globalCompositeOperation = "destination-out";
+        const clearRect = new Path2D();
+        clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+        ctx.fill(clearRect);
+        clearPreviewCanvas();
+    }
+};
+
+
+function changeActionButtonStatus(buttonId, status){
+    const ELEMENTS_ARRAY = document.querySelectorAll(`.${buttonId}SvgElement`);
+    const button = document.getElementById(`${buttonId}Button`);
     if (status == "on"){
         for(i=0; i<ELEMENTS_ARRAY.length; i++){
             ELEMENTS_ARRAY[i].style.fill = "#682375";
         }
-        undoButton.onclick = function(){undoLastAction()};
+        if (buttonId == "Undo"){
+            button.onclick = function(){undoLastAction()};
+        }
+        else if (buttonId == "Redo"){
+            button.onclick = function(){redoLastAction()};
+        }
+        else if (buttonId == "Copy"){
+            button.onclick = function(){Fragment.copy()};
+        }
+        else if (buttonId == "Cut"){
+            button.onclick = function(){Fragment.cut()};
+        }
+
     }
     else if(status == "off"){
         for(i=0; i<ELEMENTS_ARRAY.length; i++){
             ELEMENTS_ARRAY[i].style.fill = "#9A949B";
         }
-       undoButton.onclick = undefined;
+        button.onclick = undefined;
     }
 }
-function redoButtonColorChange(status){
-    const ELEMENTS_ARRAY = document.querySelectorAll(`.RedoSvgElement`);
-    const redoButton = document.getElementById("RedoButton");
-    if (status == "on"){
-        for(i=0; i<ELEMENTS_ARRAY.length; i++){
-            ELEMENTS_ARRAY[i].style.fill = "#682375";
-        }
-        redoButton.onclick = function(){redoLastAction()};
-    }
-    else if(status == "off"){
-        for(i=0; i<ELEMENTS_ARRAY.length; i++){
-            ELEMENTS_ARRAY[i].style.fill = "#9A949B";
-        }
-        redoButton.onclick = undefined;
-    }
-}
+
 function undoLastAction(){
     createCanvas(false);
     if (backgroundImage != null){
@@ -432,10 +493,10 @@ function undoLastAction(){
     ctx.fillStyle = beforeUndoToolProperties[8];
     redoActionPropertiesList.push(beforeUndoToolProperties);
     if (undoActionsList.length == 0){
-        undoButtonColorChange("off");
+        changeActionButtonStatus("Undo", "off");
     }
     if (redoActionList.length != 0){
-        redoButtonColorChange("on");
+        changeActionButtonStatus("Redo", "on");
     }
 }
 function redoLastAction(){
@@ -502,10 +563,10 @@ function redoLastAction(){
     ctx.fillStyle = beforeRedoToolProperties[8]
     undoActionPropertiesList.push(beforeRedoToolProperties);
     if (redoActionList.length == 0){
-        redoButtonColorChange("off");
+        changeActionButtonStatus("Redo", "off");
     }
     if (undoActionsList.length != 0){
-        undoButtonColorChange("on");
+        changeActionButtonStatus("Undo", "on");
     }
 }
 
@@ -675,6 +736,7 @@ function getCursorLocation(event){
 
         selectionBoxPoints = [[cursorX-distanceXY[0], cursorY-distanceXY[1]], [(cursorX-distanceXY[0])+(selectionBoxPoints[1][0]-selectionBoxPoints[0][0]), (cursorY-distanceXY[1])+(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])]];
         distanceXY = [];
+        changeActionButtonStatus("Undo", "on");
     }
 }
 function mouseDown(){
@@ -686,7 +748,6 @@ function mouseDown(){
     if (selectedTool == "STo"){
         if (shapeTool.shape == "rectangle" || shapeTool.shape == "circle" || shapeTool.shape == "line"){
             if (shapePoints.length != 1){
-                
                 shapePoints.push(cursorAxises);
             }
             else{
@@ -743,6 +804,8 @@ function mouseDown(){
         if (selectionBoxPoints.length != 1){
             selectionBoxPoints = [];
             selectionBoxPoints.push(cursorAxises);
+            changeActionButtonStatus("Copy", "off")
+            changeActionButtonStatus("Cut", "off")
         }
         else{
             selectionBoxPoints.push(cursorAxises);
@@ -751,11 +814,12 @@ function mouseDown(){
             pctx.strokeStyle = "rgba(0,0,75,0.8)"
             pctx.setLineDash([8, 5]);
             pctx.stroke(selectionBox);
+            changeActionButtonStatus("Copy", "on")
+            changeActionButtonStatus("Cut", "on")
         }
     }
     if (selectedTool == "Sel" && canvasContainer.style.cursor == "grab"){
         movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-        console.log(movedCanvasFragment)
         ctx.globalCompositeOperation = "destination-out";
         const eraseRect = new Path2D();
         eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
@@ -779,10 +843,10 @@ function mouseUp(){
                     shapePoints = [];
                     clearPreviewCanvas();
                 }
-                undoButtonColorChange("on");
+                changeActionButtonStatus("Undo", "on");
                 redoActionList = []
                 redoActionPropertiesList = [];
-                redoButtonColorChange("off");
+                changeActionButtonStatus("Redo", "off");
                 let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, selectedTool, shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius];
                 undoActionPropertiesList.push(lastActionProperties);
                 console.log("Tool properties saved");
