@@ -49,6 +49,9 @@ let distanceXY = [];
 function pythagoras(a, b){
     return Math.sqrt(a*a+b*b);
 }
+function rgbToHex(r, g, b) { //thx man https://stackoverflow.com/a/5624139
+    return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+}
 
 function selectTool(t){
     canvasContainer.style.cursor = "crosshair";
@@ -216,8 +219,17 @@ function reverseToolButtonColor(){
 
 
 function setColorFromLibrary(t){
-    selectedColorPicker.value = t.getAttribute("hex-data");
-    selectedColorHexInput.value = t.getAttribute("hex-data");
+    if (t.id.slice(0,4) == "User"){
+        let rgb = t.style.backgroundColor.split(", ");
+        rgb[0] = rgb[0].slice(4);
+        rgb[2] = rgb[2].slice(0, rgb[2].length-1);
+        selectedColorPicker.value = rgbToHex(rgb[0], rgb[1], rgb[2]);
+        selectedColorHexInput.value = rgbToHex(rgb[0], rgb[1], rgb[2]);
+    }
+    else{
+        selectedColorPicker.value = t.getAttribute("hex-data");
+        selectedColorHexInput.value = t.getAttribute("hex-data");
+    }
     ctx.strokeStyle = selectedColorPicker.value
     selectedColorBox.style.borderColor = selectedColorPicker.value
 }
@@ -333,6 +345,39 @@ function openFile(action, t){
     };
 }
 
+function loadUserColors(){
+    let raws = document.cookie.split("; ");
+    let cells = []
+    cells[0] = raws[0].split("!");
+    cells[1] = raws[1].split("!");
+    cells[0][0] = cells[0][0].slice(5);
+    cells[1][0] = cells[1][0].slice(5);
+    console.log(cells)
+    for(let j=0; j<2; j++){
+        for(let i=0; i<7; i++){
+            let currentCell = document.getElementById(`UserColor${j+1}-${i+1}`);
+            currentCell.style.backgroundColor = cells[j][i];
+        }
+    }
+}
+function saveUserColor(t){
+    t.style.backgroundColor = selectedColorPicker.value;
+    let raw = "";
+    for(let j=1; j<3; j++){
+        for(let i=1; i<8; i++){
+            let currentCell = document.getElementById(`UserColor${j}-${i}`);
+            if (i!=7){
+                raw = raw + currentCell.style.backgroundColor + "!";
+            }
+            else{
+                raw = raw + currentCell.style.backgroundColor
+            }
+        }
+        document.cookie = `UsC${j}=${raw}; path=/` //UsC1 - UserColorsRaw1
+        raw = [];
+    }
+
+}
 
 const Fragment = {
     canvasFragment: undefined,
@@ -569,6 +614,70 @@ function redoLastAction(){
         changeActionButtonStatus("Undo", "on");
     }
 }
+
+function keyUp(e) {
+    switch (e.code){
+        case "KeyB":
+            document.getElementById("PBrButton").click();
+            break;
+        case "KeyE":
+            document.getElementById("EraButton").click();
+            break;
+        case "KeyH":
+            document.getElementById("SToButton").click();
+            break;    
+        case "KeyA":
+            document.getElementById("SelButton").click();
+            break;
+        
+        case "KeyZ":
+            document.getElementById("UndoButton").click();
+            break;
+        case "KeyY":
+            document.getElementById("RedoButton").click();
+            break;
+        case "KeyC":
+            document.getElementById("CopyButton").click();
+            break;
+        case "KeyV":
+            document.getElementById("PasteButton").click();
+            break;
+        case "KeyX":
+            document.getElementById("CutButton").click();
+            break;
+        
+        case "KeyN":
+            document.getElementById("NewFileButton").click();
+            break;
+        case "KeyO":
+            document.getElementById("OpenFileButton").click();
+            break;
+        case "KeyI":
+            document.getElementById("InsertFileButton").click();
+            break;
+        case "KeyS":
+            document.getElementById("SaveAsButton").click();
+            break;
+    }
+    if (e.code.slice(0, 3) == "Dig"){
+        let num = e.code.slice(e.code.length-1)
+        if (num<8 && num>0){
+            if (e.shiftKey && e.altKey){
+                document.getElementById(`UserColor2-${num}`).click();
+            }
+            else if (e.shiftKey){
+                document.getElementById(`UserColor1-${num}`).click();
+            }
+            else if (e.altKey){
+                document.getElementById(`DefaultColor2-${num}`).click();
+            }
+            else{
+                document.getElementById(`DefaultColor1-${num}`).click();
+            }
+        }
+    }
+}
+
 
 function drawStroke(X,Y){
     ctx.lineTo(X, Y);
@@ -855,3 +964,10 @@ function mouseUp(){
     }
     isMouseDown = false;
 }
+
+document.addEventListener('contextmenu', event => {
+    event.preventDefault();
+});
+addEventListener("paste", (event) => {document.getElementById("PasteButton").click();});
+document.addEventListener('keyup', keyUp, false);
+loadUserColors();
