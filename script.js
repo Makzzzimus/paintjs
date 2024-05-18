@@ -87,7 +87,7 @@ function selectTool(t){
         cooldown = 0;
     }
     if(selectedTool == "STo"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select><input type="number" min="3" max="24" value="3" id="InputCorners" onchange="resetPolygon()" style="width: 35px; display: none";></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape?: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
+        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select><input type="number" min="3" max="24" value="3" id="InputCorners" onchange="resetPolygon()" style="width: 35px; display: none";></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
         ctx.globalCompositeOperation="source-over";
         ctx.lineWidth = shapeTool.stroke;
         shapePoints = [];
@@ -623,7 +623,7 @@ function keyUp(e) {
         case "KeyE":
             document.getElementById("EraButton").click();
             break;
-        case "KeyH":
+        case "KeyS":
             document.getElementById("SToButton").click();
             break;    
         case "KeyA":
@@ -645,19 +645,25 @@ function keyUp(e) {
         case "KeyX":
             document.getElementById("CutButton").click();
             break;
-        
-        case "KeyN":
-            document.getElementById("NewFileButton").click();
-            break;
-        case "KeyO":
-            document.getElementById("OpenFileButton").click();
-            break;
-        case "KeyI":
-            document.getElementById("InsertFileButton").click();
-            break;
-        case "KeyS":
-            document.getElementById("SaveAsButton").click();
-            break;
+        case "KeyT":
+            selectedColorPicker.click();
+            break;    
+    }
+    if (e.altKey){
+        switch (e.code){
+            case "KeyN":
+                document.getElementById("NewFileButton").click();
+                break;
+            case "KeyO":
+                document.getElementById("OpenFileButton").click();
+                break;
+            case "KeyI":
+                document.getElementById("InsertFileButton").click();
+                break;
+            case "KeyS":
+                document.getElementById("SaveAsButton").click();
+                break;
+        }
     }
     if (e.code.slice(0, 3) == "Dig"){
         let num = e.code.slice(e.code.length-1)
@@ -665,10 +671,10 @@ function keyUp(e) {
             if (e.shiftKey && e.altKey){
                 document.getElementById(`UserColor2-${num}`).click();
             }
-            else if (e.shiftKey){
+            else if (e.altKey){
                 document.getElementById(`UserColor1-${num}`).click();
             }
-            else if (e.altKey){
+            else if (e.shiftKey){
                 document.getElementById(`DefaultColor2-${num}`).click();
             }
             else{
@@ -970,4 +976,9 @@ document.addEventListener('contextmenu', event => {
 });
 addEventListener("paste", (event) => {document.getElementById("PasteButton").click();});
 document.addEventListener('keyup', keyUp, false);
+tippy('[data-tippy-content]',{
+    delay: [400, 100],
+    animation: 'shift-toward',
+    allowHTML: true,
+});
 loadUserColors();
