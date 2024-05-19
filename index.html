@@ -40,7 +40,7 @@
                         </svg>
                     </div>
                     <div class="ToolButton" id="CPiButton" onclick="selectTool(this)">
-                       
+                        
                     </div>
                     <div class="ToolButton" id="SelButton" onclick="selectTool(this)" data-tippy-content="<strong>Selection tool (A)</strong><br>Selects the area for further actions" data-tippy-placement="right">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
@@ -158,7 +158,7 @@
                             <rect fill="#682375" x="26.3" y="27.4" width="2" height="7.2"/>
                         </svg>
                     </button>
-                    <input class="FileButton" id="FileOpenDialogCaller" type="file" onchange="openFile('open', this)" style="display: none;">
+                    <input class="FileButton" id="FileOpenDialogCaller" type="file" onchange="openFile('open', this)" accept="image/png, image/jpeg" style="display: none;">
                     <button class="FileButton" id="OpenFileButton" onclick="document.getElementById('FileOpenDialogCaller').click()" data-tippy-content="<strong>Open File (Alt + O)</strong><br>Sets selected image as canvas">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path fill="#682375" d="M23.81,23.48H5.39c-1.43,0-2.59-1.16-2.59-2.59V7.23c0-0.69,0.27-1.35,0.76-1.84C4.05,4.9,4.7,4.64,5.39,4.64c0,0,0,0,0.01,0l18.42,0.04c1.43,0,2.59,1.17,2.59,2.59v13.62C26.41,22.32,25.24,23.48,23.81,23.48z M5.39,6.64c-0.16,0-0.31,0.06-0.42,0.17C4.86,6.92,4.8,7.07,4.8,7.23v13.66c0,0.33,0.27,0.59,0.59,0.59h18.42c0.33,0,0.59-0.27,0.59-0.59V7.27c0-0.33-0.27-0.59-0.59-0.59L5.39,6.64C5.39,6.64,5.39,6.64,5.39,6.64z"/>
@@ -170,7 +170,7 @@
                             <polygon fill="#682375" points="19.7,30.9 21.4,32.7 19.7,32.7 "/>
                         </svg>
                     </button>
-                    <input class="FileButton" id="FileInsertDialogCaller" type="file" onchange="openFile('insert', this)" style="display: none;">
+                    <input class="FileButton" id="FileInsertDialogCaller" type="file" onchange="openFile('insert', this)" accept="image/png, image/jpeg" style="display: none;">
                     <button class="FileButton" id="InsertFileButton" onclick="document.getElementById('FileInsertDialogCaller').click()" data-tippy-content="<strong>Insert File (Alt + I)</strong><br>Inserts an image to the already existing canvas">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path fill="#682375" d="M23.81,23.48H5.39c-1.43,0-2.59-1.16-2.59-2.59V7.23c0-0.69,0.27-1.35,0.76-1.84C4.05,4.9,4.7,4.64,5.39,4.64c0,0,0,0,0.01,0l18.42,0.04c1.43,0,2.59,1.17,2.59,2.59v13.62C26.41,22.32,25.24,23.48,23.81,23.48z M5.39,6.64c-0.16,0-0.31,0.06-0.42,0.17C4.86,6.92,4.8,7.07,4.8,7.23v13.66c0,0.33,0.27,0.59,0.59,0.59h18.42c0.33,0,0.59-0.27,0.59-0.59V7.27c0-0.33-0.27-0.59-0.59-0.59L5.39,6.64C5.39,6.64,5.39,6.64,5.39,6.64z"/>

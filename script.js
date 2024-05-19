@@ -257,8 +257,15 @@ function setFillColorFromPrimary(){
 
 
 function openCreateFilePopup(){
-    document.getElementById("BackgroundDim").style.display = "flex";
-    document.getElementById("FileCreationPopup").style.display = "block"
+    let confirmDeletion = true
+    if (canvas.width > 0 || canvas.height > 0){
+        confirmDeletion = confirm("⚠The previous canvas will be erased. Are you sure you want to continue?");
+    }
+    if (confirmDeletion){
+        document.getElementById("BackgroundDim").style.display = "flex";
+        document.getElementById("FileCreationPopup").style.display = "block"
+    }
+    
 }
 function createCanvas(clearHistory){
     let width = document.getElementById("WidthInput").value;
@@ -323,26 +330,52 @@ function openFile(action, t){
     if (uploadedImage == null){
         alert("❌File wasn't selected");
     }
-    console.log(uploadedImage);
-    const img = new Image();
-    img.src = URL.createObjectURL(uploadedImage);
-    img.onload = function(){
-        if (action == "open"){
-            document.getElementById("WidthInput").value = img.width;
-            document.getElementById("HeightInput").value = img.height;
-            createCanvas(true);
-            ctx.drawImage(img, 0 ,0);
-            backgroundImage = img;
-        }
-        if (action == "insert" && canvas.height < img.height || canvas.width < img.width){
-            alert("❌Image resolution is higher than canvas size");
-        }
-        else{
-            ctx.drawImage(img, 0 ,0);
-            backgroundImage = img;
-        }
-        
-    };
+    else{
+        console.log(uploadedImage);
+        const img = new Image();
+        img.src = URL.createObjectURL(uploadedImage);
+        img.onload = function(){
+            console.log(img.getType())
+            if (action == "open"){
+                let confirmDeletion = true
+                if (canvas.width > 0 || canvas.height > 0){
+                    confirmDeletion = confirm("⚠The previous canvas will be erased. Are you sure you want to continue?");
+                }
+                if (confirmDeletion){
+                    document.getElementById("WidthInput").value = img.width;
+                    document.getElementById("HeightInput").value = img.height;
+                    createCanvas(true);
+                    ctx.globalCompositeOperation = "source-over";
+                    ctx.drawImage(img, 0 ,0);
+                    backgroundImage = img;
+                }
+            }
+    
+            if (action == "insert" && (canvas.height < img.height || canvas.width < img.width)){
+                alert("❌Image resolution is higher than canvas size");
+            }
+            else if(action == "insert"){
+                ctx.globalCompositeOperation = "source-over";
+                ctx.drawImage(img, 0 ,0);
+                clearPreviewCanvas();
+                selectionBoxPoints = [[0, 0],[img.width, img.height]]
+                const selectionField = new Path2D();
+                selectionField.rect(0, 0, img.width, img.height);
+                pctx.strokeStyle = "rgba(0,0,75,0.8)";
+                pctx.setLineDash([8, 5]);
+                pctx.stroke(selectionField);
+    
+                undoActionsList.push(img);
+                changeActionButtonStatus("Undo", "on");
+                redoActionList = [];
+                redoActionPropertiesList = [];
+                changeActionButtonStatus("Redo", "off");
+                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, action, shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius];
+                undoActionPropertiesList.push(lastActionProperties);
+            }
+            
+        };
+    }
 }
 
 function loadUserColors(){
@@ -402,9 +435,7 @@ const Fragment = {
             const img = new Image();
             img.src = URL.createObjectURL(blob);
             img.onload = () => {
-                const canvasRefreshLine = new Path2D();
-                canvasRefreshLine.lineTo(0, 1);
-                ctx.stroke(canvasRefreshLine);
+                ctx.globalCompositeOperation = "source-over";
                 ctx.drawImage(img, 0, 0);
                 clearPreviewCanvas();
                 const selectionBox = new Path2D();
@@ -471,7 +502,7 @@ function changeActionButtonStatus(buttonId, status){
 function undoLastAction(){
     createCanvas(false);
     if (backgroundImage != null){
-        console.log(1)
+        ctx.globalCompositeOperation = "source-over";
         ctx.drawImage(backgroundImage, 0, 0);
     }
     for(i=0; i<undoActionsList.length-1; i++){
@@ -525,7 +556,19 @@ function undoLastAction(){
             ctx.globalCompositeOperation = "destination-out";
             clearRect.rect(undoActionsList[i][2][0], undoActionsList[i][2][1], undoActionsList[i][2][2], undoActionsList[i][2][3])
             ctx.fill(clearRect);
+            ctx.globalCompositeOperation = "source-over";
             ctx.putImageData(undoActionsList[i][0], undoActionsList[i][1][0], undoActionsList[i][1][1]);
+        }
+        else if(actionType == "insert"){
+            ctx.globalCompositeOperation = "source-over";
+            ctx.drawImage(undoActionsList[i], 0, 0)
+        }
+        else if(actionType == "ClearSelectedArea"){
+            const clearRect = new Path2D();
+            ctx.globalCompositeOperation = "destination-out";
+            console.log(undoActionsList[i])
+            clearRect.rect(undoActionsList[i][0][0], undoActionsList[i][0][1], undoActionsList[i][1][0], undoActionsList[i][1][1])
+            ctx.fill(clearRect);
         }
     }
     redoActionList.push(undoActionsList.pop());
@@ -595,8 +638,19 @@ function redoLastAction(){
         ctx.globalCompositeOperation = "destination-out";
         clearRect.rect(redoActionList[redoActionList.length - 1][2][0], redoActionList[redoActionList.length - 1][2][1], redoActionList[redoActionList.length - 1][2][2], redoActionList[redoActionList.length - 1][2][3])
         ctx.fill(clearRect);
+        ctx.globalCompositeOperation = "source-over";
         ctx.putImageData(redoActionList[redoActionList.length - 1][0], redoActionList[redoActionList.length - 1][1][0], redoActionList[redoActionList.length - 1][1][1]);
     }
+    else if(actionType == "insert"){
+        ctx.globalCompositeOperation = "source-over";
+        ctx.drawImage(redoActionList[redoActionList.length - 1], 0, 0)
+    }
+    else if(actionType == "ClearSelectedArea"){
+            const clearRect = new Path2D();
+            ctx.globalCompositeOperation = "destination-out";
+            clearRect.rect(redoActionList[redoActionList.length - 1][0][0], redoActionList[redoActionList.length - 1][0][1], redoActionList[redoActionList.length - 1][1][0], redoActionList[redoActionList.length - 1][1][1])
+            ctx.fill(clearRect);
+        }
     
     undoActionsList.push(redoActionList.pop());
     const beforeRedoToolProperties = redoActionPropertiesList.pop();
@@ -645,9 +699,26 @@ function keyUp(e) {
         case "KeyX":
             document.getElementById("CutButton").click();
             break;
-        case "KeyT":
+        case "KeyC":
             selectedColorPicker.click();
-            break;    
+            break;
+        case "Backspace":
+        case "Delete":
+            if (selectionBoxPoints != []){
+                const clearRect = new Path2D();
+                clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+                ctx.globalCompositeOperation = "destination-out";
+                ctx.fill(clearRect);
+
+                undoActionsList.push(selectionBoxPoints);
+                changeActionButtonStatus("Undo", "on");
+                redoActionList = [];
+                redoActionPropertiesList = [];
+                changeActionButtonStatus("Redo", "off");
+                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, "ClearSelectedArea", shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius];
+                undoActionPropertiesList.push(lastActionProperties);
+            }
+            break    
     }
     if (e.altKey){
         switch (e.code){
@@ -836,6 +907,7 @@ function getCursorLocation(event){
     if(isMovingFragment == true && isMouseDown == false && movedCanvasFragment != undefined){
         isMovingFragment = false;
         clearPreviewCanvas();
+        ctx.globalCompositeOperation = "source-over";
         ctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
 
         undoActionsList.push([movedCanvasFragment, [cursorX-distanceXY[0], cursorY-distanceXY[1]], [selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]]]);
@@ -894,7 +966,6 @@ function mouseDown(){
             let corners = document.getElementById("InputCorners").value;
             if (shapePoints.length == 0){
                 shapePoints.push(cursorAxises);
-                //ctx.beginPath();
                 polygon.moveTo(cursorAxises[0], cursorAxises[1]);
             }
             else if(shapePoints.length != 0 && shapePoints.length != corners-1){
@@ -981,4 +1052,6 @@ tippy('[data-tippy-content]',{
     animation: 'shift-toward',
     allowHTML: true,
 });
-loadUserColors();
+try{
+    loadUserColors();
+}catch{console.error("An error occurred while loading user's colors")}
