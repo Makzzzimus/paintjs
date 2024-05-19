@@ -66,44 +66,48 @@ function selectTool(t){
     }
     selectedTool = t.id.slice(0,3);
     changeToolButtonColor(t);
-    if(selectedTool == "PBr"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Brush size: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrush.stroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrush.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Brush shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <div> <label>Brush stroke quality: </label><br> <select id="SelectBrushQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
-        ctx.globalCompositeOperation="source-over";
-        ctx.lineWidth = paintBrush.stroke;
-        changeShape(null);
-        clearPreviewCanvas();
-        document.getElementById("SelectBrushShape").value = paintBrush.strokeShape;
-        document.getElementById("SelectBrushQuality").value = paintBrush.strokeQuality;
-        cooldown = 0;
-    }
-    if(selectedTool == "Era"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Eraser size: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraser.stroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraser.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Eraser shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
-        ctx.globalCompositeOperation="destination-out";
-        ctx.lineWidth = eraser.stroke;
-        changeShape(null);
-        clearPreviewCanvas();
-        document.getElementById("SelectEraserShape").value = eraser.strokeShape;
-        document.getElementById("SelectEraserQuality").value = eraser.strokeQuality;
-        cooldown = 0;
-    }
-    if(selectedTool == "STo"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select><input type="number" min="3" max="24" value="3" id="InputCorners" onchange="resetPolygon()" style="width: 35px; display: none";></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
-        ctx.globalCompositeOperation="source-over";
-        ctx.lineWidth = shapeTool.stroke;
-        shapePoints = [];
-        document.getElementById("SelectShapeToolShape").value = shapeTool.shape;
-        document.getElementById("CheckboxShapeFill").checked = shapeTool.fillShape;
-        document.getElementById("InputFillColor").value = shapeTool.shapeFillColor;
-        if (shapeTool.shape == "polygon"){
-            document.getElementById("InputCorners").style.display = "inline";
-        }
-        changeShape(null);
-        clearPreviewCanvas();
-    }
-    if(selectedTool == "Sel"){
-        document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
-        selectionBoxPoints = [];
-        clearPreviewCanvas();
+    switch (selectedTool){
+        case "PBr":
+            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Brush size: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrush.stroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrush.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Brush shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <div> <label>Brush stroke quality: </label><br> <select id="SelectBrushQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
+            ctx.globalCompositeOperation="source-over";
+            ctx.lineWidth = paintBrush.stroke;
+            changeShape(null);
+            clearPreviewCanvas();
+            document.getElementById("SelectBrushShape").value = paintBrush.strokeShape;
+            document.getElementById("SelectBrushQuality").value = paintBrush.strokeQuality;
+            cooldown = 0;
+            break;
+        case "Era":
+            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Eraser size: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraser.stroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraser.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Eraser shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
+            ctx.globalCompositeOperation="destination-out";
+            ctx.lineWidth = eraser.stroke;
+            changeShape(null);
+            clearPreviewCanvas();
+            document.getElementById("SelectEraserShape").value = eraser.strokeShape;
+            document.getElementById("SelectEraserQuality").value = eraser.strokeQuality;
+            cooldown = 0;
+            break;
+        case "STo":
+            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select><input type="number" min="3" max="24" value="3" id="InputCorners" onchange="resetPolygon()" style="width: 35px; display: none";></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
+            ctx.globalCompositeOperation="source-over";
+            ctx.lineWidth = shapeTool.stroke;
+            shapePoints = [];
+            document.getElementById("SelectShapeToolShape").value = shapeTool.shape;
+            document.getElementById("CheckboxShapeFill").checked = shapeTool.fillShape;
+            document.getElementById("InputFillColor").value = shapeTool.shapeFillColor;
+            if (shapeTool.shape == "polygon"){
+                document.getElementById("InputCorners").style.display = "inline";
+            }
+            changeShape(null);
+            clearPreviewCanvas();
+            break;
+        case "Tex":
+            break;
+        case "Sel":
+            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
+            selectionBoxPoints = [];
+            clearPreviewCanvas();
+            break;
     }
 }
 
@@ -128,48 +132,50 @@ function changeStroke(t){
     }
 }
 function changeShape(t){
-    if (selectedTool == "PBr"){
-        if (t != null){
-            paintBrush.strokeShape = t.value;
-        }
-        if (paintBrush.strokeShape == "square"){
-            ctx.lineCap = "butt";
-            ctx.lineJoin = "bevel";
-        }
-        else if(paintBrush.strokeShape == "round"){
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-        }
-    }
-    else if (selectedTool == "Era"){
-        if (t != null){
-            eraser.strokeShape = t.value;
-        }
-        if (eraser.strokeShape == "square"){
-            ctx.lineCap = "butt";
-            ctx.lineJoin = "bevel";
-        }
-        else if(eraser.strokeShape == "round"){
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-        }
-    }
-    else if (selectedTool == "STo"){
-        if (t != null){
-            shapeTool.strokeShape = t.value;
-        }
-        if (shapeTool.strokeShape == "sharp"){
-            ctx.lineCap = "butt";
-            ctx.lineJoin = "miter";
-        }
-        else if (shapeTool.strokeShape == "cut"){
-            ctx.lineCap = "butt";
-            ctx.lineJoin = "bevel";
-        }
-        else if (shapeTool.strokeShape == "rounded"){
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
-        }
+    switch (selectedTool){
+        case "PBr":
+            if (t != null){
+                paintBrush.strokeShape = t.value;
+            }
+            if (paintBrush.strokeShape == "square"){
+                ctx.lineCap = "butt";
+                ctx.lineJoin = "bevel";
+            }
+            else if(paintBrush.strokeShape == "round"){
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+            }
+            break;
+        case "Era":
+            if (t != null){
+                eraser.strokeShape = t.value;
+            }
+            if (eraser.strokeShape == "square"){
+                ctx.lineCap = "butt";
+                ctx.lineJoin = "bevel";
+            }
+            else if(eraser.strokeShape == "round"){
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+            }
+            break;
+        case "STo":
+            if (t != null){
+                shapeTool.strokeShape = t.value;
+            }
+            if (shapeTool.strokeShape == "sharp"){
+                ctx.lineCap = "butt";
+                ctx.lineJoin = "miter";
+            }
+            else if (shapeTool.strokeShape == "cut"){
+                ctx.lineCap = "butt";
+                ctx.lineJoin = "bevel";
+            }
+            else if (shapeTool.strokeShape == "rounded"){
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+            }
+            break;
     }
 }
 function setShapeToolShape(t){
@@ -276,21 +282,25 @@ function createCanvas(clearHistory){
     canvas.height = height;
     previewCanvas.width = width;
     previewCanvas.height = height;
-    if (selectedTool == "PBr"){
-        ctx.lineWidth = paintBrush.stroke;
-        ctx.strokeStyle = selectedColorPicker.value;
-        changeShape(null);
+    ctx.strokeStyle = selectedColorPicker.value;
+    switch (selectedTool){
+        case "PBr":
+            ctx.lineWidth = paintBrush.stroke;
+            ctx.strokeStyle = selectedColorPicker.value;
+            changeShape(null);
+            break;
+        case "Era":
+            ctx.lineWidth = eraser.stroke;
+            ctx.strokeStyle = selectedColorPicker.value;
+            changeShape(null);
+            break;
+        case "STo":
+            ctx.lineWidth = shapeTool.stroke;
+            ctx.strokeStyle = selectedColorPicker.value;
+            changeShape(null);
+            break;
     }
-    if (selectedTool == "Era"){
-        ctx.lineWidth = eraser.stroke;
-        ctx.strokeStyle = selectedColorPicker.value;
-        changeShape(null);
-    }
-    if (selectedTool == "STo"){
-        ctx.lineWidth = shapeTool.stroke;
-        ctx.strokeStyle = selectedColorPicker.value;
-        changeShape(null);
-    }
+
     changeShape(null);
     closeFileCreationPopup();
     if (clearHistory !== false){
@@ -477,19 +487,20 @@ function changeActionButtonStatus(buttonId, status){
         for(i=0; i<ELEMENTS_ARRAY.length; i++){
             ELEMENTS_ARRAY[i].style.fill = "#682375";
         }
-        if (buttonId == "Undo"){
-            button.onclick = function(){undoLastAction()};
+        switch (buttonId){
+            case "Undo":
+                button.onclick = function(){undoLastAction()};
+                break;
+            case "Redo":
+                button.onclick = function(){redoLastAction()};
+                break;
+            case "Copy":
+                button.onclick = function(){Fragment.copy()};
+                break;
+            case "Cut":
+                button.onclick = function(){Fragment.cut()};
+                break;
         }
-        else if (buttonId == "Redo"){
-            button.onclick = function(){redoLastAction()};
-        }
-        else if (buttonId == "Copy"){
-            button.onclick = function(){Fragment.copy()};
-        }
-        else if (buttonId == "Cut"){
-            button.onclick = function(){Fragment.cut()};
-        }
-
     }
     else if(status == "off"){
         for(i=0; i<ELEMENTS_ARRAY.length; i++){
@@ -513,62 +524,67 @@ function undoLastAction(){
         ctx.globalCompositeOperation = undoActionPropertiesList[i][4];
         let actionType = undoActionPropertiesList[i][5];
         let actionShape = undoActionPropertiesList[i][6];
-        if (actionType == "PBr" || actionType == "Era"){
-            ctx.beginPath();
-            for(j=0; j<undoActionsList[i].length; j++){
-                let cursorLocations = undoActionsList[i][j].split("; ");
-                ctx.lineTo(cursorLocations[0], cursorLocations[1]);
-                ctx.stroke();
-            }
-        }
-        else if(actionType == "STo"){
-            let undoShapePoints = undoActionsList[i];
-            const shape = new Path2D();
-            if (actionShape == "rectangle"){
-                shape.rect(undoShapePoints[0][0], undoShapePoints[0][1], undoShapePoints[1][0]-undoShapePoints[0][0], undoShapePoints[1][1]-undoShapePoints[0][1]);
-            }
-            else if (actionShape == "circle"){
-                let radius = undoActionPropertiesList[i][9];
-                shape.arc(undoShapePoints[0][0], undoShapePoints[0][1], radius, 0, 2*Math.PI, false);
-            }
-            else if (actionShape == "line"){
-                shape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1]);
-                shape.lineTo(undoShapePoints[1][0], undoShapePoints[1][1]);
-            }
-            else if (actionShape == "polygon"){
-                shape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1])
-                for (let i=1; i<undoShapePoints.length; i++){
-                    shape.lineTo(undoShapePoints[i][0], undoShapePoints[i][1]);
-                    ctx.stroke(shape);
+        switch (actionType){
+            case "PBr":
+            case "Era":
+                ctx.beginPath();
+                for(j=0; j<undoActionsList[i].length; j++){
+                    let cursorLocations = undoActionsList[i][j].split("; ");
+                    ctx.lineTo(cursorLocations[0], cursorLocations[1]);
+                    ctx.stroke();
                 }
-                shape.closePath();
-            }
-            ctx.stroke(shape);
-            if (undoActionPropertiesList[i][7] == true){
-                ctx.fillStyle = undoActionPropertiesList[i][8];
-                ctx.fill(shape);
-            }
-        }
-        else if(actionType == "Sel"){
-            canvasContainer.style.cursor = "crosshair";
-            selectionBoxPoints = [];
-            const clearRect = new Path2D();
-            ctx.globalCompositeOperation = "destination-out";
-            clearRect.rect(undoActionsList[i][2][0], undoActionsList[i][2][1], undoActionsList[i][2][2], undoActionsList[i][2][3])
-            ctx.fill(clearRect);
-            ctx.globalCompositeOperation = "source-over";
-            ctx.putImageData(undoActionsList[i][0], undoActionsList[i][1][0], undoActionsList[i][1][1]);
-        }
-        else if(actionType == "insert"){
-            ctx.globalCompositeOperation = "source-over";
-            ctx.drawImage(undoActionsList[i], 0, 0)
-        }
-        else if(actionType == "ClearSelectedArea"){
-            const clearRect = new Path2D();
-            ctx.globalCompositeOperation = "destination-out";
-            console.log(undoActionsList[i])
-            clearRect.rect(undoActionsList[i][0][0], undoActionsList[i][0][1], undoActionsList[i][1][0], undoActionsList[i][1][1])
-            ctx.fill(clearRect);
+                break;
+            case "STo":
+                let undoShapePoints = undoActionsList[i];
+                const shape = new Path2D();
+                switch (actionShape){
+                    case "rectangle":
+                        shape.rect(undoShapePoints[0][0], undoShapePoints[0][1], undoShapePoints[1][0]-undoShapePoints[0][0], undoShapePoints[1][1]-undoShapePoints[0][1]);
+                        break;
+                    case "circle":
+                        let radius = undoActionPropertiesList[i][9];
+                        shape.arc(undoShapePoints[0][0], undoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+                        break;
+                    case "line":
+                        shape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1]);
+                        shape.lineTo(undoShapePoints[1][0], undoShapePoints[1][1]);
+                        break;
+                    case "polygon":
+                        shape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1])
+                        for (let i=1; i<undoShapePoints.length; i++){
+                            shape.lineTo(undoShapePoints[i][0], undoShapePoints[i][1]);
+                            ctx.stroke(shape);
+                        }
+                        shape.closePath();
+                        break;
+                }
+                ctx.stroke(shape);
+                if (undoActionPropertiesList[i][7] == true){
+                    ctx.fillStyle = undoActionPropertiesList[i][8];
+                    ctx.fill(shape);
+                }
+                break;
+            case "Sel":
+                canvasContainer.style.cursor = "crosshair";
+                selectionBoxPoints = [];
+                const clearRect = new Path2D();
+                ctx.globalCompositeOperation = "destination-out";
+                clearRect.rect(undoActionsList[i][2][0], undoActionsList[i][2][1], undoActionsList[i][2][2], undoActionsList[i][2][3])
+                ctx.fill(clearRect);
+                ctx.globalCompositeOperation = "source-over";
+                ctx.putImageData(undoActionsList[i][0], undoActionsList[i][1][0], undoActionsList[i][1][1]);
+                break;
+            case "insert":
+                ctx.globalCompositeOperation = "source-over";
+                ctx.drawImage(undoActionsList[i], 0, 0)
+                break;
+            case "ClearSelectedArea":
+                const eraseRect = new Path2D();
+                ctx.globalCompositeOperation = "destination-out";
+                console.log(undoActionsList[i])
+                eraseRect.rect(undoActionsList[i][0][0], undoActionsList[i][0][1], undoActionsList[i][1][0]-undoActionsList[i][0][0], undoActionsList[i][1][1]-undoActionsList[i][0][1])
+                ctx.fill(eraseRect);
+                break;
         }
     }
     redoActionList.push(undoActionsList.pop());
@@ -595,63 +611,67 @@ function redoLastAction(){
     ctx.globalCompositeOperation = redoActionPropertiesList[redoActionPropertiesList.length - 1][4];
     let actionType = redoActionPropertiesList[redoActionPropertiesList.length - 1][5];
     let actionShape = redoActionPropertiesList[redoActionPropertiesList.length - 1][6];
-    if (actionType == "PBr" || actionType == "Era"){
-        ctx.beginPath();
-        for(j=0; j<redoActionList[redoActionList.length - 1].length; j++){
-            let cursorLocations = redoActionList[redoActionList.length - 1][j].split("; ");
-            ctx.lineTo(cursorLocations[0], cursorLocations[1]);
-            ctx.stroke();
-        }
-    }
-    else if (actionType == "STo"){
-        let redoShapePoints = redoActionList[redoActionList.length - 1];
+    switch (actionType){
+        case "PBr":
+        case "Era":
+            ctx.beginPath();
+            for(j=0; j<redoActionList[redoActionList.length - 1].length; j++){
+                let cursorLocations = redoActionList[redoActionList.length - 1][j].split("; ");
+                ctx.lineTo(cursorLocations[0], cursorLocations[1]);
+                ctx.stroke();
+            }
+            break;
+        case "STo":
+            let redoShapePoints = redoActionList[redoActionList.length - 1];
             const shape = new Path2D();
-            if (actionShape == "rectangle"){
-                shape.rect(redoShapePoints[0][0], redoShapePoints[0][1], redoShapePoints[1][0]-redoShapePoints[0][0], redoShapePoints[1][1]-redoShapePoints[0][1]);
-            }
-            else if (actionShape == "circle"){
-                let radius = redoActionPropertiesList[redoActionPropertiesList.length - 1][9];
-                shape.arc(redoShapePoints[0][0], redoShapePoints[0][1], radius, 0, 2*Math.PI, false);
-            }
-            else if (actionShape == "line"){
-                shape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1]);
-                shape.lineTo(redoShapePoints[1][0], redoShapePoints[1][1]);
-            }
-            else if (actionShape == "polygon"){
-                shape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1])
-                for (let i=1; i<redoShapePoints.length; i++){
-                    shape.lineTo(redoShapePoints[i][0], redoShapePoints[i][1]);
-                    ctx.stroke(shape);
-                }
-                shape.closePath();
+            switch (actionShape){
+                case "rectangle":
+                    shape.rect(redoShapePoints[0][0], redoShapePoints[0][1], redoShapePoints[1][0]-redoShapePoints[0][0], redoShapePoints[1][1]-redoShapePoints[0][1]);
+                    break;
+                case "circle":
+                    let radius = redoActionPropertiesList[redoActionPropertiesList.length - 1][9];
+                    shape.arc(redoShapePoints[0][0], redoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+                    break;
+                case "line":
+                    shape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1]);
+                    shape.lineTo(redoShapePoints[1][0], redoShapePoints[1][1]);
+                    break;
+                case "polygon":
+                    shape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1])
+                    for (let i=1; i<redoShapePoints.length; i++){
+                        shape.lineTo(redoShapePoints[i][0], redoShapePoints[i][1]);
+                        ctx.stroke(shape);
+                    }
+                    shape.closePath();
+                    break;
             }
             ctx.stroke(shape);
             if (redoActionPropertiesList[redoActionPropertiesList.length - 1][7] == true){
                 ctx.fillStyle = redoActionPropertiesList[redoActionPropertiesList.length - 1][8];
                 ctx.fill(shape);
             }
-    }
-    else if(actionType == "Sel"){
-        canvasContainer.style.cursor = "crosshair";
-        selectionBoxPoints = [];
-        const clearRect = new Path2D();
-        ctx.globalCompositeOperation = "destination-out";
-        clearRect.rect(redoActionList[redoActionList.length - 1][2][0], redoActionList[redoActionList.length - 1][2][1], redoActionList[redoActionList.length - 1][2][2], redoActionList[redoActionList.length - 1][2][3])
-        ctx.fill(clearRect);
-        ctx.globalCompositeOperation = "source-over";
-        ctx.putImageData(redoActionList[redoActionList.length - 1][0], redoActionList[redoActionList.length - 1][1][0], redoActionList[redoActionList.length - 1][1][1]);
-    }
-    else if(actionType == "insert"){
-        ctx.globalCompositeOperation = "source-over";
-        ctx.drawImage(redoActionList[redoActionList.length - 1], 0, 0)
-    }
-    else if(actionType == "ClearSelectedArea"){
+            break;
+        case "Sel":
+            canvasContainer.style.cursor = "crosshair";
+            selectionBoxPoints = [];
             const clearRect = new Path2D();
             ctx.globalCompositeOperation = "destination-out";
-            clearRect.rect(redoActionList[redoActionList.length - 1][0][0], redoActionList[redoActionList.length - 1][0][1], redoActionList[redoActionList.length - 1][1][0], redoActionList[redoActionList.length - 1][1][1])
+            clearRect.rect(redoActionList[redoActionList.length - 1][2][0], redoActionList[redoActionList.length - 1][2][1], redoActionList[redoActionList.length - 1][2][2], redoActionList[redoActionList.length - 1][2][3])
             ctx.fill(clearRect);
-        }
-    
+            ctx.globalCompositeOperation = "source-over";
+            ctx.putImageData(redoActionList[redoActionList.length - 1][0], redoActionList[redoActionList.length - 1][1][0], redoActionList[redoActionList.length - 1][1][1]);
+            break;
+        case "insert":
+            ctx.globalCompositeOperation = "source-over";
+            ctx.drawImage(redoActionList[redoActionList.length - 1], 0, 0);
+            break;
+        case "ClearSelectedArea":
+            const eraseRect = new Path2D();
+            ctx.globalCompositeOperation = "destination-out";
+            eraseRect.rect(redoActionList[redoActionList.length - 1][0][0], redoActionList[redoActionList.length - 1][0][1], redoActionList[redoActionList.length - 1][1][0], redoActionList[redoActionList.length - 1][1][1])
+            ctx.fill(eraseRect);
+            break;
+    }
     undoActionsList.push(redoActionList.pop());
     const beforeRedoToolProperties = redoActionPropertiesList.pop();
     ctx.strokeStyle = beforeRedoToolProperties[0];
@@ -772,94 +792,74 @@ function getCursorLocation(event){
     cursorY = Math.round(event.clientY - rect.top);
     cursorLocationInput.value = `${cursorX}, ${cursorY}`;
     if (isMouseDown == true){
-        if (selectedTool == "PBr"){
-            if (paintBrush.strokeQuality == "original"){
-                drawStroke(cursorX, cursorY);
+        if (selectedTool == "PBr" || selectedTool == "Era"){
+            let tool = undefined;
+            if (selectedTool == "PBr"){
+                tool = paintBrush;
             }
-            if (paintBrush.strokeQuality == "high"){
-                if (cooldown == 1){
+            else if (selectedTool == "Era"){
+                tool = eraser;
+            }
+            switch (tool.strokeQuality){
+                case "original":
                     drawStroke(cursorX, cursorY);
-                    cooldown = 0;
-                }
-                else{
-                    cooldown++;
-                }
-            }
-            if (paintBrush.strokeQuality == "medium"){
-                if (cooldown == 3){
-                    drawStroke(cursorX, cursorY);
-                    cooldown = 0;
-                }
-                else{
-                    cooldown++;
-                }
-            }
-            if (paintBrush.strokeQuality == "low"){
-                if (cooldown == 5){
-                    drawStroke(cursorX, cursorY);
-                    cooldown = 0;
-                }
-                else{
-                    cooldown++;
-                }
-            }
-        }
-        if (selectedTool == "Era"){
-            if (eraser.strokeQuality == "original"){
-                drawStroke(cursorX, cursorY);
-            }
-            if (eraser.strokeQuality == "high"){
-                if (cooldown == 1){
-                    drawStroke(cursorX, cursorY);
-                    cooldown = 0;
-                }
-                else{
-                    cooldown++;
-                }
-            }
-            if (eraser.strokeQuality == "medium"){
-                if (cooldown == 3){
-                    drawStroke(cursorX, cursorY);
-                    cooldown = 0;
-                }
-                else{
-                    cooldown++;
-                }
-            }
-            if (eraser.strokeQuality == "low"){
-                if (cooldown == 5){
-                    drawStroke(cursorX, cursorY);
-                    cooldown = 0;
-                }
-                else{
-                    cooldown++;
-                }
+                    break;
+                case "high":
+                    if (cooldown == 1){
+                        drawStroke(cursorX, cursorY);
+                        cooldown = 0;
+                    }
+                    else{
+                        cooldown++;
+                    }
+                    break;
+                case "medium":
+                    if (cooldown == 3){
+                        drawStroke(cursorX, cursorY);
+                        cooldown = 0;
+                    }
+                    else{
+                        cooldown++;
+                    }
+                    break;
+                case "low":
+                    if (cooldown == 5){
+                        drawStroke(cursorX, cursorY);
+                        cooldown = 0;
+                    }
+                    else{
+                        cooldown++;
+                    }
+                    break;
             }
         }
     }
     if ((selectedTool == "STo" && shapePoints.length == 1) || (selectedTool == "STo" && shapeTool.shape == "polygon" && shapePoints.length > 0 && shapePoints.length != document.getElementById("InputCorners").value)){
         let shape = new Path2D();
-        if (shapeTool.shape == "rectangle"){
-            clearPreviewCanvas();
-            shape.rect(shapePoints[0][0], shapePoints[0][1], cursorX-shapePoints[0][0], cursorY-shapePoints[0][1]);
-        }
-        else if (shapeTool.shape == "circle"){
-            clearPreviewCanvas();
-            shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(pythagoras(Math.abs(shapePoints[0][0]-cursorX), Math.abs(shapePoints[0][1]-cursorY))), 0, 2*Math.PI);
-        }
-        else if (shapeTool.shape == "line"){
-            clearPreviewCanvas();
-            shape.moveTo(shapePoints[0][0],shapePoints[0][1])
-            shape.lineTo(cursorX, cursorY)
-        }
-        else if (shapeTool.shape == "polygon"){
-            clearPreviewCanvas();
-            shape.moveTo(shapePoints[shapePoints.length - 1][0],shapePoints[shapePoints.length - 1][1])
-            shape.lineTo(cursorX, cursorY)
+        switch (shapeTool.shape){
+            case "rectangle":
+                clearPreviewCanvas();
+                shape.rect(shapePoints[0][0], shapePoints[0][1], cursorX-shapePoints[0][0], cursorY-shapePoints[0][1]);
+                break;
+            case "circle":
+                clearPreviewCanvas();
+                shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(pythagoras(Math.abs(shapePoints[0][0]-cursorX), Math.abs(shapePoints[0][1]-cursorY))), 0, 2*Math.PI);
+                break;
+            case "line":
+                clearPreviewCanvas();
+                shape.moveTo(shapePoints[0][0],shapePoints[0][1])
+                shape.lineTo(cursorX, cursorY)
+                break;
+            case "polygon":
+                clearPreviewCanvas();
+                shape.moveTo(shapePoints[shapePoints.length - 1][0],shapePoints[shapePoints.length - 1][1])
+                shape.lineTo(cursorX, cursorY)
+                break;
         }
         pctx.setLineDash([]);
         pctx.strokeStyle = "rgba(0,0,0,0.7)"
         pctx.stroke(shape);
+
     }
     if (selectedTool == "Sel" && selectionBoxPoints.length == 1){
         clearPreviewCanvas();
@@ -940,20 +940,21 @@ function mouseDown(){
             else{
                 shapePoints.push(cursorAxises);
                 const shape = new Path2D();
-                if (shapeTool.shape == "rectangle"){
-                    shape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
+                switch (shapeTool.shape){
+                    case "rectangle":
+                        shape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
+                        break;
+                    case "circle":
+                        let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]));
+                        lastRadius = radius;
+                        console.log(radius);
+                        shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false); 
+                        break;
+                    case "line":
+                        shape.moveTo(shapePoints[0][0],shapePoints[0][1]);
+                        shape.lineTo(shapePoints[1][0],shapePoints[1][1]);
+                        break;
                 }
-                else if (shapeTool.shape == "circle"){
-                    let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]));
-                    lastRadius = radius;
-                    console.log(radius);
-                    shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false);  
-                }
-                else if (shapeTool.shape == "line"){
-                    shape.moveTo(shapePoints[0][0],shapePoints[0][1]);
-                    shape.lineTo(shapePoints[1][0],shapePoints[1][1]);
-                }
-                
                 ctx.stroke(shape);
                 if (shapeTool.fillShape == true){
                     ctx.fillStyle = shapeTool.shapeFillColor;

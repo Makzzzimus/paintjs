@@ -39,7 +39,7 @@
                             <polygon class="SToSvgElement" fill="#9A949B" points="21.6,18 15.1,27.4 28.1,27.4 "/>
                         </svg>
                     </div>
-                    <div class="ToolButton" id="CPiButton" onclick="selectTool(this)">
+                    <div class="ToolButton" id="TexButton" onclick="selectTool(this)">
                         
                     </div>
                     <div class="ToolButton" id="SelButton" onclick="selectTool(this)" data-tippy-content="<strong>Selection tool (A)</strong><br>Selects the area for further actions" data-tippy-placement="right">
@@ -99,7 +99,7 @@
                 </button>
             </div>
             <div id="ColorsBox">
-                <div id="SelectedColorBox" data-tippy-content="<strong>Color palette (T)</strong><br>Opens a color palette that contains all possible colors">
+                <div id="SelectedColorBox" data-tippy-content="<strong>Color palette (C)</strong><br>Opens a color palette that contains all possible colors">
                     <input type="color" id="SelectedColor" onchange="setWithColorPicker()">
                     <input type="text" id="SelectedColorHex" style="width: 60px; margin-bottom: 5px; font-size: 10pt;" value="#000000" onchange="setColorWithHex()"><br>
                     <button id="CopyHexButton" onclick="copyHex()">Copy</button>
