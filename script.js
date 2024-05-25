@@ -1084,6 +1084,18 @@ function getCursorLocation(event){
             distanceXY = [];
         }
     }
+    if (selectedTool == "Tex"){
+        if(textTool.text != ""){
+            clearPreviewCanvas();
+            let textStyles = "";
+            if (textTool.bold){textStyles += "bold "};
+            if (textTool.italic){textStyles += "italic "};
+            pctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+            pctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
+            pctx.textAlign = (textTool.textAlignment.toLowerCase());
+            pctx.fillText(textTool.text, cursorX, cursorY);
+        }
+    }
 }
 function mouseDown(){
     isMouseDown = true;
@@ -1183,10 +1195,12 @@ function mouseDown(){
             ctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
             ctx.textAlign = (textTool.textAlignment.toLowerCase());
             ctx.fillText(textTool.text, cursorX, cursorY);
-            textNodeContent.value = "";
+            clearPreviewCanvas();
 
             saveAction([textTool.text, cursorX, cursorY]);
-    }
+            textNodeContent.value = "";
+            textTool.text = "";
+        }
     }
 }
 function mouseUp(){
