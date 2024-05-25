@@ -23,6 +23,10 @@ const textTool = {
     italic: false,
     bold: false,
     text: "",
+    shadowOffsetX: 5,
+    shadowOffsetY: 5,
+    shadowBlur: 0,
+    shadowColor: "rgba(0, 0, 0, 1)",
 }
 let shapePoints = [];
 let selectionBoxPoints = [];
@@ -38,6 +42,8 @@ const pctx = previewCanvas.getContext("2d", { willReadFrequently: true });
 const canvasContainer = document.getElementById("CanvasContainer");
 const tempCanvas = document.createElement("canvas");
 const tctx = tempCanvas.getContext("2d");
+const shadowPreviewCanvas = document.getElementById("ShadowPreviewCanvas");
+const spctx = shadowPreviewCanvas.getContext("2d");
 let textNodeContent;
 
 let cursorX = 0;
@@ -58,8 +64,18 @@ let distanceXY = [];
 function pythagoras(a, b){
     return Math.sqrt(a*a+b*b);
 }
+
 function rgbToHex(r, g, b) { //thx man https://stackoverflow.com/a/5624139
     return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
+}
+function hexToRgb(rawhex) { //ty https://stackoverflow.com/a/11508164
+    let hex = rawhex.substring(1);
+    console.log(hex)
+    let bigint = parseInt(hex, 16);
+    let r = (bigint >> 16) & 255;
+    let g = (bigint >> 8) & 255;
+    let b = bigint & 255;
+    return r + ", " + g + ", " + b;
 }
 
 function selectTool(t){
@@ -67,6 +83,7 @@ function selectTool(t){
     changeActionButtonStatus("Copy", "off")
     changeActionButtonStatus("Cut", "off")
     textNodeContent = undefined;
+    ctx.shadowColor = "rgba(0, 0, 0, 0)"
     if (selectedTool === null){
         document.getElementById("ToolPreferencesBox").style.opacity = 1;
         document.getElementById("ToolPreferencesBox").style.transform = "scale(1)";
@@ -154,6 +171,7 @@ function selectTool(t){
                         
                     </div> 
                 </div>
+                <button style="margin-bottom: 10px" onclick="openShadowPropertiesPopup('text')">Open text shadow properties</button>
                 <textarea onmouseleave="this.blur()" onchange="saveText(this)" id="TextNodeContent">${textTool.text}</textarea>`;
             textNodeContent = document.getElementById("TextNodeContent");
             ctx.globalCompositeOperation="source-over";
@@ -406,10 +424,58 @@ function openCreateFilePopup(){
     }
     if (confirmDeletion){
         document.getElementById("BackgroundDim").style.display = "flex";
-        document.getElementById("FileCreationPopup").style.display = "block"
+        document.getElementById("FileCreationPopup").style.display = "block";
     }
     
 }
+function closePopup(){
+    document.getElementById("BackgroundDim").style.display = "none";
+    document.getElementById("FileCreationPopup").style.display = "none";
+}
+function swapValues(){
+    let temp = document.getElementById("HeightInput").value;
+    document.getElementById("HeightInput").value = document.getElementById("WidthInput").value;
+    document.getElementById("WidthInput").value = temp;
+}
+
+function openShadowPropertiesPopup(applyTo){
+    shadowPreviewCanvas.width = 250; //clear canvas
+    document.getElementById("BackgroundDim").style.display = "flex";
+    document.getElementById("ShadowPropertiesPopup").style.display = "block";
+
+    spctx.shadowOffsetX = document.getElementById("OffsetXInput").value;
+    spctx.shadowOffsetY = document.getElementById("OffsetYInput").value;
+
+    if (applyTo == "text"){
+        if (document.getElementById("EnableShadowCheckbox").checked){
+            console.log(`rgba(${hexToRgb(document.getElementById("ShadowColorInput").value)}, ${document.getElementById("ShadowOpacityInput").value/100})`)
+            spctx.shadowColor = `rgba(${hexToRgb(document.getElementById("ShadowColorInput").value)}, ${document.getElementById("ShadowOpacityInput").value/100})`;
+            spctx.shadowBlur = document.getElementById("ShadowBlurInput").value;
+        }
+        else{
+            spctx.shadowColor = "rgba(0, 0, 0, 0,)";
+            spctx.shadowBlur = 0;
+        }
+        let textStyles = "";
+        if (textTool.bold){textStyles += "bold "};
+        if (textTool.italic){textStyles += "italic "};
+        spctx.fillStyle = selectedColorPicker.value;
+        spctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
+        spctx.textAlign = "center";
+
+        spctx.fillText("Lorem ipsum", 125, 110);
+    }
+}
+function confirmShadow(){
+    document.getElementById("BackgroundDim").style.display = "none";
+    document.getElementById("ShadowPropertiesPopup").style.display = "none";
+
+    textTool.shadowOffsetX = spctx.shadowOffsetX;
+    textTool.shadowOffsetY = spctx.shadowOffsetY;
+    textTool.shadowBlur = spctx.shadowBlur;
+    textTool.shadowColor =  spctx.shadowColor;
+}
+
 function createCanvas(clearHistory){
     let width = document.getElementById("WidthInput").value;
     let height = document.getElementById("HeightInput").value;
@@ -439,7 +505,7 @@ function createCanvas(clearHistory){
     }
 
     changeShape();
-    closeFileCreationPopup();
+    closePopup();
     if (clearHistory !== false){
         undoActionsList = [];
         redoActionList = [];
@@ -454,15 +520,6 @@ function clearPreviewCanvas(){
     let height = document.getElementById("HeightInput").value;
     previewCanvas.width = width;
     previewCanvas.height = height;
-}
-function closeFileCreationPopup(){
-    document.getElementById("BackgroundDim").style.display = "none";
-    document.getElementById("FileCreationPopup").style.display = "none";
-}
-function swapValues(){
-    let temp = document.getElementById("HeightInput").value;
-    document.getElementById("HeightInput").value = document.getElementById("WidthInput").value;
-    document.getElementById("WidthInput").value = temp;
 }
 function saveFile(){
     const link = document.createElement("a");
@@ -651,7 +708,7 @@ function saveAction(action, customTool){
     }
     undoActionsList.push(action);
 
-    let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, tool, shapeTool.shape, shapeTool.fillShape,  shapeTool.shapeFillColor, lastRadius, ctx.font, ctx.textAlign];
+    let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, tool, shapeTool.shape, shapeTool.fillShape,  shapeTool.shapeFillColor, lastRadius, ctx.font, ctx.textAlign, ctx.shadowOffsetX, ctx.shadowOffsetY, ctx.shadowBlur, ctx.shadowColor];
     undoActionPropertiesList.push(lastActionProperties);
     console.log("Tool properties saved");
 
@@ -660,6 +717,7 @@ function saveAction(action, customTool){
     redoActionPropertiesList = [];
     changeActionButtonStatus("Redo", "off");
 }
+
 function undoLastAction(){
     createCanvas(false);
     if (backgroundImage != null){
@@ -669,7 +727,7 @@ function undoLastAction(){
     for(i=0; i<undoActionsList.length-1; i++){
         let actionShape, actionType;
 
-        [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth,  ctx.globalCompositeOperation, actionType, actionShape] = [undoActionPropertiesList[i][0], undoActionPropertiesList[i][1], undoActionPropertiesList[i][2], undoActionPropertiesList[i][3], undoActionPropertiesList[i][4], undoActionPropertiesList[i][5], undoActionPropertiesList[i][6],];
+        [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth,  ctx.globalCompositeOperation, actionType, actionShape, ctx.shadowOffsetX, ctx.shadowOffsetY, ctx.shadowBlur, ctx.shadowColor] = [undoActionPropertiesList[i][0], undoActionPropertiesList[i][1], undoActionPropertiesList[i][2], undoActionPropertiesList[i][3], undoActionPropertiesList[i][4], undoActionPropertiesList[i][5], undoActionPropertiesList[i][6], undoActionPropertiesList[i][12], undoActionPropertiesList[i][13], undoActionPropertiesList[i][14], undoActionPropertiesList[i][15]];
         switch (actionType){
             case "PBr":
             case "Era":
@@ -759,7 +817,7 @@ function redoLastAction(){
     let lastActionIndex = redoActionList.length - 1;
 
     let actionShape, actionType;
-    [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, actionType, actionShape] = [redoActionPropertiesList[lastActionPropIndex][0], redoActionPropertiesList[lastActionPropIndex][1], redoActionPropertiesList[lastActionPropIndex][2], redoActionPropertiesList[lastActionPropIndex][3], redoActionPropertiesList[lastActionPropIndex][4], redoActionPropertiesList[lastActionPropIndex][5], redoActionPropertiesList[lastActionPropIndex][6]];
+    [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, actionType, actionShape, ctx.shadowOffsetX, ctx.shadowOffsetY, ctx.shadowBlur, ctx.shadowColor] = [redoActionPropertiesList[lastActionPropIndex][0], redoActionPropertiesList[lastActionPropIndex][1], redoActionPropertiesList[lastActionPropIndex][2], redoActionPropertiesList[lastActionPropIndex][3], redoActionPropertiesList[lastActionPropIndex][4], redoActionPropertiesList[lastActionPropIndex][5], redoActionPropertiesList[lastActionPropIndex][6], redoActionPropertiesList[lastActionPropIndex][12], redoActionPropertiesList[lastActionPropIndex][13], redoActionPropertiesList[lastActionPropIndex][14], redoActionPropertiesList[lastActionPropIndex][15]];
     switch (actionType){
         case "PBr":
         case "Era":
@@ -925,10 +983,10 @@ function keyUp(e) {
                 else if (e.altKey){
                     document.getElementById(`UserColor1-${num}`).click();
                 }
-                else if (e.shiftKey){
+                else if (e.shiftKey && e.ctrlKey){
                     document.getElementById(`DefaultColor2-${num}`).click();
                 }
-                else{
+                else if (e.shiftKey){
                     document.getElementById(`DefaultColor1-${num}`).click();
                 }
             }
@@ -1194,9 +1252,14 @@ function mouseDown(){
             ctx.fillStyle = selectedColorPicker.value;
             ctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
             ctx.textAlign = (textTool.textAlignment.toLowerCase());
+
+            ctx.shadowOffsetX = textTool.shadowOffsetX;
+            ctx.shadowOffsetY = textTool.shadowOffsetY;
+            ctx.shadowBlur = textTool.shadowBlur;
+            ctx.shadowColor =  textTool.shadowColor;
+
             ctx.fillText(textTool.text, cursorX, cursorY);
             clearPreviewCanvas();
-
             saveAction([textTool.text, cursorX, cursorY]);
             textNodeContent.value = "";
             textTool.text = "";
