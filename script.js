@@ -465,7 +465,7 @@ function swapValues(){
     document.getElementById("WidthInput").value = temp;
 }
 function saveFile(){
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = canvas.toDataURL();
     let adjective = ["Wonderful", "Stylized", "Sharp", "Detailed", "Geometric", "Futuristic", "Historic", "Vivid", "Beautiful", "Grainy", "Great", "Attractive", "Colorful", "Dramatic", "Evocative", "Digital", "Striking", "Distorted"];
     let subject = ["Painting", "Drawing", "Picture", "Sketch", "Canvas", "Portrait", "Portrayal", "Illustration", "Artwork", "Concept", "Depiction", "Visualization"];
@@ -512,13 +512,7 @@ function openFile(action, t){
                 pctx.setLineDash([8, 5]);
                 pctx.stroke(selectionField);
     
-                undoActionsList.push(img);
-                changeActionButtonStatus("Undo", "on");
-                redoActionList = [];
-                redoActionPropertiesList = [];
-                changeActionButtonStatus("Redo", "off");
-                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, action, shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius];
-                undoActionPropertiesList.push(lastActionProperties);
+                saveAction(img, "insert");
             }
             
         };
@@ -569,7 +563,7 @@ const Fragment = {
         tempCanvas.toBlob(function(blob){
             navigator.clipboard.write([
                 new ClipboardItem({
-                    'image/png': blob
+                    "image/png": blob
                 })
             ]);
         });
@@ -585,6 +579,7 @@ const Fragment = {
                 ctx.globalCompositeOperation = "source-over";
                 ctx.drawImage(img, 0, 0);
                 clearPreviewCanvas();
+
                 const selectionBox = new Path2D();
                 selectionBox.rect(0, 0, img.width, img.height);
                 pctx.strokeStyle = "rgba(0,0,75,0.7)"
@@ -602,7 +597,7 @@ const Fragment = {
         tempCanvas.toBlob(function(blob){
             navigator.clipboard.write([
                 new ClipboardItem({
-                    'image/png': blob
+                    "image/png": blob
                 })
             ]);
         });
@@ -646,7 +641,25 @@ function changeActionButtonStatus(buttonId, status){
         button.onclick = undefined;
     }
 }
+function saveAction(action, customTool){
+    let tool;
+    if (customTool != undefined){
+        tool = customTool
+    }
+    else{
+        tool = selectedTool
+    }
+    undoActionsList.push(action);
 
+    let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, tool, shapeTool.shape, shapeTool.fillShape,  shapeTool.shapeFillColor, lastRadius, ctx.font, ctx.textAlign];
+    undoActionPropertiesList.push(lastActionProperties);
+    console.log("Tool properties saved");
+
+    changeActionButtonStatus("Undo", "on");
+    redoActionList = []
+    redoActionPropertiesList = [];
+    changeActionButtonStatus("Redo", "off");
+}
 function undoLastAction(){
     createCanvas(false);
     if (backgroundImage != null){
@@ -654,13 +667,9 @@ function undoLastAction(){
         ctx.drawImage(backgroundImage, 0, 0);
     }
     for(i=0; i<undoActionsList.length-1; i++){
-        ctx.strokeStyle = undoActionPropertiesList[i][0];
-        ctx.lineCap = undoActionPropertiesList[i][1];
-        ctx.lineJoin = undoActionPropertiesList[i][2];
-        ctx.lineWidth = undoActionPropertiesList[i][3];
-        ctx.globalCompositeOperation = undoActionPropertiesList[i][4];
-        let actionType = undoActionPropertiesList[i][5];
-        let actionShape = undoActionPropertiesList[i][6];
+        let actionShape, actionType;
+
+        [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth,  ctx.globalCompositeOperation, actionType, actionShape] = [undoActionPropertiesList[i][0], undoActionPropertiesList[i][1], undoActionPropertiesList[i][2], undoActionPropertiesList[i][3], undoActionPropertiesList[i][4], undoActionPropertiesList[i][5], undoActionPropertiesList[i][6],];
         switch (actionType){
             case "PBr":
             case "Era":
@@ -724,7 +733,6 @@ function undoLastAction(){
             case "ClearSelectedArea":
                 const eraseRect = new Path2D();
                 ctx.globalCompositeOperation = "destination-out";
-                console.log(undoActionsList[i])
                 eraseRect.rect(undoActionsList[i][0][0], undoActionsList[i][0][1], undoActionsList[i][1][0]-undoActionsList[i][0][0], undoActionsList[i][1][1]-undoActionsList[i][0][1])
                 ctx.fill(eraseRect);
                 break;
@@ -747,19 +755,17 @@ function undoLastAction(){
     }
 }
 function redoLastAction(){
-    ctx.strokeStyle = redoActionPropertiesList[redoActionPropertiesList.length - 1][0];
-    ctx.lineCap = redoActionPropertiesList[redoActionPropertiesList.length - 1][1];
-    ctx.lineJoin = redoActionPropertiesList[redoActionPropertiesList.length - 1][2];
-    ctx.lineWidth = redoActionPropertiesList[redoActionPropertiesList.length - 1][3];
-    ctx.globalCompositeOperation = redoActionPropertiesList[redoActionPropertiesList.length - 1][4];
-    let actionType = redoActionPropertiesList[redoActionPropertiesList.length - 1][5];
-    let actionShape = redoActionPropertiesList[redoActionPropertiesList.length - 1][6];
+    let lastActionPropIndex = redoActionPropertiesList.length - 1;
+    let lastActionIndex = redoActionList.length - 1;
+
+    let actionShape, actionType;
+    [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, actionType, actionShape] = [redoActionPropertiesList[lastActionPropIndex][0], redoActionPropertiesList[lastActionPropIndex][1], redoActionPropertiesList[lastActionPropIndex][2], redoActionPropertiesList[lastActionPropIndex][3], redoActionPropertiesList[lastActionPropIndex][4], redoActionPropertiesList[lastActionPropIndex][5], redoActionPropertiesList[lastActionPropIndex][6]];
     switch (actionType){
         case "PBr":
         case "Era":
             ctx.beginPath();
-            for(j=0; j<redoActionList[redoActionList.length - 1].length; j++){
-                let cursorLocations = redoActionList[redoActionList.length - 1][j].split("; ");
+            for(j=0; j<redoActionList[lastActionIndex].length; j++){
+                let cursorLocations = redoActionList[lastActionIndex][j].split("; ");
                 ctx.lineTo(cursorLocations[0], cursorLocations[1]);
                 ctx.stroke();
             }
@@ -795,10 +801,10 @@ function redoLastAction(){
             }
             break;
         case "Tex":
-            ctx.font = redoActionPropertiesList[redoActionList.length - 1][10];
-            ctx.textAlign = redoActionPropertiesList[redoActionList.length - 1][11];
+            ctx.font = redoActionPropertiesList[lastActionIndex][10];
+            ctx.textAlign = redoActionPropertiesList[lastActionIndex][11];
             ctx.fillStyle = ctx.strokeStyle;
-            ctx.fillText(redoActionList[redoActionList.length - 1][0], redoActionList[redoActionList.length - 1][1], redoActionList[redoActionList.length - 1][2]);
+            ctx.fillText(redoActionList[lastActionIndex][0], redoActionList[lastActionIndex][1], redoActionList[lastActionIndex][2]);
             break;
         case "Sel":
             canvasContainer.style.cursor = "crosshair";
@@ -812,12 +818,12 @@ function redoLastAction(){
             break;
         case "insert":
             ctx.globalCompositeOperation = "source-over";
-            ctx.drawImage(redoActionList[redoActionList.length - 1], 0, 0);
+            ctx.drawImage(redoActionList[lastActionIndex], 0, 0);
             break;
         case "ClearSelectedArea":
             const eraseRect = new Path2D();
             ctx.globalCompositeOperation = "destination-out";
-            eraseRect.rect(redoActionList[redoActionList.length - 1][0][0], redoActionList[redoActionList.length - 1][0][1], redoActionList[redoActionList.length - 1][1][0], redoActionList[redoActionList.length - 1][1][1])
+            eraseRect.rect(redoActionList[lastActionIndex][0][0], redoActionList[lastActionIndex][0][1], redoActionList[lastActionIndex][1][0], redoActionList[lastActionIndex][1][1])
             ctx.fill(eraseRect);
             break;
     }
@@ -890,13 +896,7 @@ function keyUp(e) {
                     ctx.globalCompositeOperation = "destination-out";
                     ctx.fill(clearRect);
     
-                    undoActionsList.push(selectionBoxPoints);
-                    changeActionButtonStatus("Undo", "on");
-                    redoActionList = [];
-                    redoActionPropertiesList = [];
-                    changeActionButtonStatus("Redo", "off");
-                    let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, "ClearSelectedArea", shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius,];
-                    undoActionPropertiesList.push(lastActionProperties);
+                    saveAction(selectionBoxPoints, "ClearSelectedArea");
                 }
                 break    
         }
@@ -1022,69 +1022,67 @@ function getCursorLocation(event){
         pctx.stroke(shape);
 
     }
-    if (selectedTool == "Sel" && selectionBoxPoints.length == 1){
-        clearPreviewCanvas();
-        const selectionBox = new Path2D();
-        selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], cursorX-selectionBoxPoints[0][0], cursorY-selectionBoxPoints[0][1])
-        pctx.strokeStyle = "rgba(0,0,75,0.7)"
-        pctx.setLineDash([8, 5]);
-        pctx.stroke(selectionBox);
-    }
-    if (selectedTool == "Sel" && selectionBoxPoints.length == 2 && isMovingFragment == false){
-        let greaterCoordinates = [];
-        let lesserCoordinates = [];
-        if (Number(selectionBoxPoints[0][0])>Number(selectionBoxPoints[1][0])){
-            greaterCoordinates.push(selectionBoxPoints[0][0]);
-            lesserCoordinates.push(selectionBoxPoints[1][0])
+    if (selectedTool == "Sel"){
+        if (selectionBoxPoints.length == 1){
+            clearPreviewCanvas();
+            const selectionBox = new Path2D();
+            selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], cursorX-selectionBoxPoints[0][0], cursorY-selectionBoxPoints[0][1])
+            pctx.strokeStyle = "rgba(0,0,75,0.7)"
+            pctx.setLineDash([8, 5]);
+            pctx.stroke(selectionBox);
         }
-        else{
-            greaterCoordinates.push(selectionBoxPoints[1][0]);
-            lesserCoordinates.push(selectionBoxPoints[0][0])
-        }
-        if (Number(selectionBoxPoints[0][1])>Number(selectionBoxPoints[1][1])){
-            greaterCoordinates.push(selectionBoxPoints[0][1]);
-            lesserCoordinates.push(selectionBoxPoints[1][1])
-        }
-        else{
-            greaterCoordinates.push(selectionBoxPoints[1][1]);
-            lesserCoordinates.push(selectionBoxPoints[0][1])
-        }
-        //console.log(`(${cursorX}>${lesserCoordinates[0]} && ${cursorX}<${greaterCoordinates[0]}) && (${cursorY}>${lesserCoordinates[1]} && ${cursorY}<${greaterCoordinates[1]}) ${(cursorX>lesserCoordinates[0] && cursorX<greaterCoordinates[0]) && (cursorY>lesserCoordinates[1] && cursorY<greaterCoordinates[1])}`);
-        if ((cursorX>lesserCoordinates[0] && cursorX<greaterCoordinates[0]) && (cursorY>lesserCoordinates[1] && cursorY<greaterCoordinates[1])){
-            canvasContainer.style.cursor = "grab";
-        }
-        else{
-            canvasContainer.style.cursor = "crosshair";
+        if (selectionBoxPoints.length == 2 && isMovingFragment == false){
+            let greaterCoordinates = [];
+            let lesserCoordinates = [];
+            if (Number(selectionBoxPoints[0][0])>Number(selectionBoxPoints[1][0])){
+                greaterCoordinates.push(selectionBoxPoints[0][0]);
+                lesserCoordinates.push(selectionBoxPoints[1][0])
+            }
+            else{
+                greaterCoordinates.push(selectionBoxPoints[1][0]);
+                lesserCoordinates.push(selectionBoxPoints[0][0])
+            }
+            if (Number(selectionBoxPoints[0][1])>Number(selectionBoxPoints[1][1])){
+                greaterCoordinates.push(selectionBoxPoints[0][1]);
+                lesserCoordinates.push(selectionBoxPoints[1][1])
+            }
+            else{
+                greaterCoordinates.push(selectionBoxPoints[1][1]);
+                lesserCoordinates.push(selectionBoxPoints[0][1])
+            }
+            if ((cursorX>lesserCoordinates[0] && cursorX<greaterCoordinates[0]) && (cursorY>lesserCoordinates[1] && cursorY<greaterCoordinates[1])){
+                canvasContainer.style.cursor = "grab";
+            }
+            else{
+                canvasContainer.style.cursor = "crosshair";
+            }
         }
     }
     if (isMouseDown == true && canvasContainer.style.cursor == "grab" && selectedTool == "Sel"){
         isMovingFragment = true;
     }
-    if (isMovingFragment == true && isMouseDown == true && movedCanvasFragment != undefined){
-        clearPreviewCanvas();
-        //console.log(movedCanvasFragment)
-        pctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
-    }
-    if(isMovingFragment == true && isMouseDown == false && movedCanvasFragment != undefined){
-        isMovingFragment = false;
-        clearPreviewCanvas();
-        ctx.globalCompositeOperation = "source-over";
-        ctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
-
-        undoActionsList.push([movedCanvasFragment, [cursorX-distanceXY[0], cursorY-distanceXY[1]], [selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]]]);
-        let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, selectedTool, shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius];
-        undoActionPropertiesList.push(lastActionProperties);
-        movedCanvasFragment = undefined;
-
-        const selectionBox = new Path2D();
-        selectionBox.rect(cursorX-distanceXY[0], cursorY-distanceXY[1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
-        pctx.strokeStyle = "rgba(0,0,75,0.7)"
-        pctx.setLineDash([8, 5]);
-        pctx.stroke(selectionBox);
-
-        selectionBoxPoints = [[cursorX-distanceXY[0], cursorY-distanceXY[1]], [(cursorX-distanceXY[0])+(selectionBoxPoints[1][0]-selectionBoxPoints[0][0]), (cursorY-distanceXY[1])+(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])]];
-        distanceXY = [];
-        changeActionButtonStatus("Undo", "on");
+    if (isMovingFragment == true && movedCanvasFragment != undefined){
+        if (isMouseDown == true){
+            clearPreviewCanvas();
+            pctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
+        }
+        else{
+            isMovingFragment = false;
+            clearPreviewCanvas();
+            ctx.globalCompositeOperation = "source-over";
+            ctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
+    
+            saveAction([movedCanvasFragment, [cursorX-distanceXY[0], cursorY-distanceXY[1]], [selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]]]);
+    
+            const selectionBox = new Path2D();
+            selectionBox.rect(cursorX-distanceXY[0], cursorY-distanceXY[1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
+            pctx.strokeStyle = "rgba(0,0,75,0.7)"
+            pctx.setLineDash([8, 5]);
+            pctx.stroke(selectionBox);
+    
+            selectionBoxPoints = [[cursorX-distanceXY[0], cursorY-distanceXY[1]], [(cursorX-distanceXY[0])+(selectionBoxPoints[1][0]-selectionBoxPoints[0][0]), (cursorY-distanceXY[1])+(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])]];
+            distanceXY = [];
+        }
     }
 }
 function mouseDown(){
@@ -1108,7 +1106,6 @@ function mouseDown(){
                     case "circle":
                         let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]));
                         lastRadius = radius;
-                        console.log(radius);
                         shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false); 
                         break;
                     case "line":
@@ -1185,18 +1182,10 @@ function mouseDown(){
             ctx.fillStyle = selectedColorPicker.value;
             ctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
             ctx.textAlign = (textTool.textAlignment.toLowerCase());
-            console.log(ctx.font)
             ctx.fillText(textTool.text, cursorX, cursorY);
             textNodeContent.value = "";
 
-            changeActionButtonStatus("Undo", "on");
-            redoActionList = []
-            redoActionPropertiesList = [];
-            changeActionButtonStatus("Redo", "off");
-            undoActionsList.push([textTool.text, cursorX, cursorY]);
-            let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, selectedTool, shapeTool.shape, undefined,  shapeTool.shapeFillColor, lastRadius, ctx.font, ctx.textAlign];
-            undoActionPropertiesList.push(lastActionProperties);
-            console.log("Tool properties saved");
+            saveAction([textTool.text, cursorX, cursorY]);
     }
     }
 }
@@ -1205,37 +1194,28 @@ function mouseUp(){
         if (selectedTool != null && canvas.height > 0){  
             if (lineList.length != 0 || (selectedTool == "STo" && shapePoints.length == 2 && shapeTool.shape != "polygon") || (selectedTool == "STo" && shapeTool.shape == "polygon" && shapePoints.length == Number(document.getElementById("InputCorners").value))){
                 if (selectedTool == "PBr" || selectedTool == "Era"){
-                    undoActionsList.push(lineList);
+                    saveAction(lineList);
                     lineList = [];
-                    console.log("Action saved");
                 }
                 else if(selectedTool == "STo"){
-                    undoActionsList.push(shapePoints);
-                    console.log("Action saved");
+                    saveAction(shapePoints);
                     shapePoints = [];
                     clearPreviewCanvas();
                 }
-                changeActionButtonStatus("Undo", "on");
-                redoActionList = []
-                redoActionPropertiesList = [];
-                changeActionButtonStatus("Redo", "off");
-                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, selectedTool, shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius];
-                undoActionPropertiesList.push(lastActionProperties);
-                console.log("Tool properties saved");
             }
         }
     }
     isMouseDown = false;
 }
 
-document.addEventListener('contextmenu', event => {
+document.addEventListener("contextmenu", event => {
     event.preventDefault();
 });
 //addEventListener("paste", (event) => {document.getElementById("PasteButton").click();});
-document.addEventListener('keyup', keyUp, false);
-tippy('[data-tippy-content]',{
+document.addEventListener("keyup", keyUp, false);
+tippy("[data-tippy-content]",{
     delay: [400, 100],
-    animation: 'shift-toward',
+    animation: "shift-toward",
     allowHTML: true,
 });
 try{
