@@ -16,6 +16,14 @@ const shapeTool = {
     fillShape: false,
     shapeFillColor: "#000000"
 };
+const textTool = {
+    fontSize: 12,
+    textAlignment: "Left",
+    font: "Arial",
+    italic: false,
+    bold: false,
+    text: "",
+}
 let shapePoints = [];
 let selectionBoxPoints = [];
 let lastRadius = 0;
@@ -30,6 +38,7 @@ const pctx = previewCanvas.getContext("2d", { willReadFrequently: true });
 const canvasContainer = document.getElementById("CanvasContainer");
 const tempCanvas = document.createElement("canvas");
 const tctx = tempCanvas.getContext("2d");
+let textNodeContent;
 
 let cursorX = 0;
 let cursorY = 0;
@@ -56,7 +65,8 @@ function rgbToHex(r, g, b) { //thx man https://stackoverflow.com/a/5624139
 function selectTool(t){
     canvasContainer.style.cursor = "crosshair";
     changeActionButtonStatus("Copy", "off")
-        changeActionButtonStatus("Cut", "off")
+    changeActionButtonStatus("Cut", "off")
+    textNodeContent = undefined;
     if (selectedTool === null){
         document.getElementById("ToolPreferencesBox").style.opacity = 1;
         document.getElementById("ToolPreferencesBox").style.transform = "scale(1)";
@@ -71,7 +81,7 @@ function selectTool(t){
             document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Brush size: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrush.stroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrush.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Brush shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <div> <label>Brush stroke quality: </label><br> <select id="SelectBrushQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
             ctx.globalCompositeOperation="source-over";
             ctx.lineWidth = paintBrush.stroke;
-            changeShape(null);
+            changeShape();
             clearPreviewCanvas();
             document.getElementById("SelectBrushShape").value = paintBrush.strokeShape;
             document.getElementById("SelectBrushQuality").value = paintBrush.strokeQuality;
@@ -81,7 +91,7 @@ function selectTool(t){
             document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Eraser size: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraser.stroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraser.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Eraser shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
             ctx.globalCompositeOperation="destination-out";
             ctx.lineWidth = eraser.stroke;
-            changeShape(null);
+            changeShape();
             clearPreviewCanvas();
             document.getElementById("SelectEraserShape").value = eraser.strokeShape;
             document.getElementById("SelectEraserQuality").value = eraser.strokeQuality;
@@ -98,10 +108,58 @@ function selectTool(t){
             if (shapeTool.shape == "polygon"){
                 document.getElementById("InputCorners").style.display = "inline";
             }
-            changeShape(null);
+            changeShape();
             clearPreviewCanvas();
             break;
         case "Tex":
+            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Font size: </label><br> <input id="TexStrokeSlider" type="range" min="1" max="128" value="${textTool.fontSize}" oninput="changeStroke(this)"> <input id="TexStrokeValue" type="number" min="1" max="72" value="${textTool.fontSize}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected font: </label><br> <select id="TexFontSelect" onchange="changeFont(this)"> <option value="Courier New">Courier New</option> <option value="Franklin Gothic Medium">Franklin Gothic Medium</option> <option value="Gill Sans">Gill Sans</option> <option value="Segoe UI">Segoe UI</option> <option value="Times New Roman">Times New Roman</option> <option value="Trebuchet MS">Trebuchet MS</option> <option value="Arial">Arial</option> <option value="Cambria">Cambria</option> <option value="Georgia">Georgia</option> <option value="Verdana">Verdana</option> </select></div> 
+            <div id="TextPropertiesFieldsContainer">
+                <div class="TextPropertiesFields"> 
+                    <div class="TextPropertiesButtons" onclick="changeTextAlignment(this)" id="Left">
+                        <svg class="AlignmentIcons" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                            <path class="LeftSvgElement" fill="#9A949B" d="M25.1,6.1H4.8c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S25.9,6.1,25.1,6.1z"/>
+                            <path class="LeftSvgElement" fill="#9A949B" d="M25.1,21.8H4.8c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S25.9,21.8,25.1,21.8z"/>
+                            <path class="LeftSvgElement" fill="#9A949B" d="M30.2,14H4.8c-0.8,0-1.5-0.7-1.5-1.5S3.9,11,4.8,11h25.4c0.8,0,1.5,0.7,1.5,1.5S31,14,30.2,14z"/>
+                            <path class="LeftSvgElement" fill="#9A949B" d="M30.2,29.7H4.8c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h25.4c0.8,0,1.5,0.7,1.5,1.5S31,29.7,30.2,29.7z"/>
+                        </svg>
+                    </div> 
+                    <div class="TextPropertiesButtons" onclick="changeTextAlignment(this)" id="Center">
+                        <svg class="AlignmentIcons" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                            <path class="CenterSvgElement" fill="#9A949B" d="M27.7,6.1H7.3c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S28.5,6.1,27.7,6.1z"/>
+                            <path class="CenterSvgElement" fill="#9A949B" d="M27.6,21.8H7.3c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S28.5,21.8,27.6,21.8z"/>
+                            <path class="CenterSvgElement" fill="#9A949B" d="M30.2,14H4.8c-0.8,0-1.5-0.7-1.5-1.5S3.9,11,4.8,11h25.4c0.8,0,1.5,0.7,1.5,1.5S31,14,30.2,14z"/>
+                            <path class="CenterSvgElement" fill="#9A949B" d="M30.2,29.7H4.8c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h25.4c0.8,0,1.5,0.7,1.5,1.5S31,29.7,30.2,29.7z"/>
+                        </svg>
+                    </div> 
+                    <div class="TextPropertiesButtons" onclick="changeTextAlignment(this)" id="Right">
+                        <svg class="AlignmentIcons" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                            <path class="RightSvgElement" fill="#9A949B"  d="M30.2,6.1H9.9C9,6.1,8.4,5.4,8.4,4.6S9,3.1,9.9,3.1h20.3c0.8,0,1.5,0.7,1.5,1.5S31,6.1,30.2,6.1z"/>
+                            <path class="RightSvgElement" fill="#9A949B" d="M30.2,21.8H9.9c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S31,21.8,30.2,21.8z"/>
+                            <path class="RightSvgElement" fill="#9A949B" d="M30.2,14H4.8c-0.8,0-1.5-0.7-1.5-1.5S3.9,11,4.8,11h25.4c0.8,0,1.5,0.7,1.5,1.5S31,14,30.2,14z"/>
+                            <path class="RightSvgElement" fill="#9A949B" d="M30.2,29.7H4.8c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h25.4c0.8,0,1.5,0.7,1.5,1.5S31,29.7,30.2,29.7z"/>7z"/>
+                        </svg>
+                    </div> 
+                </div> 
+                    <div class="TextPropertiesFields">
+                        <div class="TextPropertiesButtons" onclick="changeTextStyle(this)" id="bold">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35     35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                                <path class="BoldSvgElement" fill="#9A949B" class="st0" d="M6.56,4.76C7.18,4.78,8,4.8,9,4.83c1.01,0.02,2.02,0.04,3.02,0.04c1.18,0,2.3-0.01,3.37-0.04c1.07-0.02,1.83-0.04,2.29-0.04c2.98,0,5.2,0.53,6.68,1.58c1.48,1.06,2.21,2.41,2.21,4.07c0,0.84-0.25,1.69-0.76,2.56c-0.5,0.86-1.28,1.63-2.34,2.3c-1.06,0.67-2.42,1.16-4.1,1.48v0.07c2.26,0.17,4.04,0.58,5.36,1.22c1.32,0.65,2.27,1.43,2.84,2.34s0.86,1.86,0.86,2.84c0,1.51-0.4,2.78-1.19,3.82s-1.93,1.82-3.42,2.36s-3.26,0.81-5.33,0.81c-0.58,0-1.4-0.02-2.48-0.05c-1.08-0.04-2.39-0.05-3.92-0.05c-1.06,0-2.09,0.01-3.1,0.02C8,30.17,7.18,30.2,6.56,30.24v-0.72c0.77-0.05,1.34-0.14,1.73-0.29c0.38-0.14,0.64-0.43,0.77-0.86c0.13-0.43,0.2-1.08,0.2-1.94V8.57c0-0.89-0.07-1.54-0.2-1.96S8.66,5.9,8.27,5.75C7.87,5.59,7.3,5.5,6.56,5.48V4.76z M17.21,5.48c-0.94,0-1.54,0.2-1.82,0.61c-0.28,0.41-0.41,1.24-0.41,2.48v17.86c0,0.84,0.07,1.48,0.2,1.91s0.37,0.72,0.72,0.86c0.35,0.14,0.87,0.22,1.57,0.22c1.75,0,3.02-0.55,3.82-1.64s1.19-2.65,1.19-4.66c0-1.85-0.46-3.28-1.39-4.28s-2.45-1.51-4.59-1.51h-3.06v-0.61h3.1c1.13,0,2-0.27,2.61-0.81c0.61-0.54,1.03-1.26,1.26-2.16c0.23-0.9,0.34-1.87,0.34-2.9c0-1.78-0.28-3.11-0.83-4.01C19.36,5.93,18.46,5.48,17.21,5.48z"/>
+                            </svg>
+                        </div> 
+                        <div class="TextPropertiesButtons" onclick="changeTextStyle(this)" id="italic">
+                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35     35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                                <path class="ItalicSvgElement" fill="#9A949B" class="st0" d="M16.76,26.43c-0.22,0.86-0.31,1.51-0.29,1.94c0.02,0.43,0.23,0.72,0.61,0.86c0.38,0.14,0.98,0.24,1.8,0.29l-0.14,0.72c-0.55-0.05-1.24-0.08-2.07-0.09c-0.83-0.01-1.66-0.02-2.5-0.02c-0.94,0-1.8,0.01-2.59,0.02c-0.79,0.01-1.45,0.04-1.98,0.09l0.18-0.72c0.79-0.05,1.41-0.14,1.85-0.29c0.44-0.14,0.8-0.43,1.06-0.86c0.26-0.43,0.5-1.08,0.72-1.94l4.75-17.86c0.24-0.89,0.34-1.54,0.29-1.96c-0.05-0.42-0.26-0.71-0.63-0.86c-0.37-0.16-0.97-0.25-1.78-0.27l0.18-0.72c0.48,0.02,1.13,0.05,1.94,0.07c0.82,0.02,1.69,0.04,2.63,0.04c0.84,0,1.67-0.01,2.5-0.04c0.83-0.02,1.53-0.05,2.11-0.07l-0.18,0.72c-0.82,0.02-1.45,0.11-1.91,0.27c-0.46,0.16-0.81,0.44-1.06,0.86s-0.5,1.07-0.74,1.96L16.76,26.43z"/>
+                            </svg>
+                        </div> 
+                        
+                    </div> 
+                </div>
+                <textarea onmouseleave="this.blur()" onchange="saveText(this)" id="TextNodeContent">${textTool.text}</textarea>`;
+            textNodeContent = document.getElementById("TextNodeContent");
+            ctx.globalCompositeOperation="source-over";
+            document.getElementById("TexFontSelect").value = textTool.font;
+            changeTextAlignment();
+            changeTextStyle();
             break;
         case "Sel":
             document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
@@ -130,11 +188,15 @@ function changeStroke(t){
         shapeTool.stroke = t.value
         ctx.lineWidth = shapeTool.stroke;
     }
+    if (selectedTool == "Tex"){
+        textTool.fontSize = t.value
+        //ctx.lineWidth = shapeTool.stroke;
+    }
 }
 function changeShape(t){
     switch (selectedTool){
         case "PBr":
-            if (t != null){
+            if (t != undefined){
                 paintBrush.strokeShape = t.value;
             }
             if (paintBrush.strokeShape == "square"){
@@ -147,7 +209,7 @@ function changeShape(t){
             }
             break;
         case "Era":
-            if (t != null){
+            if (t != undefined){
                 eraser.strokeShape = t.value;
             }
             if (eraser.strokeShape == "square"){
@@ -160,7 +222,7 @@ function changeShape(t){
             }
             break;
         case "STo":
-            if (t != null){
+            if (t != undefined){
                 shapeTool.strokeShape = t.value;
             }
             if (shapeTool.strokeShape == "sharp"){
@@ -180,7 +242,7 @@ function changeShape(t){
 }
 function setShapeToolShape(t){
     if (selectedTool == "STo"){
-        if (t != null){
+        if (t != undefined){
             shapeTool.shape = t.value;
             if (shapeTool.shape == "polygon"){
                 document.getElementById("InputCorners").style.display = "inline";
@@ -210,6 +272,81 @@ function changeIsFillShape(t){
         shapeTool.fillShape = false;
     }
 }
+function changeFont(t){
+    if (t != undefined){
+        textTool.font = t.value;
+    }  
+}
+function changeTextAlignment(t){
+    if (t != undefined){
+        textTool.textAlignment = t.id;
+        let tempAlignments = ["Left", "Center", "Right"];
+        let svgElementsArr;
+        for(let j=0; j<tempAlignments.length; j++){
+            svgElementsArr = document.querySelectorAll(`.${tempAlignments[j]}SvgElement`);
+            for(i=0; i<svgElementsArr.length; i++){
+                svgElementsArr[i].style.fill = "#9A949B";
+            }
+        }
+    }
+    const ELEMENTS_ARRAY = document.querySelectorAll(`.${textTool.textAlignment}SvgElement`);
+    for(i=0; i<ELEMENTS_ARRAY.length; i++){
+        ELEMENTS_ARRAY[i].style.fill = "#682375";
+    }
+}
+function changeTextStyle(t){
+    if (t != undefined){
+        if (textTool[`${t.id}`]){
+            textTool[`${t.id}`] = false;
+        }
+        else{
+            textTool[`${t.id}`] = true;
+        }
+    }
+    let svgElementsArr;
+        if(textTool.bold){
+            svgElementsArr = document.querySelectorAll(`.BoldSvgElement`);
+            for(i=0; i<svgElementsArr.length; i++){
+                svgElementsArr[i].style.fill = "#682375";
+            }
+        }
+        else{
+            svgElementsArr = document.querySelectorAll(`.BoldSvgElement`);
+            for(i=0; i<svgElementsArr.length; i++){
+                svgElementsArr[i].style.fill = "#9A949B";
+            }
+        }
+
+        if(textTool.italic){
+            svgElementsArr = document.querySelectorAll(`.ItalicSvgElement`);
+            for(i=0; i<svgElementsArr.length; i++){
+                svgElementsArr[i].style.fill = "#682375";
+            }
+        }
+        else{
+            svgElementsArr = document.querySelectorAll(`.ItalicSvgElement`);
+            for(i=0; i<svgElementsArr.length; i++){
+                svgElementsArr[i].style.fill = "#9A949B";
+            }
+        }
+
+        if(textTool.underlined){
+            svgElementsArr = document.querySelectorAll(`.UnderlinedSvgElement`);
+            for(i=0; i<svgElementsArr.length; i++){
+                svgElementsArr[i].style.fill = "#682375";
+            }
+        }
+        else{
+            svgElementsArr = document.querySelectorAll(`.UnderlinedSvgElement`);
+            for(i=0; i<svgElementsArr.length; i++){
+                svgElementsArr[i].style.fill = "#9A949B";
+            }
+        }
+}
+function saveText(t){
+    textTool.text = t.value;
+}
+
 function changeToolButtonColor(t){
     const ELEMENTS_ARRAY = document.querySelectorAll(`.${t.id.slice(0,3)}SvgElement`);
     for(i=0; i<ELEMENTS_ARRAY.length; i++){
@@ -287,21 +424,21 @@ function createCanvas(clearHistory){
         case "PBr":
             ctx.lineWidth = paintBrush.stroke;
             ctx.strokeStyle = selectedColorPicker.value;
-            changeShape(null);
+            changeShape();
             break;
         case "Era":
             ctx.lineWidth = eraser.stroke;
             ctx.strokeStyle = selectedColorPicker.value;
-            changeShape(null);
+            changeShape();
             break;
         case "STo":
             ctx.lineWidth = shapeTool.stroke;
             ctx.strokeStyle = selectedColorPicker.value;
-            changeShape(null);
+            changeShape();
             break;
     }
 
-    changeShape(null);
+    changeShape();
     closeFileCreationPopup();
     if (clearHistory !== false){
         undoActionsList = [];
@@ -564,6 +701,12 @@ function undoLastAction(){
                     ctx.fill(shape);
                 }
                 break;
+            case "Tex":
+                ctx.font = undoActionPropertiesList[i][10];
+                ctx.textAlign = undoActionPropertiesList[i][11];
+                ctx.fillStyle = ctx.strokeStyle;
+                ctx.fillText(undoActionsList[i][0], undoActionsList[i][1], undoActionsList[i][2]);
+                break;
             case "Sel":
                 canvasContainer.style.cursor = "crosshair";
                 selectionBoxPoints = [];
@@ -651,6 +794,12 @@ function redoLastAction(){
                 ctx.fill(shape);
             }
             break;
+        case "Tex":
+            ctx.font = redoActionPropertiesList[redoActionList.length - 1][10];
+            ctx.textAlign = redoActionPropertiesList[redoActionList.length - 1][11];
+            ctx.fillStyle = ctx.strokeStyle;
+            ctx.fillText(redoActionList[redoActionList.length - 1][0], redoActionList[redoActionList.length - 1][1], redoActionList[redoActionList.length - 1][2]);
+            break;
         case "Sel":
             canvasContainer.style.cursor = "crosshair";
             selectionBoxPoints = [];
@@ -690,86 +839,98 @@ function redoLastAction(){
 }
 
 function keyUp(e) {
-    switch (e.code){
-        case "KeyB":
-            document.getElementById("PBrButton").click();
-            break;
-        case "KeyE":
-            document.getElementById("EraButton").click();
-            break;
-        case "KeyS":
-            document.getElementById("SToButton").click();
-            break;    
-        case "KeyA":
-            document.getElementById("SelButton").click();
-            break;
-        
-        case "KeyZ":
-            document.getElementById("UndoButton").click();
-            break;
-        case "KeyY":
-            document.getElementById("RedoButton").click();
-            break;
-        case "KeyC":
-            document.getElementById("CopyButton").click();
-            break;
-        case "KeyV":
-            document.getElementById("PasteButton").click();
-            break;
-        case "KeyX":
-            document.getElementById("CutButton").click();
-            break;
-        case "KeyC":
-            selectedColorPicker.click();
-            break;
-        case "Backspace":
-        case "Delete":
-            if (selectionBoxPoints != []){
-                const clearRect = new Path2D();
-                clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-                ctx.globalCompositeOperation = "destination-out";
-                ctx.fill(clearRect);
-
-                undoActionsList.push(selectionBoxPoints);
-                changeActionButtonStatus("Undo", "on");
-                redoActionList = [];
-                redoActionPropertiesList = [];
-                changeActionButtonStatus("Redo", "off");
-                let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, "ClearSelectedArea", shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius];
-                undoActionPropertiesList.push(lastActionProperties);
-            }
-            break    
+    let isFocused
+    if (textNodeContent != undefined){
+        isFocused = (document.activeElement == textNodeContent);
     }
-    if (e.altKey){
+    else{
+        isFocused = false
+    }
+    if(!isFocused){
         switch (e.code){
-            case "KeyN":
-                document.getElementById("NewFileButton").click();
+            case "KeyB":
+                document.getElementById("PBrButton").click();
                 break;
-            case "KeyO":
-                document.getElementById("OpenFileButton").click();
-                break;
-            case "KeyI":
-                document.getElementById("InsertFileButton").click();
+            case "KeyE":
+                document.getElementById("EraButton").click();
                 break;
             case "KeyS":
-                document.getElementById("SaveAsButton").click();
+                document.getElementById("SToButton").click();
+                break;    
+            case "KeyT":
+                document.getElementById("TexButton").click();
+                break;  
+            case "KeyA":
+                document.getElementById("SelButton").click();
                 break;
+            
+            case "KeyZ":
+                document.getElementById("UndoButton").click();
+                break;
+            case "KeyY":
+                document.getElementById("RedoButton").click();
+                break;
+            case "KeyC":
+                document.getElementById("CopyButton").click();
+                break;
+            case "KeyV":
+                document.getElementById("PasteButton").click();
+                break;
+            case "KeyX":
+                document.getElementById("CutButton").click();
+                break;
+            case "KeyC":
+                selectedColorPicker.click();
+                break;
+            case "Backspace":
+            case "Delete":
+                if (selectionBoxPoints != []){
+                    const clearRect = new Path2D();
+                    clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+                    ctx.globalCompositeOperation = "destination-out";
+                    ctx.fill(clearRect);
+    
+                    undoActionsList.push(selectionBoxPoints);
+                    changeActionButtonStatus("Undo", "on");
+                    redoActionList = [];
+                    redoActionPropertiesList = [];
+                    changeActionButtonStatus("Redo", "off");
+                    let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, "ClearSelectedArea", shapeTool.shape, shapeTool.fillShape, shapeTool.shapeFillColor, lastRadius,];
+                    undoActionPropertiesList.push(lastActionProperties);
+                }
+                break    
         }
-    }
-    if (e.code.slice(0, 3) == "Dig"){
-        let num = e.code.slice(e.code.length-1)
-        if (num<8 && num>0){
-            if (e.shiftKey && e.altKey){
-                document.getElementById(`UserColor2-${num}`).click();
+        if (e.altKey){
+            switch (e.code){
+                case "KeyN":
+                    document.getElementById("NewFileButton").click();
+                    break;
+                case "KeyO":
+                    document.getElementById("OpenFileButton").click();
+                    break;
+                case "KeyI":
+                    document.getElementById("InsertFileButton").click();
+                    break;
+                case "KeyS":
+                    document.getElementById("SaveAsButton").click();
+                    break;
             }
-            else if (e.altKey){
-                document.getElementById(`UserColor1-${num}`).click();
-            }
-            else if (e.shiftKey){
-                document.getElementById(`DefaultColor2-${num}`).click();
-            }
-            else{
-                document.getElementById(`DefaultColor1-${num}`).click();
+        }
+        if (e.code.slice(0, 3) == "Dig"){
+            let num = e.code.slice(e.code.length-1)
+            if (num<8 && num>0){
+                if (e.shiftKey && e.altKey){
+                    document.getElementById(`UserColor2-${num}`).click();
+                }
+                else if (e.altKey){
+                    document.getElementById(`UserColor1-${num}`).click();
+                }
+                else if (e.shiftKey){
+                    document.getElementById(`DefaultColor2-${num}`).click();
+                }
+                else{
+                    document.getElementById(`DefaultColor1-${num}`).click();
+                }
             }
         }
     }
@@ -987,32 +1148,56 @@ function mouseDown(){
             }
         }
     }
-    if (selectedTool == "Sel" && canvasContainer.style.cursor != "grab"){
-        if (selectionBoxPoints.length != 1){
-            selectionBoxPoints = [];
-            selectionBoxPoints.push(cursorAxises);
-            changeActionButtonStatus("Copy", "off")
-            changeActionButtonStatus("Cut", "off")
+    if (selectedTool == "Sel"){
+        if (canvasContainer.style.cursor != "grab"){
+            if (selectionBoxPoints.length != 1){
+                selectionBoxPoints = [];
+                selectionBoxPoints.push(cursorAxises);
+                changeActionButtonStatus("Copy", "off")
+                changeActionButtonStatus("Cut", "off")
+            }
+            else{
+                selectionBoxPoints.push(cursorAxises);
+                const selectionBox = new Path2D();
+                selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
+                pctx.strokeStyle = "rgba(0,0,75,0.8)"
+                pctx.setLineDash([8, 5]);
+                pctx.stroke(selectionBox);
+                changeActionButtonStatus("Copy", "on")
+                changeActionButtonStatus("Cut", "on")
+            }
         }
         else{
-            selectionBoxPoints.push(cursorAxises);
-            const selectionBox = new Path2D();
-            selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
-            pctx.strokeStyle = "rgba(0,0,75,0.8)"
-            pctx.setLineDash([8, 5]);
-            pctx.stroke(selectionBox);
-            changeActionButtonStatus("Copy", "on")
-            changeActionButtonStatus("Cut", "on")
+            movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+            ctx.globalCompositeOperation = "destination-out";
+            const eraseRect = new Path2D();
+            eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0]    [1]);
+            distanceXY[0] = cursorX-selectionBoxPoints[0][0];
+            distanceXY[1] = cursorY-selectionBoxPoints[0][1];
+            ctx.fill(eraseRect);
         }
     }
-    if (selectedTool == "Sel" && canvasContainer.style.cursor == "grab"){
-        movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-        ctx.globalCompositeOperation = "destination-out";
-        const eraseRect = new Path2D();
-        eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-        distanceXY[0] = cursorX-selectionBoxPoints[0][0];
-        distanceXY[1] = cursorY-selectionBoxPoints[0][1];
-        ctx.fill(eraseRect);
+    if (selectedTool == "Tex"){
+        if(textTool.text != ""){
+            let textStyles = "";
+            if (textTool.bold){textStyles += "bold "};
+            if (textTool.italic){textStyles += "italic "};
+            ctx.fillStyle = selectedColorPicker.value;
+            ctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
+            ctx.textAlign = (textTool.textAlignment.toLowerCase());
+            console.log(ctx.font)
+            ctx.fillText(textTool.text, cursorX, cursorY);
+            textNodeContent.value = "";
+
+            changeActionButtonStatus("Undo", "on");
+            redoActionList = []
+            redoActionPropertiesList = [];
+            changeActionButtonStatus("Redo", "off");
+            undoActionsList.push([textTool.text, cursorX, cursorY]);
+            let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, selectedTool, shapeTool.shape, undefined,  shapeTool.shapeFillColor, lastRadius, ctx.font, ctx.textAlign];
+            undoActionPropertiesList.push(lastActionProperties);
+            console.log("Tool properties saved");
+    }
     }
 }
 function mouseUp(){
@@ -1046,7 +1231,7 @@ function mouseUp(){
 document.addEventListener('contextmenu', event => {
     event.preventDefault();
 });
-addEventListener("paste", (event) => {document.getElementById("PasteButton").click();});
+//addEventListener("paste", (event) => {document.getElementById("PasteButton").click();});
 document.addEventListener('keyup', keyUp, false);
 tippy('[data-tippy-content]',{
     delay: [400, 100],
