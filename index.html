@@ -241,31 +241,31 @@
                 <div id="SizeInputs" class="PopupContentGroup">
                     <div class="InputBox">
                         <label>Enable shadow</label>
-                        <input type="checkbox" id="EnableShadowCheckbox" onchange="openShadowPropertiesPopup('text')">
+                        <input type="checkbox" id="EnableShadowCheckbox">
                     </div>
                     <div class="InputBox">
                         <label>Shadow offset by X</label><br>
-                        <input type="number" id="OffsetXInput" onchange="openShadowPropertiesPopup('text')" min="-75" max="75" value="5">
+                        <input type="number" id="OffsetXInput" min="-75" max="75" value="5">
                     </div>
                     <div class="InputBox">
                         <label>Shadow offset by Y</label><br>
-                        <input type="number" id="OffsetYInput" onchange="openShadowPropertiesPopup('text')" min="-75" max="75" value="5">
+                        <input type="number" id="OffsetYInput" min="-75" max="75" value="5">
                     </div>
                     <div class="InputBox">
                         <label>Shadow Blur</label><br>
-                        <input type="number" id="ShadowBlurInput" onchange="openShadowPropertiesPopup('text')" min="1" max="100" value="5">
+                        <input type="number" id="ShadowBlurInput" min="0" max="100" value="5">
                     </div>
                     <div class="InputBox">
                         <label>Shadow opacity</label><br>
-                        <input type="number" id="ShadowOpacityInput" onchange="openShadowPropertiesPopup('text')" min="1" max="100" value="100">
+                        <input type="number" id="ShadowOpacityInput"min="1" max="100" value="100">
                     </div>
                     <div class="InputBox">
                         <label>Shadow color</label><br>
-                        <input type="color" id="ShadowColorInput" onchange="openShadowPropertiesPopup('text')" value="#000000">
+                        <input type="color" id="ShadowColorInput" value="#000000">
                     </div>
                 </div>
             </div>
-            <button class="FinishPopupButton" onclick="confirmShadow()">Create</button><br>
+            <button class="FinishPopupButton" id="ApplyShadowButton">Apply</button><br>
             <button class="CancelButton" onclick="closePopup()">Cancel</button>
         </div>
     </div>

@@ -14,7 +14,13 @@ const shapeTool = {
     strokeShape: "sharp",
     shape: "rectangle",
     fillShape: false,
-    shapeFillColor: "#000000"
+    shapeFillColor: "#000000",
+    shadowOffsetX: 5,
+    shadowOffsetY: 5,
+    shadowBlur: 5,
+    shadowOpacity: 75,
+    rawShadowColor: "#000000",
+    shadowColor: "rgba(0, 0, 0, 0)",
 };
 const textTool = {
     fontSize: 12,
@@ -25,8 +31,10 @@ const textTool = {
     text: "",
     shadowOffsetX: 5,
     shadowOffsetY: 5,
-    shadowBlur: 0,
-    shadowColor: "rgba(0, 0, 0, 1)",
+    shadowBlur: 5,
+    shadowOpacity: 75,
+    rawShadowColor: "#000000",
+    shadowColor: "rgba(0, 0, 0, 0)",
 }
 let shapePoints = [];
 let selectionBoxPoints = [];
@@ -84,6 +92,7 @@ function selectTool(t){
     changeActionButtonStatus("Cut", "off")
     textNodeContent = undefined;
     ctx.shadowColor = "rgba(0, 0, 0, 0)"
+    ctx.shadowBlur = 0;
     if (selectedTool === null){
         document.getElementById("ToolPreferencesBox").style.opacity = 1;
         document.getElementById("ToolPreferencesBox").style.transform = "scale(1)";
@@ -115,7 +124,7 @@ function selectTool(t){
             cooldown = 0;
             break;
         case "STo":
-            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select><input type="number" min="3" max="24" value="3" id="InputCorners" onchange="resetPolygon()" style="width: 35px; display: none";></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <div><br><label>Fill shape: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
+            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select><input type="number" min="3" max="24" value="3" id="InputCorners" onchange="resetPolygon()" style="width: 35px; display: none";></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <button style="margin-top: 5px" onclick="openShadowPropertiesPopup('shape', 'open')">Open shape shadow properties</button> <div><label>Fill shape: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
             ctx.globalCompositeOperation="source-over";
             ctx.lineWidth = shapeTool.stroke;
             shapePoints = [];
@@ -171,8 +180,8 @@ function selectTool(t){
                         
                     </div> 
                 </div>
-                <button style="margin-bottom: 10px" onclick="openShadowPropertiesPopup('text')">Open text shadow properties</button>
-                <textarea onmouseleave="this.blur()" onchange="saveText(this)" id="TextNodeContent">${textTool.text}</textarea>`;
+                <button style="margin-bottom: 10px" onclick="openShadowPropertiesPopup('text', 'open')">Open text shadow properties</button>
+                <textarea onmouseleave="this.blur()" onchange="saveText(this)" style="resize: vertical;" id="TextNodeContent">${textTool.text}</textarea>`;
             textNodeContent = document.getElementById("TextNodeContent");
             ctx.globalCompositeOperation="source-over";
             document.getElementById("TexFontSelect").value = textTool.font;
@@ -431,6 +440,7 @@ function openCreateFilePopup(){
 function closePopup(){
     document.getElementById("BackgroundDim").style.display = "none";
     document.getElementById("FileCreationPopup").style.display = "none";
+    document.getElementById("ShadowPropertiesPopup").style.display = "none";
 }
 function swapValues(){
     let temp = document.getElementById("HeightInput").value;
@@ -438,42 +448,134 @@ function swapValues(){
     document.getElementById("WidthInput").value = temp;
 }
 
-function openShadowPropertiesPopup(applyTo){
+function openShadowPropertiesPopup(applyTo, action){
     shadowPreviewCanvas.width = 250; //clear canvas
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("ShadowPropertiesPopup").style.display = "block";
+    let offsetXInput = document.getElementById("OffsetXInput");
+    let offsetYInput = document.getElementById("OffsetYInput");
+    let shadowBlurInput = document.getElementById("ShadowBlurInput");
+    let shadowColorInput = document.getElementById("ShadowColorInput");
+    let shadowOpacityInput = document.getElementById("ShadowOpacityInput");
+    let shadowCheckbox = document.getElementById("EnableShadowCheckbox");
 
-    spctx.shadowOffsetX = document.getElementById("OffsetXInput").value;
-    spctx.shadowOffsetY = document.getElementById("OffsetYInput").value;
+    let tool;
 
-    if (applyTo == "text"){
-        if (document.getElementById("EnableShadowCheckbox").checked){
-            console.log(`rgba(${hexToRgb(document.getElementById("ShadowColorInput").value)}, ${document.getElementById("ShadowOpacityInput").value/100})`)
-            spctx.shadowColor = `rgba(${hexToRgb(document.getElementById("ShadowColorInput").value)}, ${document.getElementById("ShadowOpacityInput").value/100})`;
-            spctx.shadowBlur = document.getElementById("ShadowBlurInput").value;
+    if (action == "open"){
+        if (applyTo == "text"){
+            tool = textTool;
+        }
+        else if(applyTo == "shape"){
+            tool = shapeTool;
+        }
+        shadowCheckbox.checked = !(tool.shadowColor == "rgba(0, 0, 0, 0)"); //Setting values to Shadow preview popup and shadow preview canvas
+        spctx.shadowOffsetX = tool.shadowOffsetX;
+        offsetXInput.value = tool.shadowOffsetX;
+        spctx.shadowOffsetY = tool.shadowOffsetY;
+        offsetYInput.value = tool.shadowOffsetY;
+        spctx.shadowBlur = tool.shadowBlur;
+        shadowBlurInput.value = tool.shadowBlur;
+        shadowOpacityInput.value = tool.shadowOpacity;
+        shadowColorInput.value = tool.rawShadowColor;
+        if (shadowCheckbox.checked){
+            spctx.shadowColor = `rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`;
+        }
+
+        if (applyTo == "text"){ //Creating text on canvas
+            let textStyles = "";
+            if (textTool.bold){textStyles += "bold "};
+            if (textTool.italic){textStyles += "italic "};
+            spctx.fillStyle = selectedColorPicker.value;
+            spctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
+            spctx.textAlign = "center";
+    
+            spctx.fillText("Lorem ipsum", 125, 110);
+
+            offsetXInput.onchange = function(){openShadowPropertiesPopup('text', 'modify')};
+            offsetYInput.onchange = function(){openShadowPropertiesPopup('text', 'modify')};
+            shadowBlurInput.onchange = function(){openShadowPropertiesPopup('text', 'modify')};
+            shadowColorInput.onchange = function(){openShadowPropertiesPopup('text', 'modify')};
+            shadowOpacityInput.onchange = function(){openShadowPropertiesPopup('text', 'modify')};
+            shadowCheckbox.onchange = function(){openShadowPropertiesPopup('text', 'modify')};
+            document.getElementById("ApplyShadowButton").onclick = function(){confirmShadow('text')};
+        }
+        else if (applyTo == "shape"){
+            const shape = new Path2D();
+            spctx.lineWidth = shapeTool.stroke;
+            spctx.strokeStyle = selectedColorPicker.value;
+            spctx.lineJoin = ctx.lineJoin;
+            shape.rect(62.5, 50, 125, 100)
+            spctx.stroke(shape);
+            if (shapeTool.fillShape){
+                spctx.fillStyle = shapeTool.shapeFillColor;
+                spctx.fill(shape)
+            }
+
+            offsetXInput.onchange = function(){openShadowPropertiesPopup('shape', 'modify')};
+            offsetYInput.onchange = function(){openShadowPropertiesPopup('shape', 'modify')};
+            shadowBlurInput.onchange = function(){openShadowPropertiesPopup('shape', 'modify')};
+            shadowColorInput.onchange = function(){openShadowPropertiesPopup('shape', 'modify')};
+            shadowOpacityInput.onchange = function(){openShadowPropertiesPopup('shape', 'modify')};
+            shadowCheckbox.onchange = function(){openShadowPropertiesPopup('shape', 'modify')};
+            document.getElementById("ApplyShadowButton").onclick = function(){confirmShadow('shape')};
+        }
+    }
+
+    else if (action == "modify"){
+        if (shadowCheckbox.checked){
+            console.log(`rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`)
+            spctx.shadowColor = `rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`;
+            spctx.shadowBlur = shadowBlurInput.value;
         }
         else{
-            spctx.shadowColor = "rgba(0, 0, 0, 0,)";
+            spctx.shadowColor = "rgba(0, 0, 0, 0)";
             spctx.shadowBlur = 0;
         }
-        let textStyles = "";
-        if (textTool.bold){textStyles += "bold "};
-        if (textTool.italic){textStyles += "italic "};
-        spctx.fillStyle = selectedColorPicker.value;
-        spctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
-        spctx.textAlign = "center";
-
-        spctx.fillText("Lorem ipsum", 125, 110);
+        spctx.shadowOffsetX = offsetXInput.value;
+        spctx.shadowOffsetY = offsetYInput.value;
+        if (applyTo == "text"){
+            let textStyles = "";
+            if (textTool.bold){textStyles += "bold "};
+            if (textTool.italic){textStyles += "italic "};
+            spctx.fillStyle = selectedColorPicker.value;
+            spctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
+            spctx.textAlign = "center";
+    
+            spctx.fillText("Lorem ipsum", 125, 110);
+        }
+        else if (applyTo == "shape"){
+            const shape = new Path2D();
+            spctx.lineWidth = shapeTool.stroke;
+            spctx.strokeStyle = selectedColorPicker.value;
+            spctx.lineJoin = ctx.lineJoin;
+            shape.rect(62.5, 50, 125, 100)
+            spctx.stroke(shape);
+            if (shapeTool.fillShape){
+                spctx.fillStyle = shapeTool.shapeFillColor;
+                spctx.fill(shape)
+            }
+        }
     }
+    
 }
-function confirmShadow(){
+function confirmShadow(applyTo){
     document.getElementById("BackgroundDim").style.display = "none";
     document.getElementById("ShadowPropertiesPopup").style.display = "none";
+    let tool;
 
-    textTool.shadowOffsetX = spctx.shadowOffsetX;
-    textTool.shadowOffsetY = spctx.shadowOffsetY;
-    textTool.shadowBlur = spctx.shadowBlur;
-    textTool.shadowColor =  spctx.shadowColor;
+    if (applyTo == "text"){
+        tool = textTool;
+    }
+    else if(applyTo == "shape"){
+        tool = shapeTool;
+    }
+
+    tool.shadowOffsetX = spctx.shadowOffsetX;
+    tool.shadowOffsetY = spctx.shadowOffsetY;
+    tool.shadowBlur = spctx.shadowBlur;
+    tool.rawShadowColor = document.getElementById("ShadowColorInput").value;
+    tool.shadowOpacity = document.getElementById("ShadowOpacityInput").value;
+    tool.shadowColor = spctx.shadowColor;
 }
 
 function createCanvas(clearHistory){
@@ -1167,6 +1269,11 @@ function mouseDown(){
                 shapePoints.push(cursorAxises);
             }
             else{
+                ctx.shadowOffsetX = shapeTool.shadowOffsetX;
+                ctx.shadowOffsetY = shapeTool.shadowOffsetY;
+                ctx.shadowBlur = shapeTool.shadowBlur;
+                ctx.shadowColor =  shapeTool.shadowColor;
+
                 shapePoints.push(cursorAxises);
                 const shape = new Path2D();
                 switch (shapeTool.shape){
@@ -1203,6 +1310,11 @@ function mouseDown(){
                 ctx.stroke(polygon);
             }
             else if (shapePoints.length == corners-1){
+                ctx.shadowOffsetX = shapeTool.shadowOffsetX;
+                ctx.shadowOffsetY = shapeTool.shadowOffsetY;
+                ctx.shadowBlur = shapeTool.shadowBlur;
+                ctx.shadowColor =  shapeTool.shadowColor;
+
                 polygon.lineTo(cursorAxises[0], cursorAxises[1]);
                 polygon.closePath();
                 ctx.stroke(polygon)
