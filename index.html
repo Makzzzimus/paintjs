@@ -12,19 +12,19 @@
 </head>
 <body onmouseup="mouseUp()">
     <div id="TittleBar">
-        <h1>PaintJS</h1>
+        <h1 id="Status">PaintJS</h1>
     </div>
     <div id="WindowContent">
         <div id="SideBar">
             <div id="ToolsBox">
                 <div id="ToolSelectionBox">
-                    <div class="ToolButton" id="PBrButton" onclick="selectTool(this)" data-tippy-content="<strong>Paint Brush tool (B)</strong><br>Paints custom brush strokes" data-tippy-placement="right"> <!-- PaintBrushButton -->
+                    <div class="ToolButton" id="PBrButton" onclick="selectTool(this)" data-tippy-content="<strong>Paint Brush tool (B)</strong><br>Draws custom brush strokes" data-tippy-placement="right"> <!-- PaintBrushButton -->
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path class="PBrSvgElement" fill="#9A949B" d="M12.89,20.53l3.91,2.55c0.76,0.5,1.79,0.21,2.18-0.62L26.45,6.7c0.32-0.68,0.09-1.49-0.54-1.91l0,0c-0.63-0.41-1.47-0.29-1.96,0.28L12.57,18.29C11.97,18.98,12.12,20.03,12.89,20.53z"/>
                             <path class="PBrSvgElement" fill="#9A949B" d="M11.81,24.99c0,0,2.51-3.54,2.26-3.65c-0.96-0.46-3.5-1.15-4.94,3.24c0,0-0.95,2.61-0.04,6.07c0,0,1.7-3.05,4.51-3.36c0,0,5.26-2.28,1.28-5.43C14.74,21.76,11.95,25.09,11.81,24.99z"/>
                         </svg>
                     </div>
-                    <div class="ToolButton" id="EraButton" onclick="selectTool(this)" data-tippy-content="<strong>Eraser tool (E)</strong><br>Makes pixels transparent" data-tippy-placement="right"> <!-- EraserButton -->
+                    <div class="ToolButton" id="EraButton" onclick="selectTool(this)" data-tippy-content="<strong>Eraser tool (E)</strong><br>Deletes drawn pixels" data-tippy-placement="right"> <!-- EraserButton -->
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35; margin: 2px;" xml:space="preserve">
                             <path class="EraSvgElement" fill="#9A949B" d="M15.6,33.9c-0.5,0-1-0.4-1-1c0-0.6,0.4-1,1-1l17.1-0.1c0,0,0,0,0,0c0.5,0,1,0.4,1,1c0,0.6-0.4,1-1,1L15.6,33.9C15.6,33.9,15.6,33.9,15.6,33.9z"/>
                             <path class="EraSvgElement" fill="#9A949B" d="M15.6,33.8c-0.4,0-0.7-0.1-1-0.3l-10-6.1c-0.9-0.6-1.2-1.8-0.7-2.7L17.8,2.1C18,1.7,18.5,1.3,19,1.2c0.5-0.1,1.1,0,1.5,0.2l0,0l10,6.1c0.4,0.3,0.8,0.7,0.9,1.2c0.1,0.5,0,1-0.2,1.5L17.2,32.9C16.9,33.5,16.2,33.8,15.6,33.8zM19.4,3.2L5.6,25.7l10,6.1L29.4,9.3L19.4,3.2z"/>
@@ -39,7 +39,7 @@
                             <polygon class="SToSvgElement" fill="#9A949B" points="21.6,18 15.1,27.4 28.1,27.4 "/>
                         </svg>
                     </div>
-                    <div class="ToolButton" id="TexButton" onclick="selectTool(this)" data-tippy-content="<strong>Text tool (T)</strong><br>Renders text to canvas" data-tippy-placement="right">
+                    <div class="ToolButton" id="TexButton" onclick="selectTool(this)" data-tippy-content="<strong>Text tool (T)</strong><br>Renders text to the canvas" data-tippy-placement="right">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path class="TexSvgElement" fill="#9A949B" d="M17.2,7.9c-0.1,0.6-0.1,1.3-0.1,1.9c0,0.6,0,1.1,0,1.4c0,0.4,0,0.8,0,1.1c0,0.4,0,0.7,0.1,0.9h-0.6c-0.1-1.2-0.3-2.1-0.5-2.8c-0.2-0.7-0.6-1.2-1.1-1.5s-1.3-0.5-2.4-0.5h-1.4v14.4c0,0.7,0.1,1.2,0.2,1.5c0.1,0.3,0.4,0.6,0.7,0.7s0.9,0.2,1.6,0.2v0.5c-0.4,0-1-0.1-1.7-0.1c-0.7,0-1.4,0-2,0c-0.8,0-1.5,0-2.1,0c-0.7,0-1.2,0-1.6,0.1v-0.5c0.7,0,1.2-0.1,1.6-0.2s0.6-0.3,0.7-0.7c0.1-0.3,0.2-0.8,0.2-1.5V8.5H7.5c-1,0-1.8,0.2-2.3,0.5c-0.5,0.3-0.9,0.8-1.1,1.5c-0.2,0.7-0.4,1.6-0.5,2.8H3c0-0.3,0.1-0.6,0.1-0.9c0-0.4,0-0.7,0-1.1c0-0.3,0-0.8,0-1.4C3,9.2,3,8.5,2.9,7.9c0.7,0,1.5,0,2.3,0.1c0.8,0,1.7,0,2.5,0s1.6,0,2.3,0c0.7,0,1.5,0,2.3,0c0.8,0,1.7,0,2.5,0C15.7,7.9,16.5,7.9,17.2,7.9z"/>
                             <path class="TexSvgElement" fill="#9A949B" d="M23.7,12.4c1.5,0,2.6,0.5,3.5,1.4c0.8,0.9,1.3,2.3,1.3,4.2h-8.9l0-0.5H26c0-0.8,0-1.6-0.2-2.3c-0.2-0.7-0.4-1.3-0.8-1.7c-0.4-0.4-0.8-0.6-1.4-0.6c-0.8,0-1.5,0.4-2.1,1.2c-0.6,0.8-1,2-1.1,3.7l0.1,0.1c0,0.3-0.1,0.5-0.1,0.8c0,0.3,0,0.6,0,0.9c0,1.1,0.2,2.1,0.6,3c0.4,0.8,0.9,1.5,1.5,1.9s1.2,0.6,1.9,0.6c0.5,0,1-0.1,1.4-0.2s0.9-0.4,1.3-0.8c0.4-0.4,0.7-0.9,1-1.5l0.5,0.2c-0.2,0.6-0.5,1.1-0.9,1.6c-0.4,0.5-1,0.9-1.6,1.3c-0.6,0.3-1.4,0.5-2.2,0.5c-1.2,0-2.3-0.3-3.1-0.8c-0.9-0.6-1.5-1.3-2-2.3c-0.5-1-0.7-2.1-0.7-3.4c0-1.5,0.2-2.8,0.7-3.8c0.5-1.1,1.1-1.9,2-2.5C21.6,12.7,22.6,12.4,23.7,12.4z"/>
@@ -84,7 +84,7 @@
                         <polygon class="CopySvgElement" fill="#9A949B" points="28.68,18.16 22.48,18.16 22.48,11.81 24.48,11.81 24.48,16.15 28.68,16.15 "/>
                     </svg>
                 </button>
-                <button class="ActionButton" id="PasteButton" onclick="Fragment.paste()" data-tippy-content="<strong>Paste (V)</strong><br>Pastes the image from clipboard to the canvas">
+                <button class="ActionButton" id="PasteButton" onclick="Fragment.paste()" data-tippy-content="<strong>Paste (V)</strong><br>Pastes the image from the clipboard to the canvas">
                     <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                         <path class="PasteSvgElement" fill="#682375" d="M28.27,32.34H17.48c-1.03,0-1.87-0.84-1.87-1.87V14.93c0-1.03,0.84-1.87,1.87-1.87h6.65c0.5,0,0.96,0.19,1.32,0.54l4.14,4.08c0.36,0.35,0.56,0.84,0.56,1.34v11.46C30.14,31.5,29.3,32.34,28.27,32.34z M17.48,14.87l-0.06,0.06v15.54l10.85,0.06l0.06-11.52l-4.16-4.12L17.48,14.87z"/>
                         <polyline class="PasteSvgElement" fill="#682375" points="24.52,13.78 24.52,18.62 29.23,18.62 "/>
@@ -103,7 +103,7 @@
                 </button>
             </div>
             <div id="ColorsBox">
-                <div id="SelectedColorBox" data-tippy-content="<strong>Color palette (C)</strong><br>Opens a color palette that contains all possible colors">
+                <div id="SelectedColorBox" data-tippy-content="<strong>Stroke color palette (C)</strong><br>Opens a color palette that contains all possible colors">
                     <input type="color" id="SelectedColor" onchange="setWithColorPicker()">
                     <input type="text" id="SelectedColorHex" style="width: 60px; margin-bottom: 5px; font-size: 10pt;" value="#000000" onchange="setColorWithHex()"><br>
                     <button id="CopyHexButton" onclick="copyHex()">Copy</button>
@@ -153,7 +153,7 @@
             <div id="FileInteractionBox">
                 <fieldset id="FileInteractionFieldset">
                     <legend id="FileActionsLegend">File actions</legend>
-                    <button class="FileButton" id="NewFileButton" onclick="openCreateFilePopup()" data-tippy-content="<strong>New File (Alt + N)</strong><br>Creates new canvas. Erases the contents of the previous canvas">
+                    <button class="FileButton" id="NewFileButton" onclick="openCreateFilePopup()" data-tippy-content="<strong>New File (Alt + N)</strong><br>Creates the new canvas. Erases the contents of the previous canvas">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path fill="#682375" d="M21.7,32H8.8c-1.1,0-2-0.9-2-2V5.2c0-1.1,0.9-2,2-2h11.7l7.8,7.7v14.5h-2V11.7l-6.6-6.5H8.8l0,24.8l12.9,0V32z"/>
                             <polyline fill="#682375" points="20.1,4.2 20.1,11.4 27.3,11.3 	"/>
@@ -163,7 +163,7 @@
                         </svg>
                     </button>
                     <input class="FileButton" id="FileOpenDialogCaller" type="file" onchange="openFile('open', this)" accept="image/png, image/jpeg" style="display: none;">
-                    <button class="FileButton" id="OpenFileButton" onclick="document.getElementById('FileOpenDialogCaller').click()" data-tippy-content="<strong>Open File (Alt + O)</strong><br>Sets selected image as canvas">
+                    <button class="FileButton" id="OpenFileButton" onclick="document.getElementById('FileOpenDialogCaller').click()" data-tippy-content="<strong>Open File (Alt + O)</strong><br>Sets the selected image as the canvas">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path fill="#682375" d="M23.81,23.48H5.39c-1.43,0-2.59-1.16-2.59-2.59V7.23c0-0.69,0.27-1.35,0.76-1.84C4.05,4.9,4.7,4.64,5.39,4.64c0,0,0,0,0.01,0l18.42,0.04c1.43,0,2.59,1.17,2.59,2.59v13.62C26.41,22.32,25.24,23.48,23.81,23.48z M5.39,6.64c-0.16,0-0.31,0.06-0.42,0.17C4.86,6.92,4.8,7.07,4.8,7.23v13.66c0,0.33,0.27,0.59,0.59,0.59h18.42c0.33,0,0.59-0.27,0.59-0.59V7.27c0-0.33-0.27-0.59-0.59-0.59L5.39,6.64C5.39,6.64,5.39,6.64,5.39,6.64z"/>
 	                        <circle fill="#682375" cx="9.09" cy="10.31" r="1.53"/>
@@ -175,7 +175,7 @@
                         </svg>
                     </button>
                     <input class="FileButton" id="FileInsertDialogCaller" type="file" onchange="openFile('insert', this)" accept="image/png, image/jpeg" style="display: none;">
-                    <button class="FileButton" id="InsertFileButton" onclick="document.getElementById('FileInsertDialogCaller').click()" data-tippy-content="<strong>Insert File (Alt + I)</strong><br>Inserts an image to the already existing canvas">
+                    <button class="FileButton" id="InsertFileButton" onclick="document.getElementById('FileInsertDialogCaller').click()" data-tippy-content="<strong>Insert File (Alt + I)</strong><br>Inserts the image to the already existing canvas">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path fill="#682375" d="M23.81,23.48H5.39c-1.43,0-2.59-1.16-2.59-2.59V7.23c0-0.69,0.27-1.35,0.76-1.84C4.05,4.9,4.7,4.64,5.39,4.64c0,0,0,0,0.01,0l18.42,0.04c1.43,0,2.59,1.17,2.59,2.59v13.62C26.41,22.32,25.24,23.48,23.81,23.48z M5.39,6.64c-0.16,0-0.31,0.06-0.42,0.17C4.86,6.92,4.8,7.07,4.8,7.23v13.66c0,0.33,0.27,0.59,0.59,0.59h18.42c0.33,0,0.59-0.27,0.59-0.59V7.27c0-0.33-0.27-0.59-0.59-0.59L5.39,6.64C5.39,6.64,5.39,6.64,5.39,6.64z"/>
 	                        <circle fill="#682375" cx="9.09" cy="10.31" r="1.53"/>
@@ -185,7 +185,7 @@
                             <rect x="29.18" y="22.99" transform="matrix(0.707 -0.7072 0.7072 0.707 -9.1465 28.7928)" fill="#682375" width="2" height="4.9"/>
                         </svg>
                     </button>
-                    <button class="FileButton" id="SaveAsButton" onclick="saveFile()" data-tippy-content="<strong>Save File (Alt + S)</strong><br>Downloads canvas contents to the local storage">
+                    <button class="FileButton" id="SaveAsButton" onclick="saveFile()" data-tippy-content="<strong>Save File (Alt + S)</strong><br>Downloads the canvas contents to the local storage">
                         <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path fill="#682375" d="M24.25,26.1H6.28c-1.31,0-2.37-1.06-2.37-2.37V5.69c0-1.3,1.06-2.37,2.36-2.37l16.28-0.06l3.95,3.95v16.62C26.51,25.08,25.49,26.1,24.25,26.1z M21.73,5.27L6.28,5.32c-0.2,0-0.37,0.17-0.37,0.37v18.03c0,0.2,0.17,0.37,0.37,0.37h17.97c0.14,0,0.26-0.12,0.26-0.26V8.04L21.73,5.27z"/>
                             <polygon fill="#682375" points="21.21,12.8 9.34,12.8 9.34,4.26 11.34,4.26 11.34,10.8 19.21,10.8 19.21,4.27 21.21,4.27 "/>

@@ -14,6 +14,7 @@ body{
     height: 100vh;
     overflow-x: hidden;
     overflow-y: hidden;
+    user-select: none;
 }
 legend{
     font-family: "Comfortaa", sans-serif;
@@ -82,7 +83,7 @@ button:hover, select:hover{
 }
 p{
     color: var(--gray);
-    font-size: 11pt;
+    font-size: 10pt;
 }
 
 
@@ -135,7 +136,7 @@ p{
 
 #ToolsBox{
     margin: 15px;
-    height: 250px;
+    height: 20vh;
     padding: 15px;
     display: flex;
 }
@@ -167,14 +168,14 @@ p{
 #ToolPreferencesFieldset{
     max-height: 100%;
 
-    overflow-y: none;
+    overflow-y: scroll;
     border-radius: 8px;
     border: dashed var(--gray);
     padding: 15px;
     text-align: center;
 }
 #PBrStrokeValue, #EraStrokeValue, #SToStrokeValue, #TexStrokeValue{
-    width: 40px;
+    width: 45px;
 }
 #InputFillColor{
     margin-right: 5px;
@@ -259,7 +260,7 @@ p{
 
 #FileInteractionBox{
     margin: 15px;
-    margin-top: 85px;
+    margin-top: 55px;
 }
 #FileInteractionFieldset{
     border-radius: 8px;

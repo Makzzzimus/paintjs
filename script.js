@@ -23,7 +23,7 @@ const shapeTool = {
     shadowColor: "rgba(0, 0, 0, 0)",
 };
 const textTool = {
-    fontSize: 12,
+    fontSize: 16,
     textAlignment: "Left",
     font: "Arial",
     italic: false,
@@ -87,6 +87,7 @@ function hexToRgb(rawhex) { //ty https://stackoverflow.com/a/11508164
 }
 
 function selectTool(t){
+    let ToolPreferencesFieldset = document.getElementById("ToolPreferencesFieldset");
     canvasContainer.style.cursor = "crosshair";
     changeActionButtonStatus("Copy", "off")
     changeActionButtonStatus("Cut", "off")
@@ -104,7 +105,7 @@ function selectTool(t){
     changeToolButtonColor(t);
     switch (selectedTool){
         case "PBr":
-            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Brush size: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrush.stroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrush.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Brush shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <div> <label>Brush stroke quality: </label><br> <select id="SelectBrushQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
+            ToolPreferencesFieldset.innerHTML = `<legend>Tool properties</legend> <div> <label>Brush size: </label><br> <input id="PBrStrokeSlider" type="range" min="1" max="72" value="${paintBrush.stroke}" oninput="changeStroke(this)"> <input id="PBrStrokeValue" type="number" min="1" max="72" value="${paintBrush.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Brush shape: </label><br> <select id="SelectBrushShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <div><br> <label>Brush stroke quality: </label><br> <select id="SelectBrushQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
             ctx.globalCompositeOperation="source-over";
             ctx.lineWidth = paintBrush.stroke;
             changeShape();
@@ -112,9 +113,11 @@ function selectTool(t){
             document.getElementById("SelectBrushShape").value = paintBrush.strokeShape;
             document.getElementById("SelectBrushQuality").value = paintBrush.strokeQuality;
             cooldown = 0;
+            tippy("#SelectBrushQuality",{content: "Reduces the number of points when drawing custom strokes in order, to enhance the performance.", delay: [400, 100],
+            animation: "shift-toward", placement: "bottom",});
             break;
         case "Era":
-            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Eraser size: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraser.stroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraser.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Eraser shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
+            ToolPreferencesFieldset.innerHTML = `<legend>Tool properties</legend> <div> <label>Eraser size: </label><br> <input id="EraStrokeSlider" type="range" min="1" max="72" value="${eraser.stroke}" oninput="changeStroke(this)"> <input id="EraStrokeValue" type="number" min="1" max="72" value="${eraser.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Eraser shape: </label><br> <select id="SelectEraserShape" onchange="changeShape(this)"> <option value="square">Square</option> <option value="round">Rounded</option> </select> </div> <br> <label>Eraser stroke quality: </label><br> <select id="SelectEraserQuality" onchange="changeQuality(this)"> <option value="original">Original</option> <option value="high">High</option> <option value="medium">Medium</option> <option value="low">Low</option></select></div>`;
             ctx.globalCompositeOperation="destination-out";
             ctx.lineWidth = eraser.stroke;
             changeShape();
@@ -122,9 +125,13 @@ function selectTool(t){
             document.getElementById("SelectEraserShape").value = eraser.strokeShape;
             document.getElementById("SelectEraserQuality").value = eraser.strokeQuality;
             cooldown = 0;
+            tippy("#SelectEraserQuality",{content: "Reduces the number of points when drawing custom strokes in order, to enhance the performance.", delay: [400, 100],
+            animation: "shift-toward", placement: "bottom",});
             break;
         case "STo":
-            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select><input type="number" min="3" max="24" value="3" id="InputCorners" onchange="resetPolygon()" style="width: 35px; display: none";></div><div><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div> <button style="margin-top: 5px" onclick="openShadowPropertiesPopup('shape', 'open')">Open shape shadow properties</button> <div><label>Fill shape: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy primary color</button></div>`;
+            ToolPreferencesFieldset.innerHTML = `<legend>Tool properties</legend> <div> <label>Shape stroke: </label><br> <input id="SToStrokeSlider" type="range" min="1" max="72" value="${shapeTool.stroke}" oninput="changeStroke(this)"> <input id="SToStrokeValue" type="number" min="1" max="72" value="${shapeTool.stroke}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected shape: </label><br> <select id="SelectShapeToolShape" onchange="setShapeToolShape(this)"> <option value="rectangle">Rectangle</option> <option value="circle">Circle</option> <option value="line">Line</option> <option value="polygon">Polygon</option> </select><input type="number" min="3" max="24" value="3" id="InputCorners" onchange="resetPolygon()" style="width: 35px; display: none";></div><div><br><label>Selected corner shape: </label><br> <select id="SelectShapeToolCornerShape" onchange="changeShape(this)"> <option value="sharp">Sharp</option> <option value="cut">Cut</option> <option value="rounded">Rounded</option></select></div>  <div><br><label>Fill shape: </label> <input type="checkbox" id="CheckboxShapeFill" onclick="changeIsFillShape(this)"></div> <div><label>Fill color: </label><br><input type="color" id="InputFillColor" onchange="setFillColor(this)"><button onclick="setFillColorFromPrimary()">Copy stroke color</button></div> <button onclick="openShadowPropertiesPopup('shape', 'open')">Open shape shadow properties</button>`;
+            tippy("#InputCorners",{content: "Number of angles of a polygon", delay: [400, 100],
+            animation: "shift-toward", placement: "bottom",});
             ctx.globalCompositeOperation="source-over";
             ctx.lineWidth = shapeTool.stroke;
             shapePoints = [];
@@ -136,9 +143,10 @@ function selectTool(t){
             }
             changeShape();
             clearPreviewCanvas();
+            
             break;
         case "Tex":
-            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend> <div> <label>Font size: </label><br> <input id="TexStrokeSlider" type="range" min="1" max="128" value="${textTool.fontSize}" oninput="changeStroke(this)"> <input id="TexStrokeValue" type="number" min="1" max="72" value="${textTool.fontSize}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected font: </label><br> <select id="TexFontSelect" onchange="changeFont(this)"> <option value="Courier New">Courier New</option> <option value="Franklin Gothic Medium">Franklin Gothic Medium</option> <option value="Gill Sans">Gill Sans</option> <option value="Segoe UI">Segoe UI</option> <option value="Times New Roman">Times New Roman</option> <option value="Trebuchet MS">Trebuchet MS</option> <option value="Arial">Arial</option> <option value="Cambria">Cambria</option> <option value="Georgia">Georgia</option> <option value="Verdana">Verdana</option> </select></div> 
+            ToolPreferencesFieldset.innerHTML = `<legend>Tool properties</legend> <div> <label>Font size: </label><br> <input id="TexStrokeSlider" type="range" min="1" max="256" value="${textTool.fontSize}" oninput="changeStroke(this)"> <input id="TexStrokeValue" type="number" min="1" max="256" value="${textTool.fontSize}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected font: </label><br> <select id="TexFontSelect" onchange="changeFont(this)"> <option value="Courier New">Courier New</option> <option value="Franklin Gothic Medium">Franklin Gothic Medium</option> <option value="Gill Sans">Gill Sans</option> <option value="Segoe UI">Segoe UI</option> <option value="Times New Roman">Times New Roman</option> <option value="Trebuchet MS">Trebuchet MS</option> <option value="Arial">Arial</option> <option value="Cambria">Cambria</option> <option value="Georgia">Georgia</option> <option value="Verdana">Verdana</option> </select></div> 
             <div id="TextPropertiesFieldsContainer">
                 <div class="TextPropertiesFields"> 
                     <div class="TextPropertiesButtons" onclick="changeTextAlignment(this)" id="Left">
@@ -187,6 +195,11 @@ function selectTool(t){
             document.getElementById("TexFontSelect").value = textTool.font;
             changeTextAlignment();
             changeTextStyle();
+            tippy("#Left",{content: "<strong>Left alignment (Shift + Left arrow)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
+            tippy("#Center",{content: "<strong>Center alignment (Shift + Right arrow)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
+            tippy("#Right",{content: "<strong>Right alignment (Shift + Down arrow)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
+            tippy("#bold",{content: "<strong>Bold (Shift + B)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
+            tippy("#italic",{content: "<strong>Italic (Shift + I)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
             break;
         case "Sel":
             document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
@@ -486,7 +499,7 @@ function openShadowPropertiesPopup(applyTo, action){
             if (textTool.bold){textStyles += "bold "};
             if (textTool.italic){textStyles += "italic "};
             spctx.fillStyle = selectedColorPicker.value;
-            spctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
+            spctx.font = `${textStyles} ${textTool.fontSize}px ${textTool.font}`;
             spctx.textAlign = "center";
     
             spctx.fillText("Lorem ipsum", 125, 110);
@@ -538,7 +551,7 @@ function openShadowPropertiesPopup(applyTo, action){
             if (textTool.bold){textStyles += "bold "};
             if (textTool.italic){textStyles += "italic "};
             spctx.fillStyle = selectedColorPicker.value;
-            spctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
+            spctx.font = `${textStyles} ${textTool.fontSize}px ${textTool.font}`;
             spctx.textAlign = "center";
     
             spctx.fillText("Lorem ipsum", 125, 110);
@@ -641,7 +654,6 @@ function openFile(action, t){
         const img = new Image();
         img.src = URL.createObjectURL(uploadedImage);
         img.onload = function(){
-            console.log(img.getType())
             if (action == "open"){
                 let confirmDeletion = true
                 if (canvas.width > 0 || canvas.height > 0){
@@ -689,7 +701,9 @@ function loadUserColors(){
     for(let j=0; j<2; j++){
         for(let i=0; i<7; i++){
             let currentCell = document.getElementById(`UserColor${j+1}-${i+1}`);
+            console.log(`UserColor${j+1}-${i+1}`)
             currentCell.style.backgroundColor = cells[j][i];
+            console.log(`cells[${j}][${i}] ` + cells[j][i])
         }
     }
 }
@@ -706,6 +720,7 @@ function saveUserColor(t){
                 raw = raw + currentCell.style.backgroundColor
             }
         }
+        console.log(`UsC${j}={raw}; path=/`)
         document.cookie = `UsC${j}=${raw}; path=/` //UsC1 - UserColorsRaw1
         raw = [];
     }
@@ -727,6 +742,9 @@ const Fragment = {
             ]);
         });
         this.canvasFragment = undefined;
+        tippy("#Status", {trigger: "click", allowHTML: true, content: "<strong>Successfully copied to the clipboard!</strong>", duration: [null, 500],})
+        document.getElementById("Status").click();
+        setTimeout(function(){document.getElementById("Status").click(); tippy("#Status", {})}, 1500)
     },
     async paste(){
         const clipboardContents = await navigator.clipboard.read();
@@ -737,7 +755,7 @@ const Fragment = {
             img.onload = () => {
                 ctx.globalCompositeOperation = "source-over";
                 ctx.drawImage(img, 0, 0);
-                clearPreviewCanvas();
+                document.getElementById("SelButton").click();
 
                 const selectionBox = new Path2D();
                 selectionBox.rect(0, 0, img.width, img.height);
@@ -767,6 +785,9 @@ const Fragment = {
         clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
         ctx.fill(clearRect);
         clearPreviewCanvas();
+        tippy("#Status", {trigger: "click", allowHTML: true, content: "<strong>Successfully copied to the clipboard!</strong>", duration: [null, 500],})
+        document.getElementById("Status").click();
+        setTimeout(function(){document.getElementById("Status").click(); tippy("#Status", {})}, 1500)
     }
 };
 
@@ -1015,14 +1036,18 @@ function keyUp(e) {
     if(!isFocused){
         switch (e.code){
             case "KeyB":
-                document.getElementById("PBrButton").click();
+                if (!e.shiftKey){
+                    document.getElementById("PBrButton").click();
+                }
                 break;
             case "KeyE":
                 document.getElementById("EraButton").click();
                 break;
             case "KeyS":
-                document.getElementById("SToButton").click();
-                break;    
+                if (!e.altKey){
+                    document.getElementById("SToButton").click();
+                }
+                break; 
             case "KeyT":
                 document.getElementById("TexButton").click();
                 break;  
@@ -1045,8 +1070,9 @@ function keyUp(e) {
             case "KeyX":
                 document.getElementById("CutButton").click();
                 break;
-            case "KeyC":
-                selectedColorPicker.click();
+            case "Escape":
+                selectionBoxPoints = [];
+                clearPreviewCanvas();
                 break;
             case "Backspace":
             case "Delete":
@@ -1073,6 +1099,35 @@ function keyUp(e) {
                     break;
                 case "KeyS":
                     document.getElementById("SaveAsButton").click();
+                    break;
+            }
+        }
+        if (e.shiftKey){
+            switch (e.code){
+                case "KeyB":
+                    try{
+                        document.getElementById("bold").click();
+                    }catch{}
+                    break;
+                case "KeyI":
+                    try{
+                        document.getElementById("italic").click();
+                    }catch{}
+                    break;
+                case "ArrowLeft":
+                    try{
+                        document.getElementById("Left").click();
+                    }catch{}
+                    break;
+                case "ArrowDown":
+                    try{
+                        document.getElementById("Center").click();
+                    }catch{}
+                    break;
+                case "ArrowRight":
+                    try{
+                        document.getElementById("Right").click();
+                    }catch{}
                     break;
             }
         }
@@ -1251,7 +1306,7 @@ function getCursorLocation(event){
             if (textTool.bold){textStyles += "bold "};
             if (textTool.italic){textStyles += "italic "};
             pctx.fillStyle = "rgba(0, 0, 0, 0.65)";
-            pctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
+            pctx.font = `${textStyles} ${textTool.fontSize}px ${textTool.font}`;
             pctx.textAlign = (textTool.textAlignment.toLowerCase());
             pctx.fillText(textTool.text, cursorX, cursorY);
         }
@@ -1362,7 +1417,7 @@ function mouseDown(){
             if (textTool.bold){textStyles += "bold "};
             if (textTool.italic){textStyles += "italic "};
             ctx.fillStyle = selectedColorPicker.value;
-            ctx.font = `${textStyles} ${textTool.fontSize}pt ${textTool.font}`;
+            ctx.font = `${textStyles} ${textTool.fontSize}px ${textTool.font}`;
             ctx.textAlign = (textTool.textAlignment.toLowerCase());
 
             ctx.shadowOffsetX = textTool.shadowOffsetX;
