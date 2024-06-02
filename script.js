@@ -454,6 +454,8 @@ function closePopup(){
     document.getElementById("BackgroundDim").style.display = "none";
     document.getElementById("FileCreationPopup").style.display = "none";
     document.getElementById("ShadowPropertiesPopup").style.display = "none";
+    document.getElementById("PreferencesPopup").style.display = "none";
+    document.getElementById("ChangelogPopup").style.display = "none";
 }
 function swapValues(){
     let temp = document.getElementById("HeightInput").value;
@@ -591,6 +593,26 @@ function confirmShadow(applyTo){
     tool.shadowColor = spctx.shadowColor;
 }
 
+function openPreferencesPopup(){
+    document.getElementById("BackgroundDim").style.display = "flex";
+    document.getElementById("PreferencesPopup").style.display = "block";
+}
+function applyPreferences(){
+    //apply preferences here
+
+    closePopup();
+}
+async function openChangelogPopup(){
+    document.getElementById("BackgroundDim").style.display = "flex";
+    document.getElementById("PreferencesPopup").style.display = "none";
+    document.getElementById("ChangelogPopup").style.display = "block";
+
+    let fetchedData = await fetch("changelog.txt");
+    let changelog = await fetchedData.text();
+    document.getElementById("ChangelogTextarea").value = changelog;
+}
+
+
 function createCanvas(clearHistory){
     let width = document.getElementById("WidthInput").value;
     let height = document.getElementById("HeightInput").value;
@@ -691,10 +713,21 @@ function openFile(action, t){
 }
 
 function loadUserColors(){
-    let raws = document.cookie.split("; ");
+    let rawCookies = document.cookie.split("; ");
+    let rows = [];
+    
+    for (let i=0; i<rawCookies.length; i++){
+        if (rawCookies[i].slice(0,3) == `UsC`){
+            rows.push(rawCookies[i])
+        }
+    }
+    console.log(rows)
+    if (rows[0].slice(0, 4) == "UsC2"){
+        rows.push(rows.shift());
+    }
     let cells = []
-    cells[0] = raws[0].split("!");
-    cells[1] = raws[1].split("!");
+    cells[0] = rows[0].split("!");
+    cells[1] = rows[1].split("!");
     cells[0][0] = cells[0][0].slice(5);
     cells[1][0] = cells[1][0].slice(5);
     console.log(cells)
@@ -1483,5 +1516,6 @@ tippy("[data-tippy-content]",{
     allowHTML: true,
 });
 try{
-    loadUserColors();
+
 }catch{console.error("An error occurred while loading user's colors")}
+loadUserColors();

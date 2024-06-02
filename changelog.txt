@@ -1,0 +1,4 @@
+v1.0.0
+    -Made github repo public
+    -Launched github pages
+    -Fixed user colors saving
