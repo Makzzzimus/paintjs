@@ -41,9 +41,10 @@ let selectionBoxPoints = [];
 let lastRadius = 0;
 const selectedColorPicker = document.getElementById("SelectedColor");
 const selectedColorHexInput = document.getElementById("SelectedColorHex");
-const cursorLocationInput = document.getElementById("CursorLocationInput")
+const cursorLocationInput = document.getElementById("CursorLocationInput");
 const selectedColorBox = document.getElementById("SelectedColorBox");
 const canvas = document.getElementById("Canvas");
+const statusText = document.getElementById("Status");
 const ctx = canvas.getContext("2d", { willReadFrequently: true });
 const previewCanvas = document.getElementById("PreviewCanvas");
 const pctx = previewCanvas.getContext("2d", { willReadFrequently: true });
@@ -78,7 +79,6 @@ function rgbToHex(r, g, b) { //thx man https://stackoverflow.com/a/5624139
 }
 function hexToRgb(rawhex) { //ty https://stackoverflow.com/a/11508164
     let hex = rawhex.substring(1);
-    console.log(hex)
     let bigint = parseInt(hex, 16);
     let r = (bigint >> 16) & 255;
     let g = (bigint >> 8) & 255;
@@ -538,7 +538,7 @@ function openShadowPropertiesPopup(applyTo, action){
 
     else if (action == "modify"){
         if (shadowCheckbox.checked){
-            console.log(`rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`)
+            //console.log(`rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`)
             spctx.shadowColor = `rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`;
             spctx.shadowBlur = shadowBlurInput.value;
         }
@@ -644,6 +644,7 @@ function createCanvas(clearHistory){
     changeShape();
     closePopup();
     if (clearHistory !== false){
+        document.title = statusText.innerHTML = "Unnamed canvas - PaintJS";
         undoActionsList = [];
         redoActionList = [];
         undoActionPropertiesList = [];
@@ -672,7 +673,6 @@ function openFile(action, t){
         alert("❌File wasn't selected");
     }
     else{
-        console.log(uploadedImage);
         const img = new Image();
         img.src = URL.createObjectURL(uploadedImage);
         img.onload = function(){
@@ -688,6 +688,7 @@ function openFile(action, t){
                     ctx.globalCompositeOperation = "source-over";
                     ctx.drawImage(img, 0 ,0);
                     backgroundImage = img;
+                    document.title = statusText.innerHTML = `${uploadedImage.name} - PaintJS`;
                 }
             }
     
@@ -721,7 +722,6 @@ function loadUserColors(){
             rows.push(rawCookies[i])
         }
     }
-    console.log(rows)
     if (rows[0].slice(0, 4) == "UsC2"){
         rows.push(rows.shift());
     }
@@ -730,13 +730,10 @@ function loadUserColors(){
     cells[1] = rows[1].split("!");
     cells[0][0] = cells[0][0].slice(5);
     cells[1][0] = cells[1][0].slice(5);
-    console.log(cells)
     for(let j=0; j<2; j++){
         for(let i=0; i<7; i++){
             let currentCell = document.getElementById(`UserColor${j+1}-${i+1}`);
-            console.log(`UserColor${j+1}-${i+1}`)
             currentCell.style.backgroundColor = cells[j][i];
-            console.log(`cells[${j}][${i}] ` + cells[j][i])
         }
     }
 }
@@ -753,7 +750,6 @@ function saveUserColor(t){
                 raw = raw + currentCell.style.backgroundColor
             }
         }
-        console.log(`UsC${j}={raw}; path=/`)
         document.cookie = `UsC${j}=${raw}; path=/` //UsC1 - UserColorsRaw1
         raw = [];
     }
