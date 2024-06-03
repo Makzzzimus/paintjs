@@ -1,6 +1,7 @@
-v1.1.0
+v1.0.1
     -Added favicon
-    -Page tittle change to opened file name
+    -Page tittle dynamically changes to the opened file name
+
 v1.0.0
     -Made github repo public
     -Launched github pages
