@@ -94,6 +94,7 @@ function selectTool(t){
     textNodeContent = undefined;
     ctx.shadowColor = "rgba(0, 0, 0, 0)"
     ctx.shadowBlur = 0;
+    clearPreviewCanvas();
     if (selectedTool === null){
         document.getElementById("ToolPreferencesBox").style.opacity = 1;
         document.getElementById("ToolPreferencesBox").style.transform = "scale(1)";
@@ -109,7 +110,6 @@ function selectTool(t){
             ctx.globalCompositeOperation="source-over";
             ctx.lineWidth = paintBrush.stroke;
             changeShape();
-            clearPreviewCanvas();
             document.getElementById("SelectBrushShape").value = paintBrush.strokeShape;
             document.getElementById("SelectBrushQuality").value = paintBrush.strokeQuality;
             cooldown = 0;
@@ -121,7 +121,6 @@ function selectTool(t){
             ctx.globalCompositeOperation="destination-out";
             ctx.lineWidth = eraser.stroke;
             changeShape();
-            clearPreviewCanvas();
             document.getElementById("SelectEraserShape").value = eraser.strokeShape;
             document.getElementById("SelectEraserQuality").value = eraser.strokeQuality;
             cooldown = 0;
@@ -142,8 +141,6 @@ function selectTool(t){
                 document.getElementById("InputCorners").style.display = "inline";
             }
             changeShape();
-            clearPreviewCanvas();
-            
             break;
         case "Tex":
             ToolPreferencesFieldset.innerHTML = `<legend>Tool properties</legend> <div> <label>Font size: </label><br> <input id="TexStrokeSlider" type="range" min="1" max="256" value="${textTool.fontSize}" oninput="changeStroke(this)"> <input id="TexStrokeValue" type="number" min="1" max="256" value="${textTool.fontSize}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected font: </label><br> <select id="TexFontSelect" onchange="changeFont(this)"> <option value="Courier New">Courier New</option> <option value="Franklin Gothic Medium">Franklin Gothic Medium</option> <option value="Gill Sans">Gill Sans</option> <option value="Segoe UI">Segoe UI</option> <option value="Times New Roman">Times New Roman</option> <option value="Trebuchet MS">Trebuchet MS</option> <option value="Arial">Arial</option> <option value="Cambria">Cambria</option> <option value="Georgia">Georgia</option> <option value="Verdana">Verdana</option> </select></div> 
@@ -204,7 +201,9 @@ function selectTool(t){
         case "Sel":
             document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
             selectionBoxPoints = [];
-            clearPreviewCanvas();
+            break;
+        case "CPi":
+            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
             break;
     }
 }
@@ -871,6 +870,8 @@ function saveAction(action, customTool){
 }
 
 function undoLastAction(){
+    changeActionButtonStatus("Copy", "off");
+    changeActionButtonStatus("Cut", "off");
     createCanvas(false);
     if (backgroundImage != null){
         ctx.globalCompositeOperation = "source-over";
@@ -965,6 +966,8 @@ function undoLastAction(){
     }
 }
 function redoLastAction(){
+    changeActionButtonStatus("Copy", "off");
+    changeActionButtonStatus("Cut", "off");
     let lastActionPropIndex = redoActionPropertiesList.length - 1;
     let lastActionIndex = redoActionList.length - 1;
 
@@ -1328,6 +1331,7 @@ function getCursorLocation(event){
         if (isMouseDown == true){
             clearPreviewCanvas();
             pctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
+            console.log(distanceXY)
         }
         else{
             isMovingFragment = false;
@@ -1362,124 +1366,131 @@ function getCursorLocation(event){
 }
 function mouseDown(){
     isMouseDown = true;
-    if (selectedTool == "PBr" || selectedTool == "Era"){
-        clearPreviewCanvas();
-        ctx.beginPath();
-    }
-    let cursorAxises = cursorLocationInput.value.split(", ");
-    if (selectedTool == "STo"){
-        if (shapeTool.shape == "rectangle" || shapeTool.shape == "circle" || shapeTool.shape == "line"){
-            if (shapePoints.length != 1){
-                shapePoints.push(cursorAxises);
-            }
-            else{
-                ctx.shadowOffsetX = shapeTool.shadowOffsetX;
-                ctx.shadowOffsetY = shapeTool.shadowOffsetY;
-                ctx.shadowBlur = shapeTool.shadowBlur;
-                ctx.shadowColor =  shapeTool.shadowColor;
-
-                shapePoints.push(cursorAxises);
-                const shape = new Path2D();
-                switch (shapeTool.shape){
-                    case "rectangle":
-                        shape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
-                        break;
-                    case "circle":
-                        let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]));
-                        lastRadius = radius;
-                        shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false); 
-                        break;
-                    case "line":
-                        shape.moveTo(shapePoints[0][0],shapePoints[0][1]);
-                        shape.lineTo(shapePoints[1][0],shapePoints[1][1]);
-                        break;
-                }
-                ctx.stroke(shape);
-                if (shapeTool.fillShape == true){
-                    ctx.fillStyle = shapeTool.shapeFillColor;
-                    ctx.fill(shape);
-                }
-                clearPreviewCanvas();
-            }
-        }
-        else if(shapeTool.shape == "polygon"){
-            let corners = document.getElementById("InputCorners").value;
-            if (shapePoints.length == 0){
-                shapePoints.push(cursorAxises);
-                polygon.moveTo(cursorAxises[0], cursorAxises[1]);
-            }
-            else if(shapePoints.length != 0 && shapePoints.length != corners-1){
-                shapePoints.push(cursorAxises);
-                polygon.lineTo(cursorAxises[0], cursorAxises[1]);
-                ctx.stroke(polygon);
-            }
-            else if (shapePoints.length == corners-1){
-                ctx.shadowOffsetX = shapeTool.shadowOffsetX;
-                ctx.shadowOffsetY = shapeTool.shadowOffsetY;
-                ctx.shadowBlur = shapeTool.shadowBlur;
-                ctx.shadowColor =  shapeTool.shadowColor;
-
-                polygon.lineTo(cursorAxises[0], cursorAxises[1]);
-                polygon.closePath();
-                ctx.stroke(polygon)
-                if (shapeTool.fillShape == true){
-                    ctx.fillStyle = shapeTool.shapeFillColor;
-                    ctx.fill(polygon);
-                }
-                shapePoints.push(cursorAxises);
-                polygon = new Path2D();
-            }
-        }
-    }
-    if (selectedTool == "Sel"){
-        if (canvasContainer.style.cursor != "grab"){
-            if (selectionBoxPoints.length != 1){
-                selectionBoxPoints = [];
-                selectionBoxPoints.push(cursorAxises);
-                changeActionButtonStatus("Copy", "off")
-                changeActionButtonStatus("Cut", "off")
-            }
-            else{
-                selectionBoxPoints.push(cursorAxises);
-                const selectionBox = new Path2D();
-                selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
-                pctx.strokeStyle = "rgba(0,0,75,0.8)"
-                pctx.setLineDash([8, 5]);
-                pctx.stroke(selectionBox);
-                changeActionButtonStatus("Copy", "on")
-                changeActionButtonStatus("Cut", "on")
-            }
-        }
-        else{
-            movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-            ctx.globalCompositeOperation = "destination-out";
-            const eraseRect = new Path2D();
-            eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0]    [1]);
-            distanceXY[0] = cursorX-selectionBoxPoints[0][0];
-            distanceXY[1] = cursorY-selectionBoxPoints[0][1];
-            ctx.fill(eraseRect);
-        }
-    }
-    if (selectedTool == "Tex"){
-        if(textTool.text != ""){
-            let textStyles = "";
-            if (textTool.bold){textStyles += "bold "};
-            if (textTool.italic){textStyles += "italic "};
-            ctx.fillStyle = selectedColorPicker.value;
-            ctx.font = `${textStyles} ${textTool.fontSize}px ${textTool.font}`;
-            ctx.textAlign = (textTool.textAlignment.toLowerCase());
-
-            ctx.shadowOffsetX = textTool.shadowOffsetX;
-            ctx.shadowOffsetY = textTool.shadowOffsetY;
-            ctx.shadowBlur = textTool.shadowBlur;
-            ctx.shadowColor =  textTool.shadowColor;
-
-            ctx.fillText(textTool.text, cursorX, cursorY);
+    //let cursorAxises = cursorLocationInput.value.split(", ");
+    switch (selectedTool){
+        case "PBr":
+        case "Era":
             clearPreviewCanvas();
-            saveAction([textTool.text, cursorX, cursorY]);
-            textNodeContent.value = "";
-            textTool.text = "";
-        }
+            ctx.beginPath();
+            break;
+        case "STo":
+            if (shapeTool.shape == "rectangle" || shapeTool.shape == "circle" || shapeTool.shape == "line"){
+                if (shapePoints.length != 1){
+                    shapePoints.push([cursorX, cursorY]);
+                }
+                else{
+                    ctx.shadowOffsetX = shapeTool.shadowOffsetX;
+                    ctx.shadowOffsetY = shapeTool.shadowOffsetY;
+                    ctx.shadowBlur = shapeTool.shadowBlur;
+                    ctx.shadowColor =  shapeTool.shadowColor;
+    
+                    shapePoints.push([cursorX, cursorY]);
+                    const shape = new Path2D();
+                    switch (shapeTool.shape){
+                        case "rectangle":
+                            shape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
+                            break;
+                        case "circle":
+                            let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]));
+                            lastRadius = radius;
+                            shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false); 
+                            break;
+                        case "line":
+                            shape.moveTo(shapePoints[0][0],shapePoints[0][1]);
+                            shape.lineTo(shapePoints[1][0],shapePoints[1][1]);
+                            break;
+                    }
+                    ctx.stroke(shape);
+                    if (shapeTool.fillShape == true){
+                        ctx.fillStyle = shapeTool.shapeFillColor;
+                        ctx.fill(shape);
+                    }
+                    clearPreviewCanvas();
+                }
+            }
+            else if(shapeTool.shape == "polygon"){
+                let corners = document.getElementById("InputCorners").value;
+                if (shapePoints.length == 0){
+                    shapePoints.push([cursorX, cursorY]);
+                    polygon.moveTo(cursorX,cursorY);
+                }
+                else if(shapePoints.length != 0 && shapePoints.length != corners-1){
+                    shapePoints.push([cursorX, cursorY]);
+                    polygon.lineTo(cursorX, cursorY);
+                    ctx.stroke(polygon);
+                }
+                else if (shapePoints.length == corners-1){
+                    ctx.shadowOffsetX = shapeTool.shadowOffsetX;
+                    ctx.shadowOffsetY = shapeTool.shadowOffsetY;
+                    ctx.shadowBlur = shapeTool.shadowBlur;
+                    ctx.shadowColor =  shapeTool.shadowColor;
+    
+                    polygon.lineTo(cursorX, cursorY);
+                    polygon.closePath();
+                    ctx.stroke(polygon)
+                    if (shapeTool.fillShape == true){
+                        ctx.fillStyle = shapeTool.shapeFillColor;
+                        ctx.fill(polygon);
+                    }
+                    shapePoints.push([cursorX, cursorY]);
+                    polygon = new Path2D();
+                }
+            }
+        break;
+        case "Sel":
+            if (canvasContainer.style.cursor != "grab"){
+                if (selectionBoxPoints.length != 1){
+                    selectionBoxPoints = [];
+                    selectionBoxPoints.push([cursorX, cursorY]);
+                    changeActionButtonStatus("Copy", "off")
+                    changeActionButtonStatus("Cut", "off")
+                }
+                else{
+                    selectionBoxPoints.push([cursorX, cursorY]);
+                    const selectionBox = new Path2D();
+                    selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
+                    pctx.strokeStyle = "rgba(0,0,75,0.8)"
+                    pctx.setLineDash([8, 5]);
+                    pctx.stroke(selectionBox);
+                    changeActionButtonStatus("Copy", "on")
+                    changeActionButtonStatus("Cut", "on")
+                }
+            }
+            else{
+                movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+                ctx.globalCompositeOperation = "destination-out";
+                const eraseRect = new Path2D();
+                eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0]    [1]);
+                distanceXY[0] = cursorX-selectionBoxPoints[0][0];
+                distanceXY[1] = cursorY-selectionBoxPoints[0][1];
+                ctx.fill(eraseRect);
+            }
+        break;
+        case "Tex":
+            if(textTool.text != ""){
+                let textStyles = "";
+                if (textTool.bold){textStyles += "bold "};
+                if (textTool.italic){textStyles += "italic "};
+                ctx.fillStyle = selectedColorPicker.value;
+                ctx.font = `${textStyles} ${textTool.fontSize}px ${textTool.font}`;
+                ctx.textAlign = (textTool.textAlignment.toLowerCase());
+    
+                ctx.shadowOffsetX = textTool.shadowOffsetX;
+                ctx.shadowOffsetY = textTool.shadowOffsetY;
+                ctx.shadowBlur = textTool.shadowBlur;
+                ctx.shadowColor =  textTool.shadowColor;
+    
+                ctx.fillText(textTool.text, cursorX, cursorY);
+                clearPreviewCanvas();
+                saveAction([textTool.text, cursorX, cursorY]);
+                textNodeContent.value = "";
+                textTool.text = "";
+            }
+        break;
+        case "CPi":
+            let colorData = ctx.getImageData(cursorX, cursorY, 1, 1).data;
+            selectedColorPicker.value = rgbToHex(colorData[0], colorData[1], colorData[2]);
+            setWithColorPicker();
     }
 }
 function mouseUp(){
