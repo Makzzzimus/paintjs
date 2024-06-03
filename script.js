@@ -643,7 +643,7 @@ function createCanvas(clearHistory){
     changeShape();
     closePopup();
     if (clearHistory !== false){
-        document.title = statusText.innerHTML = "Unnamed canvas - PaintJS";
+        document.title = statusText.innerHTML = "Unnamed canvas - rePaint";
         undoActionsList = [];
         redoActionList = [];
         undoActionPropertiesList = [];
@@ -687,7 +687,7 @@ function openFile(action, t){
                     ctx.globalCompositeOperation = "source-over";
                     ctx.drawImage(img, 0 ,0);
                     backgroundImage = img;
-                    document.title = statusText.innerHTML = `${uploadedImage.name} - PaintJS`;
+                    document.title = statusText.innerHTML = `${uploadedImage.name} - rePaint`;
                 }
             }
     
@@ -1366,7 +1366,6 @@ function getCursorLocation(event){
 }
 function mouseDown(){
     isMouseDown = true;
-    //let cursorAxises = cursorLocationInput.value.split(", ");
     switch (selectedTool){
         case "PBr":
         case "Era":
@@ -1460,8 +1459,8 @@ function mouseDown(){
                 movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
                 ctx.globalCompositeOperation = "destination-out";
                 const eraseRect = new Path2D();
-                eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0]    [1]);
-                distanceXY[0] = cursorX-selectionBoxPoints[0][0];
+                eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+                distanceXY[0] = selectionBoxPoints[0][0] - cursorX;
                 distanceXY[1] = cursorY-selectionBoxPoints[0][1];
                 ctx.fill(eraseRect);
             }
