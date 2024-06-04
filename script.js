@@ -89,8 +89,8 @@ function hexToRgb(rawhex) { //ty https://stackoverflow.com/a/11508164
 function selectTool(t){
     let ToolPreferencesFieldset = document.getElementById("ToolPreferencesFieldset");
     canvasContainer.style.cursor = "crosshair";
-    changeActionButtonStatus("Copy", "off")
-    changeActionButtonStatus("Cut", "off")
+    changeActionButtonStatus("Copy", "off");
+    changeActionButtonStatus("Cut", "off");
     textNodeContent = undefined;
     ctx.shadowColor = "rgba(0, 0, 0, 0)"
     ctx.shadowBlur = 0;
@@ -770,9 +770,9 @@ const Fragment = {
             ]);
         });
         this.canvasFragment = undefined;
-        tippy("#Status", {trigger: "click", allowHTML: true, content: "<strong>Successfully copied to the clipboard!</strong>", duration: [null, 500],})
-        document.getElementById("Status").click();
-        setTimeout(function(){document.getElementById("Status").click(); tippy("#Status", {})}, 1500)
+        const statusTooltip = statusText._tippy;
+        statusTooltip.show();
+        setTimeout(function(){statusTooltip.hide()}, 1500);
     },
     async paste(){
         const clipboardContents = await navigator.clipboard.read();
@@ -791,6 +791,8 @@ const Fragment = {
                 pctx.setLineDash([8, 5]);
                 pctx.stroke(selectionBox);
                 selectionBoxPoints = [[0, 0], [img.width, img.height]];
+                changeActionButtonStatus("Copy", "on");
+                changeActionButtonStatus("Cut", "on");
             }
         }
     },
@@ -813,9 +815,9 @@ const Fragment = {
         clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
         ctx.fill(clearRect);
         clearPreviewCanvas();
-        tippy("#Status", {trigger: "click", allowHTML: true, content: "<strong>Successfully copied to the clipboard!</strong>", duration: [null, 500],})
-        document.getElementById("Status").click();
-        setTimeout(function(){document.getElementById("Status").click(); tippy("#Status", {})}, 1500)
+        const statusTooltip = statusText._tippy;
+        statusTooltip.show();
+        setTimeout(function(){statusTooltip.hide()}, 1500);
     }
 };
 
@@ -1104,6 +1106,9 @@ function keyUp(e) {
                 break;
             case "Escape":
                 selectionBoxPoints = [];
+                canvasContainer.style.cursor = "crosshair"
+                changeActionButtonStatus("Copy", "off");
+                changeActionButtonStatus("Cut", "off");
                 clearPreviewCanvas();
                 break;
             case "Backspace":
@@ -1441,8 +1446,8 @@ function mouseDown(){
                 if (selectionBoxPoints.length != 1){
                     selectionBoxPoints = [];
                     selectionBoxPoints.push([cursorX, cursorY]);
-                    changeActionButtonStatus("Copy", "off")
-                    changeActionButtonStatus("Cut", "off")
+                    changeActionButtonStatus("Copy", "off");
+                    changeActionButtonStatus("Cut", "off");
                 }
                 else{
                     selectionBoxPoints.push([cursorX, cursorY]);
@@ -1451,8 +1456,8 @@ function mouseDown(){
                     pctx.strokeStyle = "rgba(0,0,75,0.8)"
                     pctx.setLineDash([8, 5]);
                     pctx.stroke(selectionBox);
-                    changeActionButtonStatus("Copy", "on")
-                    changeActionButtonStatus("Cut", "on")
+                    changeActionButtonStatus("Copy", "on");
+                    changeActionButtonStatus("Cut", "on");
                 }
             }
             else{
@@ -1532,7 +1537,8 @@ tippy("[data-tippy-content]",{
     animation: "shift-toward",
     allowHTML: true,
 });
+tippy("#Status", {trigger: "manual", allowHTML: true, content: "<strong>Successfully copied to the clipboard!</strong>", duration: [null, 500],});
 try{
-
+    loadUserColors();
 }catch{console.error("An error occurred while loading user's colors")}
-loadUserColors();
+
