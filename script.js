@@ -1456,12 +1456,23 @@ function mouseDown(){
                 }
             }
             else{
+                let temp = [];
+                if (selectionBoxPoints[0][0] > selectionBoxPoints[1][0]){
+                    temp[0] = selectionBoxPoints[0][0];
+                    selectionBoxPoints[0][0] = selectionBoxPoints[1][0];
+                    selectionBoxPoints[1][0] = temp[0];
+                }
+                if (selectionBoxPoints[0][1] > selectionBoxPoints[1][1]){
+                    temp[1] = selectionBoxPoints[0][1];
+                    selectionBoxPoints[0][1] = selectionBoxPoints[1][1];
+                    selectionBoxPoints[1][1] = temp[1];
+                }
                 movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
                 ctx.globalCompositeOperation = "destination-out";
                 const eraseRect = new Path2D();
                 eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-                distanceXY[0] = selectionBoxPoints[0][0] - cursorX;
-                distanceXY[1] = cursorY-selectionBoxPoints[0][1];
+                distanceXY[0] = cursorX - selectionBoxPoints[0][0];
+                distanceXY[1] = cursorY - selectionBoxPoints[0][1];
                 ctx.fill(eraseRect);
             }
         break;
