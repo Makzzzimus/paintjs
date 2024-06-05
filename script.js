@@ -70,7 +70,7 @@ let movedCanvasFragment;
 let isMovingFragment = false;
 let distanceXY = [];
 let isWriting = false;
-let arrowMovingDistance = 10;
+let arrowIncrementDistance = 1;
 let verticallyMovedDistance = 0;
 let horizontallyMovedDistance = 0;
 
@@ -452,6 +452,7 @@ function openCreateFilePopup(){
         document.getElementById("FileCreationPopup").style.display = "block";
     }
     clearPreviewCanvas();
+    selectionBoxPoints = [];
 }
 function closePopup(){
     document.getElementById("BackgroundDim").style.display = "none";
@@ -468,6 +469,7 @@ function swapValues(){
 
 function openShadowPropertiesPopup(applyTo, action){
     clearPreviewCanvas();
+    selectionBoxPoints = [];
     shadowPreviewCanvas.width = 250; //clear canvas
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("ShadowPropertiesPopup").style.display = "block";
@@ -599,11 +601,13 @@ function confirmShadow(applyTo){
 
 function openPreferencesPopup(){
     clearPreviewCanvas();
+    selectionBoxPoints = [];
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("PreferencesPopup").style.display = "block";
 }
 function applyPreferences(){
-    //apply preferences here
+    arrowIncrementDistance = Number(document.getElementById("ArrowIncrementDistanceInput").value);
+    document.cookie = `AID=${arrowIncrementDistance}; path=/`
 
     closePopup();
 }
@@ -760,6 +764,21 @@ function saveUserColor(t){
     }
 
 }
+function loadUserPreferences(){
+    let rawCookies = document.cookie.split("; ");
+    let arrowIncrementDistanceCookie = undefined;
+    for (let i=0; i<rawCookies.length; i++){
+        if (rawCookies[i].slice(0, 3) == "AID"){
+            arrowIncrementDistanceCookie = rawCookies[i];
+            continue;
+        }
+    }
+    if (arrowIncrementDistanceCookie != undefined){
+        arrowIncrementDistance = Number(arrowIncrementDistanceCookie.slice(4));
+        document.getElementById("ArrowIncrementDistanceInput").value = arrowIncrementDistance;
+    }
+}
+
 
 const Fragment = {
     canvasFragment: undefined,
@@ -1076,8 +1095,8 @@ function keyDown(e){
     }
     if (selectionBoxPoints.length != 0){
         if (e.code.slice(0, 5) == "Arrow"){
-            let horizontalMoveDistance = arrowMovingDistance;
-            let verticalMoveDistance = arrowMovingDistance;
+            let horizontalMoveDistance = arrowIncrementDistance;
+            let verticalMoveDistance = arrowIncrementDistance;
             switch (e.code){
                 case "ArrowLeft":
                         horizontalMoveDistance *= -1;
@@ -1612,6 +1631,7 @@ tippy("[data-tippy-content]",{
     allowHTML: true,
 });
 tippy("#Status", {trigger: "manual", allowHTML: true, content: "<strong>Successfully copied to the clipboard!</strong>", duration: [null, 500],});
+loadUserPreferences();
 try{
     loadUserColors();
 }catch{console.error("An error occurred while loading user's colors")}
