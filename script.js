@@ -69,6 +69,10 @@ let backgroundImage;
 let movedCanvasFragment;
 let isMovingFragment = false;
 let distanceXY = [];
+let isWriting = false;
+let arrowMovingDistance = 10;
+let verticallyMovedDistance = 0;
+let horizontallyMovedDistance = 0;
 
 function pythagoras(a, b){
     return Math.sqrt(a*a+b*b);
@@ -447,7 +451,7 @@ function openCreateFilePopup(){
         document.getElementById("BackgroundDim").style.display = "flex";
         document.getElementById("FileCreationPopup").style.display = "block";
     }
-    
+    clearPreviewCanvas();
 }
 function closePopup(){
     document.getElementById("BackgroundDim").style.display = "none";
@@ -463,6 +467,7 @@ function swapValues(){
 }
 
 function openShadowPropertiesPopup(applyTo, action){
+    clearPreviewCanvas();
     shadowPreviewCanvas.width = 250; //clear canvas
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("ShadowPropertiesPopup").style.display = "block";
@@ -593,6 +598,7 @@ function confirmShadow(applyTo){
 }
 
 function openPreferencesPopup(){
+    clearPreviewCanvas();
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("PreferencesPopup").style.display = "block";
 }
@@ -874,6 +880,7 @@ function saveAction(action, customTool){
 function undoLastAction(){
     changeActionButtonStatus("Copy", "off");
     changeActionButtonStatus("Cut", "off");
+    selectionBoxPoints = [];
     createCanvas(false);
     if (backgroundImage != null){
         ctx.globalCompositeOperation = "source-over";
@@ -1059,15 +1066,66 @@ function redoLastAction(){
     }
 }
 
-function keyUp(e) {
-    let isFocused
+
+function keyDown(e){
     if (textNodeContent != undefined){
-        isFocused = (document.activeElement == textNodeContent);
+        isWriting = (document.activeElement == textNodeContent);
     }
     else{
-        isFocused = false
+        isWriting = false
     }
-    if(!isFocused){
+    if (selectionBoxPoints.length != 0){
+        if (e.code.slice(0, 5) == "Arrow"){
+            let horizontalMoveDistance = arrowMovingDistance;
+            let verticalMoveDistance = arrowMovingDistance;
+            switch (e.code){
+                case "ArrowLeft":
+                        horizontalMoveDistance *= -1;
+                        verticalMoveDistance = 0;
+                        horizontallyMovedDistance += horizontalMoveDistance;
+                    break;
+                case "ArrowRight":
+                        verticalMoveDistance = 0;
+                        horizontallyMovedDistance += horizontalMoveDistance;
+                    break;
+                case "ArrowUp":
+                        horizontalMoveDistance = 0;
+                        verticalMoveDistance *= -1;
+                        verticallyMovedDistance += verticalMoveDistance;
+                    break;
+                case "ArrowDown":
+                        horizontalMoveDistance = 0;
+                        verticallyMovedDistance += verticalMoveDistance;
+                    break;
+            }
+            if ((selectionBoxPoints[0][0] + horizontalMoveDistance) > 0 && (selectionBoxPoints[0][0] + horizontalMoveDistance) < canvas.width+1 && 
+            (selectionBoxPoints[1][0] + horizontalMoveDistance) > 0 && (selectionBoxPoints[1][0] + horizontalMoveDistance) < canvas.width+1 &&
+            (selectionBoxPoints[0][1] + verticalMoveDistance) > 0 && (selectionBoxPoints[0][1] + verticalMoveDistance) < canvas.height+1 &&
+            (selectionBoxPoints[1][1] + verticalMoveDistance) > 0 && (selectionBoxPoints[1][1] + verticalMoveDistance) < canvas.height+1){
+                movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+        
+                let clearRect = new Path2D();
+                clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+                ctx.globalCompositeOperation = "destination-out";
+                ctx.fill(clearRect);
+    
+                ctx.putImageData(movedCanvasFragment, selectionBoxPoints[0][0] += horizontalMoveDistance, selectionBoxPoints[0][1] += verticalMoveDistance)
+    
+                clearPreviewCanvas();
+                const selectionBox = new Path2D();
+                selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], (selectionBoxPoints[1][0] += horizontalMoveDistance) - selectionBoxPoints[0][0], (selectionBoxPoints[1][1] += verticalMoveDistance) - selectionBoxPoints[0][1])
+                pctx.strokeStyle = "rgba(0,0,75,0.8)"
+                pctx.setLineDash([8, 5]);
+                pctx.stroke(selectionBox);
+            }
+            else{
+                alert("❌The selection area cannot extend beyond the canvas boundaries");
+            }
+        }
+    }
+}
+function keyUp(e) {
+    if(!isWriting){
         switch (e.code){
             case "KeyB":
                 if (!e.shiftKey){
@@ -1184,6 +1242,18 @@ function keyUp(e) {
                     document.getElementById(`DefaultColor1-${num}`).click();
                 }
             }
+        }
+        if (e.code.slice(0, 5) == "Arrow"){
+            let selectionBoxPointsBeforeMovement = [];
+            selectionBoxPointsBeforeMovement.push([selectionBoxPoints[0][0] - horizontallyMovedDistance, selectionBoxPoints[0][1] - verticallyMovedDistance]);
+            selectionBoxPointsBeforeMovement.push([selectionBoxPoints[1][0] - horizontallyMovedDistance, selectionBoxPoints[1][1] - verticallyMovedDistance]);
+
+            saveAction([movedCanvasFragment, [selectionBoxPoints[0][0], selectionBoxPoints[0][1]],
+                [selectionBoxPointsBeforeMovement[0][0], selectionBoxPointsBeforeMovement[0][1],
+                selectionBoxPointsBeforeMovement[1][0]-selectionBoxPointsBeforeMovement[0][0],
+                selectionBoxPointsBeforeMovement[1][1]-selectionBoxPointsBeforeMovement[0][1]]]);
+                
+            horizontallyMovedDistance = verticallyMovedDistance = 0;
         }
     }
 }
@@ -1455,23 +1525,26 @@ function mouseDown(){
                     selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
                     pctx.strokeStyle = "rgba(0,0,75,0.8)"
                     pctx.setLineDash([8, 5]);
+
                     pctx.stroke(selectionBox);
+
                     changeActionButtonStatus("Copy", "on");
                     changeActionButtonStatus("Cut", "on");
+
+                    let temp = [];  //Sort selection box point. selectionBoxPoints[0] must be in a left bottom corner, while selectionBoxPoints[1] in right top
+                    if (selectionBoxPoints[0][0] > selectionBoxPoints[1][0]){
+                        temp[0] = selectionBoxPoints[0][0];
+                        selectionBoxPoints[0][0] = selectionBoxPoints[1][0];
+                        selectionBoxPoints[1][0] = temp[0];
+                    }
+                    if (selectionBoxPoints[0][1] > selectionBoxPoints[1][1]){
+                        temp[1] = selectionBoxPoints[0][1];
+                        selectionBoxPoints[0][1] = selectionBoxPoints[1][1];
+                        selectionBoxPoints[1][1] = temp[1];
+                    }
                 }
             }
             else{
-                let temp = [];
-                if (selectionBoxPoints[0][0] > selectionBoxPoints[1][0]){
-                    temp[0] = selectionBoxPoints[0][0];
-                    selectionBoxPoints[0][0] = selectionBoxPoints[1][0];
-                    selectionBoxPoints[1][0] = temp[0];
-                }
-                if (selectionBoxPoints[0][1] > selectionBoxPoints[1][1]){
-                    temp[1] = selectionBoxPoints[0][1];
-                    selectionBoxPoints[0][1] = selectionBoxPoints[1][1];
-                    selectionBoxPoints[1][1] = temp[1];
-                }
                 movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
                 ctx.globalCompositeOperation = "destination-out";
                 const eraseRect = new Path2D();
@@ -1532,6 +1605,7 @@ document.addEventListener("contextmenu", event => {
 });
 //addEventListener("paste", (event) => {document.getElementById("PasteButton").click();});
 document.addEventListener("keyup", keyUp, false);
+document.addEventListener("keydown", keyDown, false);
 tippy("[data-tippy-content]",{
     delay: [400, 100],
     animation: "shift-toward",
