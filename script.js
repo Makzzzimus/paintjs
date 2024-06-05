@@ -1142,6 +1142,13 @@ function keyDown(e){
             }
         }
     }
+    switch (e.code){
+        case "Enter":
+            let confirmButtons = document.querySelectorAll(".FinishPopupButton");
+            for (let i=0; i<confirmButtons.length; i++){
+                try{confirmButtons[i].click()}catch{};
+            }
+    }
 }
 function keyUp(e) {
     if(!isWriting){
