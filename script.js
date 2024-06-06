@@ -29,6 +29,7 @@ const textTool = {
     italic: false,
     bold: false,
     text: "",
+    textOpacity: 1,
     shadowOffsetX: 5,
     shadowOffsetY: 5,
     shadowBlur: 5,
@@ -196,10 +197,15 @@ function selectTool(t){
                     </div> 
                 </div>
                 <button style="margin-bottom: 10px" onclick="openShadowPropertiesPopup('text', 'open')">Open text shadow properties</button>
+                <div>
+                    <label>Text opacity:</label><br>
+                    <input type="number" id="TextOpacityInput" min="1" max="100" value="100">
+                </div>
                 <textarea onmouseleave="this.blur()" onchange="saveText(this)" style="resize: vertical;" id="TextNodeContent">${textTool.text}</textarea>`;
             textNodeContent = document.getElementById("TextNodeContent");
             ctx.globalCompositeOperation="source-over";
             document.getElementById("TexFontSelect").value = textTool.font;
+            document.getElementById("TextOpacityInput").value = textTool.textOpacity * 100;
             changeTextAlignment();
             changeTextStyle();
             tippy("#Left",{content: "<strong>Left alignment (Shift + Left arrow)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
@@ -1614,7 +1620,9 @@ function mouseDown(){
                 let textStyles = "";
                 if (textTool.bold){textStyles += "bold "};
                 if (textTool.italic){textStyles += "italic "};
-                ctx.fillStyle = selectedColorPicker.value;
+                textTool.textOpacity = document.getElementById("TextOpacityInput").value / 100;
+
+                ctx.fillStyle = `rgba(${hexToRgb(selectedColorPicker.value)}, ${textTool.textOpacity})`;
                 ctx.font = `${textStyles} ${textTool.fontSize}px ${textTool.font}`;
                 ctx.textAlign = (textTool.textAlignment.toLowerCase());
     
