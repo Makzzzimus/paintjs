@@ -36,6 +36,12 @@ const textTool = {
     rawShadowColor: "#000000",
     shadowColor: "rgba(0, 0, 0, 0)",
 }
+const canvasProperties = {
+    width: 800,
+    height: 600,
+    isTransparentBackground: true,
+    backgroundColor: "#000000",
+}
 let shapePoints = [];
 let selectionBoxPoints = [];
 let lastRadius = 0;
@@ -460,11 +466,27 @@ function closePopup(){
     document.getElementById("ShadowPropertiesPopup").style.display = "none";
     document.getElementById("PreferencesPopup").style.display = "none";
     document.getElementById("ChangelogPopup").style.display = "none";
+
+    document.getElementById("WidthInput").value = canvasProperties.width;
+    document.getElementById("HeightInput").value = canvasProperties.height;
+    document.getElementById("TransparentCanvasCheckbox").checked = canvasProperties.isTransparentBackground;
+    document.getElementById("CanvasBackgroundInput").value = canvasProperties.backgroundColor;
+    showCanvasBackgroundBox(document.getElementById("TransparentCanvasCheckbox"));
 }
 function swapValues(){
     let temp = document.getElementById("HeightInput").value;
     document.getElementById("HeightInput").value = document.getElementById("WidthInput").value;
     document.getElementById("WidthInput").value = temp;
+}
+function showCanvasBackgroundBox(t){
+    if (!t.checked){
+        document.getElementById("CanvasBackgroundColorInputBox").style.display = "inline";
+        document.getElementById("FileCreationPopup").style.height = "330px"
+    }
+    else{
+        document.getElementById("CanvasBackgroundColorInputBox").style.display = "none";
+        document.getElementById("FileCreationPopup").style.height = "270px"
+    }
 }
 
 function openShadowPropertiesPopup(applyTo, action){
@@ -623,29 +645,36 @@ async function openChangelogPopup(){
 
 
 function createCanvas(clearHistory){
-    let width = document.getElementById("WidthInput").value;
-    let height = document.getElementById("HeightInput").value;
+    let width = canvasProperties.width = document.getElementById("WidthInput").value;
+    let height = canvasProperties.height = document.getElementById("HeightInput").value;
     canvasContainer.style.width = width+"px";
     canvasContainer.style.height = height+"px";
-    canvas.width = width;
-    canvas.height = height;
-    previewCanvas.width = width;
-    previewCanvas.height = height;
+    canvas.width = previewCanvas.width = width;
+    canvas.height = previewCanvas.height = height;
+
     ctx.strokeStyle = selectedColorPicker.value;
+
+    if (document.getElementById("TransparentCanvasCheckbox").checked == false){
+        canvasProperties.isTransparentBackground = false;
+        let canvasBackgroundShape = new Path2D();
+        canvasBackgroundShape.rect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = canvasProperties.backgroundColor = document.getElementById("CanvasBackgroundInput").value;
+        ctx.fill(canvasBackgroundShape);
+    }
+    else{
+        canvasProperties.isTransparentBackground = true;
+    }
     switch (selectedTool){
         case "PBr":
             ctx.lineWidth = paintBrush.stroke;
-            ctx.strokeStyle = selectedColorPicker.value;
             changeShape();
             break;
         case "Era":
             ctx.lineWidth = eraser.stroke;
-            ctx.strokeStyle = selectedColorPicker.value;
             changeShape();
             break;
         case "STo":
             ctx.lineWidth = shapeTool.stroke;
-            ctx.strokeStyle = selectedColorPicker.value;
             changeShape();
             break;
     }
@@ -979,7 +1008,7 @@ function undoLastAction(){
     }
     redoActionList.push(undoActionsList.pop());
     const beforeUndoToolProperties = undoActionPropertiesList.pop();
-    ctx.strokeStyle = beforeUndoToolProperties[0];
+    ctx.strokeStyle = selectedColorPicker.value;
     ctx.lineCap = beforeUndoToolProperties[1];
     ctx.lineJoin = beforeUndoToolProperties[2];
     ctx.lineWidth = beforeUndoToolProperties[3];

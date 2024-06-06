@@ -230,7 +230,7 @@
         </div>
     </div>
     <div id="BackgroundDim">
-        <div id="FileCreationPopup" class="PopupWindow" style="width: 420px; height: 280px;">
+        <div id="FileCreationPopup" class="PopupWindow" style="width: 420px; height: 270px;">
             <h2>New File</h2>
             <div class="PopupOptions">
                 <div id="SizeInputs" class="PopupContentGroup">
@@ -250,7 +250,16 @@
                             <option value="">pixels</option>
                         </select>
                     </div>
-                    <button onclick="swapValues()">🔀</button>
+                    <button onclick="swapValues()">🔀</button><br><br>
+                    <div class="InputBox">
+                        <label>Transparent canvas:</label>
+                        <input type="checkbox" id="TransparentCanvasCheckbox" checked onclick="showCanvasBackgroundBox(this)">
+                    </div>
+                    <div class="InputBox" id="CanvasBackgroundColorInputBox" style="display: none;">
+                        <label>Canvas background:</label><br>
+                        <input type="color" id="CanvasBackgroundInput">
+                    </div>
+
                 </div>
             </div>
             <button class="FinishPopupButton" onclick="createCanvas()">Create</button><br>
