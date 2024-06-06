@@ -959,32 +959,45 @@ function undoLastAction(){
                 break;
             case "STo":
                 let undoShapePoints = undoActionsList[i];
-                const shape = new Path2D();
+                const strokeShape = new Path2D();
                 switch (actionShape){
                     case "rectangle":
-                        shape.rect(undoShapePoints[0][0], undoShapePoints[0][1], undoShapePoints[1][0]-undoShapePoints[0][0], undoShapePoints[1][1]-undoShapePoints[0][1]);
+                        strokeShape.rect(undoShapePoints[0][0], undoShapePoints[0][1], undoShapePoints[1][0]-undoShapePoints[0][0], undoShapePoints[1][1]-undoShapePoints[0][1]);
                         break;
                     case "circle":
                         let radius = undoActionPropertiesList[i][9];
-                        shape.arc(undoShapePoints[0][0], undoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+                        strokeShape.arc(undoShapePoints[0][0], undoShapePoints[0][1], radius, 0, 2*Math.PI, false);
                         break;
                     case "line":
-                        shape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1]);
-                        shape.lineTo(undoShapePoints[1][0], undoShapePoints[1][1]);
+                        strokeShape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1]);
+                        strokeShape.lineTo(undoShapePoints[1][0], undoShapePoints[1][1]);
                         break;
                     case "polygon":
-                        shape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1])
+                        strokeShape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1])
                         for (let i=1; i<undoShapePoints.length; i++){
-                            shape.lineTo(undoShapePoints[i][0], undoShapePoints[i][1]);
+                            strokeShape.lineTo(undoShapePoints[i][0], undoShapePoints[i][1]);
                             ctx.stroke(shape);
                         }
-                        shape.closePath();
+                        strokeShape.closePath();
                         break;
                 }
-                ctx.stroke(shape);
+                ctx.stroke(strokeShape);
                 if (undoActionPropertiesList[i][7] == true){
                     ctx.fillStyle = `rgba(${hexToRgb(undoActionPropertiesList[i][8])}, ${undoActionPropertiesList[i][17]})`;
-                    ctx.fill(shape);
+                    const fillShape = new Path2D();
+                    switch (actionShape){
+                        case "rectangle":
+                            fillShape.rect(undoShapePoints[0][0]+ctx.lineWidth/2,
+                                undoShapePoints[0][1]+ctx.lineWidth/2,
+                                undoShapePoints[1][0]-undoShapePoints[0][0]-ctx.lineWidth,
+                                undoShapePoints[1][1]-undoShapePoints[0][1]-ctx.lineWidth);
+                            break;
+                        case "circle":
+                            let radius = undoActionPropertiesList[i][9]-ctx.lineWidth/2;
+                            fillShape.arc(undoShapePoints[0][0], undoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+                            break;
+                    }
+                    ctx.fill(fillShape);
                 }
                 break;
             case "Tex":
@@ -1050,33 +1063,46 @@ function redoLastAction(){
             }
             break;
         case "STo":
-            let redoShapePoints = redoActionList[redoActionList.length - 1];
-            const shape = new Path2D();
+            let redoShapePoints = redoActionList[lastActionIndex];
+            const strokeShape = new Path2D();
             switch (actionShape){
                 case "rectangle":
-                    shape.rect(redoShapePoints[0][0], redoShapePoints[0][1], redoShapePoints[1][0]-redoShapePoints[0][0], redoShapePoints[1][1]-redoShapePoints[0][1]);
+                    strokeShape.rect(redoShapePoints[0][0], redoShapePoints[0][1], redoShapePoints[1][0]-redoShapePoints[0][0], redoShapePoints[1][1]-redoShapePoints[0][1]);
                     break;
                 case "circle":
                     let radius = redoActionPropertiesList[redoActionPropertiesList.length - 1][9];
-                    shape.arc(redoShapePoints[0][0], redoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+                    strokeShape.arc(redoShapePoints[0][0], redoShapePoints[0][1], radius, 0, 2*Math.PI, false);
                     break;
                 case "line":
-                    shape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1]);
-                    shape.lineTo(redoShapePoints[1][0], redoShapePoints[1][1]);
+                    strokeShape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1]);
+                    strokeShape.lineTo(redoShapePoints[1][0], redoShapePoints[1][1]);
                     break;
                 case "polygon":
-                    shape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1])
+                    strokeShape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1])
                     for (let i=1; i<redoShapePoints.length; i++){
                         shape.lineTo(redoShapePoints[i][0], redoShapePoints[i][1]);
                         ctx.stroke(shape);
                     }
-                    shape.closePath();
+                    strokeShape.closePath();
                     break;
             }
-            ctx.stroke(shape);
+            ctx.stroke(strokeShape);
             if (redoActionPropertiesList[lastActionPropIndex][7] == true){
                 ctx.fillStyle = `rgba(${hexToRgb(redoActionPropertiesList[lastActionPropIndex][8])}, ${redoActionPropertiesList[lastActionPropIndex][17]})`;
-                ctx.fill(shape);
+                const fillShape = new Path2D();
+                switch (actionShape){
+                    case "rectangle":
+                        fillShape.rect(redoShapePoints[0][0]+ctx.lineWidth/2,
+                        redoShapePoints[0][1]+ctx.lineWidth/2,
+                        redoShapePoints[1][0]-redoShapePoints[0][0]-ctx.lineWidth,
+                        redoShapePoints[1][1]-redoShapePoints[0][1]-ctx.lineWidth);
+                        break;
+                    case "circle":
+                        let radius = redoActionPropertiesList[lastActionPropIndex][9]-ctx.lineWidth/2;
+                        fillShape.arc(redoShapePoints[0][0], redoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+                        break;
+                }
+                ctx.fill(fillShape);
             }
             break;
         case "Tex":
@@ -1523,27 +1549,52 @@ function mouseDown(){
                     ctx.shadowColor =  shapeTool.shadowColor;
     
                     shapePoints.push([cursorX, cursorY]);
-                    const shape = new Path2D();
+
+                    const strokeShape = new Path2D();
                     switch (shapeTool.shape){
                         case "rectangle":
-                            shape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
+                            let temp = [];  //Sort shape points.  shapePoints[0] must be in a left bottom corner, while  shapePoints[1] in right top
+                            if (shapePoints[0][0] > shapePoints[1][0]){
+                                temp[0] = shapePoints[0][0];
+                                shapePoints[0][0] = shapePoints[1][0];
+                                shapePoints[1][0] = temp[0];
+                            }
+                            if (shapePoints[0][1] > shapePoints[1][1]){
+                                temp[1] = shapePoints[0][1];
+                                shapePoints[0][1] = shapePoints[1][1];
+                                shapePoints[1][1] = temp[1];
+                            }
+                            strokeShape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
                             break;
                         case "circle":
                             let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]));
                             lastRadius = radius;
-                            shape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false); 
+                            strokeShape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false); 
                             break;
                         case "line":
-                            shape.moveTo(shapePoints[0][0],shapePoints[0][1]);
-                            shape.lineTo(shapePoints[1][0],shapePoints[1][1]);
+                            strokeShape.moveTo(shapePoints[0][0],shapePoints[0][1]);
+                            strokeShape.lineTo(shapePoints[1][0],shapePoints[1][1]);
                             break;
                     }
                     shapeTool.opacity = document.getElementById("ShapeOpacityInput").value / 100;
                     ctx.strokeStyle = `rgba(${hexToRgb(selectedColorPicker.value)}, ${shapeTool.opacity})`;
-                    ctx.stroke(shape);
+                    ctx.stroke(strokeShape);
                     if (shapeTool.fillShape == true){
+                        const fillShape = new Path2D();
+                        switch (shapeTool.shape){
+                            case "rectangle":
+                                fillShape.rect(shapePoints[0][0]+ctx.lineWidth/2,
+                                shapePoints[0][1]+ctx.lineWidth/2,
+                                (shapePoints[1][0]-shapePoints[0][0])-ctx.lineWidth,
+                                (shapePoints[1][1]-shapePoints[0][1])-ctx.lineWidth);
+                                break;
+                            case "circle":
+                                let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]))-ctx.lineWidth/2;
+                                fillShape.arc(shapePoints[0][0], shapePoints[0][1], Math.abs(radius), 0, 2*Math.PI, false); 
+                                break;
+                        }
                         ctx.fillStyle = `rgba(${hexToRgb(shapeTool.shapeFillColor)}, ${shapeTool.opacity})`;
-                        ctx.fill(shape);
+                        ctx.fill(fillShape);
                     }
                     clearPreviewCanvas();
                 }
