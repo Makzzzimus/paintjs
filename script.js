@@ -921,7 +921,7 @@ function saveAction(action, customTool){
     }
     undoActionsList.push(action);
 
-    let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, tool, shapeTool.shape, shapeTool.fillShape,  shapeTool.shapeFillColor, lastRadius, ctx.font, ctx.textAlign, ctx.shadowOffsetX, ctx.shadowOffsetY, ctx.shadowBlur, ctx.shadowColor];
+    let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, tool, shapeTool.shape, shapeTool.fillShape,  shapeTool.shapeFillColor, lastRadius, ctx.font, ctx.textAlign, ctx.shadowOffsetX, ctx.shadowOffsetY, ctx.shadowBlur, ctx.shadowColor, textTool.textOpacity];
     undoActionPropertiesList.push(lastActionProperties);
     console.log("Tool properties saved");
 
@@ -987,7 +987,7 @@ function undoLastAction(){
             case "Tex":
                 ctx.font = undoActionPropertiesList[i][10];
                 ctx.textAlign = undoActionPropertiesList[i][11];
-                ctx.fillStyle = ctx.strokeStyle;
+                ctx.fillStyle = `rgba(${hexToRgb(ctx.strokeStyle)}, ${undoActionPropertiesList[i][16]})`;
                 ctx.fillText(undoActionsList[i][0], undoActionsList[i][1], undoActionsList[i][2]);
                 break;
             case "Sel":
@@ -1079,7 +1079,7 @@ function redoLastAction(){
         case "Tex":
             ctx.font = redoActionPropertiesList[lastActionIndex][10];
             ctx.textAlign = redoActionPropertiesList[lastActionIndex][11];
-            ctx.fillStyle = ctx.strokeStyle;
+            ctx.fillStyle = `rgba(${hexToRgb(ctx.strokeStyle)}, ${redoActionPropertiesList[lastActionPropIndex][16]})`;;
             ctx.fillText(redoActionList[lastActionIndex][0], redoActionList[lastActionIndex][1], redoActionList[lastActionIndex][2]);
             break;
         case "Sel":
