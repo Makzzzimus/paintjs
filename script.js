@@ -725,10 +725,24 @@ function clearPreviewCanvas(){
 function saveFile(){
     const link = document.createElement("a");
     link.href = canvas.toDataURL();
-    let adjective = ["Wonderful", "Stylized", "Sharp", "Detailed", "Geometric", "Futuristic", "Historic", "Vivid", "Beautiful", "Grainy", "Great", "Attractive", "Colorful", "Dramatic", "Evocative", "Digital", "Striking", "Distorted"];
-    let subject = ["Painting", "Drawing", "Picture", "Sketch", "Canvas", "Portrait", "Portrayal", "Illustration", "Artwork", "Concept", "Depiction", "Visualization"];
-    link.download = `${adjective[Math.round(Math.random()*17)]} ${subject[Math.round(Math.random()*11)]}.png`;
-    link.click();
+    let finalName = "";
+    if (statusText.innerHTML.slice(0, 7) == "Unnamed"){
+        let adjective = ["Wonderful", "Stylized", "Sharp", "Detailed", "Geometric", "Futuristic", "Historic", "Vivid", "Beautiful", "Grainy", "Great", "Attractive", "Colorful", "Dramatic", "Evocative", "Digital", "Striking", "Distorted"];
+        let subject = ["Painting", "Drawing", "Picture", "Sketch", "Canvas", "Portrait", "Portrayal", "Illustration", "Artwork", "Concept", "Depiction", "Visualization"];
+        finalName = `${adjective[Math.round(Math.random()*17)]} ${subject[Math.round(Math.random()*11)]}.png`;
+        statusText.innerHTML = `${finalName} - rePaint`;
+    }
+    else if(statusText.innerHTML.slice(0, 7) == "rePaint"){
+        alert("❌Canvas doesn't exist. Nothing to download");
+    }
+    else{
+        finalName = statusText.innerHTML.slice(0, statusText.innerHTML.length - 10);
+    }
+    if(statusText.innerHTML.slice(0, 7) != "rePaint"){
+        link.download = finalName;
+        link.click();
+    }
+    
 }
 function openFile(action, t){
     const uploadedImage = t.files[0];
