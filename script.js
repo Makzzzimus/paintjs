@@ -559,8 +559,16 @@ function openShadowPropertiesPopup(applyTo, action){
             shape.rect(62.5, 50, 125, 100)
             spctx.stroke(shape);
             if (shapeTool.fillShape){
+                spctx.shadowColor = "rgba(0, 0, 0, 0)"
+                spctx.shadowBlur = 0;
+                
+                const fillShape = new Path2D();
+                fillShape.rect(62.5 + spctx.lineWidth/2, 50 + spctx.lineWidth/2, 125 - spctx.lineWidth,100 - spctx.lineWidth);
                 spctx.fillStyle = shapeTool.shapeFillColor;
-                spctx.fill(shape)
+                spctx.fill(fillShape)
+
+                spctx.shadowBlur = tool.shadowBlur;
+                spctx.shadowColor = `rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`;
             }
 
             offsetXInput.onchange = function(){openShadowPropertiesPopup('shape', 'modify')};
@@ -603,8 +611,16 @@ function openShadowPropertiesPopup(applyTo, action){
             shape.rect(62.5, 50, 125, 100)
             spctx.stroke(shape);
             if (shapeTool.fillShape){
+                spctx.shadowColor = "rgba(0, 0, 0, 0)"
+                spctx.shadowBlur = 0;
+
+                const fillShape = new Path2D();
+                fillShape.rect(62.5 + spctx.lineWidth/2, 50 + spctx.lineWidth/2, 125 - spctx.lineWidth,100 - spctx.lineWidth);
                 spctx.fillStyle = shapeTool.shapeFillColor;
-                spctx.fill(shape)
+                spctx.fill(fillShape)
+
+                spctx.shadowBlur = shapeTool.shadowBlur;
+                spctx.shadowColor = `rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`;
             }
         }
     }
@@ -985,6 +1001,8 @@ function undoLastAction(){
                 if (undoActionPropertiesList[i][7] == true){
                     ctx.fillStyle = `rgba(${hexToRgb(undoActionPropertiesList[i][8])}, ${undoActionPropertiesList[i][17]})`;
                     const fillShape = new Path2D();
+                    ctx.shadowColor = "rgba(0, 0, 0, 0)"
+                    ctx.shadowBlur = 0;
                     switch (actionShape){
                         case "rectangle":
                             fillShape.rect(undoShapePoints[0][0]+ctx.lineWidth/2,
@@ -1090,6 +1108,8 @@ function redoLastAction(){
             if (redoActionPropertiesList[lastActionPropIndex][7] == true){
                 ctx.fillStyle = `rgba(${hexToRgb(redoActionPropertiesList[lastActionPropIndex][8])}, ${redoActionPropertiesList[lastActionPropIndex][17]})`;
                 const fillShape = new Path2D();
+                ctx.shadowColor = "rgba(0, 0, 0, 0)"
+                ctx.shadowBlur = 0;
                 switch (actionShape){
                     case "rectangle":
                         fillShape.rect(redoShapePoints[0][0]+ctx.lineWidth/2,
@@ -1580,6 +1600,8 @@ function mouseDown(){
                     ctx.strokeStyle = `rgba(${hexToRgb(selectedColorPicker.value)}, ${shapeTool.opacity})`;
                     ctx.stroke(strokeShape);
                     if (shapeTool.fillShape == true){
+                        ctx.shadowColor = "rgba(0, 0, 0, 0)"
+                        ctx.shadowBlur = 0;
                         const fillShape = new Path2D();
                         switch (shapeTool.shape){
                             case "rectangle":
@@ -1595,6 +1617,8 @@ function mouseDown(){
                         }
                         ctx.fillStyle = `rgba(${hexToRgb(shapeTool.shapeFillColor)}, ${shapeTool.opacity})`;
                         ctx.fill(fillShape);
+                        ctx.shadowBlur = shapeTool.shadowBlur;
+                        ctx.shadowColor =  shapeTool.shadowColor;
                     }
                     clearPreviewCanvas();
                 }
