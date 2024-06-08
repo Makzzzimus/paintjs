@@ -301,7 +301,7 @@
             <button class="FinishPopupButton" id="ApplyShadowButton">Apply</button><br>
             <button class="CancelButton" onclick="closePopup()">Cancel</button>
         </div>
-        <div id="PreferencesPopup" class="PopupWindow" style="width: 350px; height: 350px;">
+        <div id="PreferencesPopup" class="PopupWindow" style="width: 350px; height: 420px;">
             <h2>Preferences</h2>
             <div class="PopupOptions">
                 <div id="SizeInputs" class="PopupContentGroup">
@@ -313,11 +313,14 @@
                         <input id="ArrowIncrementDistanceInput" type="number" min="0" value="1">
                     </div>
                     <div class="InputBox">
-
+                        <label>Action history limit</label><br>
+                        <input id="ActionHistoryLimitInput" type="number" min="5" max="250" value="25">
+                        <p style="margin-top: 0px;">It is not recommended to set a limit of more than 50 actions</p>
                     </div>
+                    <!-- </div>
                     <div class="InputBox">
 
-                    </div>
+                    </div> -->
                     <br>
                     <div class="InputBox">
                         <input type="text" readonly value="1.0.1 (b1ea799)">

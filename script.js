@@ -81,6 +81,8 @@ let isWriting = false;
 let arrowIncrementDistance = 1;
 let verticallyMovedDistance = 0;
 let horizontallyMovedDistance = 0;
+let FirstActionsImageData = undefined;
+let actionHistoryLimit = 25;
 
 function pythagoras(a, b){
     return Math.sqrt(a*a+b*b);
@@ -654,7 +656,9 @@ function openPreferencesPopup(){
 }
 function applyPreferences(){
     arrowIncrementDistance = Number(document.getElementById("ArrowIncrementDistanceInput").value);
-    document.cookie = `AID=${arrowIncrementDistance}; path=/`
+    actionHistoryLimit = Number(document.getElementById("ActionHistoryLimitInput").value);
+    document.cookie = `AID=${arrowIncrementDistance}; path=/`;
+    document.cookie = `AHL=${actionHistoryLimit}; path=/`;
 
     closePopup();
 }
@@ -712,6 +716,8 @@ function createCanvas(clearHistory){
         redoActionList = [];
         undoActionPropertiesList = [];
         redoActionPropertiesList = [];
+        backgroundImage = undefined;
+        FirstActionsImageData = undefined;
         changeActionButtonStatus("Undo", "off");
         changeActionButtonStatus("Redo", "off");
     }
@@ -835,15 +841,24 @@ function saveUserColor(t){
 function loadUserPreferences(){
     let rawCookies = document.cookie.split("; ");
     let arrowIncrementDistanceCookie = undefined;
+    let actionHistoryLimitCookie = undefined;
     for (let i=0; i<rawCookies.length; i++){
         if (rawCookies[i].slice(0, 3) == "AID"){
             arrowIncrementDistanceCookie = rawCookies[i];
+            continue;
+        }
+        if (rawCookies[i].slice(0, 3) == "AHL"){
+            actionHistoryLimitCookie = rawCookies[i];
             continue;
         }
     }
     if (arrowIncrementDistanceCookie != undefined){
         arrowIncrementDistance = Number(arrowIncrementDistanceCookie.slice(4));
         document.getElementById("ArrowIncrementDistanceInput").value = arrowIncrementDistance;
+    }
+    if (actionHistoryLimitCookie != undefined){
+        actionHistoryLimit = Number(actionHistoryLimitCookie.slice(4));
+        document.getElementById("ActionHistoryLimitInput").value = actionHistoryLimit;
     }
 }
 
@@ -968,10 +983,17 @@ function undoLastAction(){
     changeActionButtonStatus("Copy", "off");
     changeActionButtonStatus("Cut", "off");
     selectionBoxPoints = [];
+    let numberOfActionsForDeletion = undefined;
     createCanvas(false);
     if (backgroundImage != null){
         ctx.globalCompositeOperation = "source-over";
         ctx.drawImage(backgroundImage, 0, 0);
+    }
+    if (FirstActionsImageData != undefined){
+        ctx.putImageData(FirstActionsImageData, 0, 0);
+    }
+    if ((undoActionsList.length-1) > actionHistoryLimit){
+        numberOfActionsForDeletion = (undoActionsList.length-1) - actionHistoryLimit;
     }
     for(i=0; i<undoActionsList.length-1; i++){
         let actionShape, actionType;
@@ -1058,6 +1080,14 @@ function undoLastAction(){
                 eraseRect.rect(undoActionsList[i][0][0], undoActionsList[i][0][1], undoActionsList[i][1][0]-undoActionsList[i][0][0], undoActionsList[i][1][1]-undoActionsList[i][0][1])
                 ctx.fill(eraseRect);
                 break;
+        }
+        if (numberOfActionsForDeletion === i){
+            FirstActionsImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            for(let j=0; j<numberOfActionsForDeletion; j++){
+                undoActionsList.shift()
+                undoActionPropertiesList.shift();
+            }
+            i=0;
         }
     }
     redoActionList.push(undoActionsList.pop());
@@ -1248,7 +1278,7 @@ function keyDown(e){
             }
     }
 }
-function keyUp(e) {
+function keyUp(e){
     if(!isWriting){
         switch (e.code){
             case "KeyB":
@@ -1270,7 +1300,10 @@ function keyUp(e) {
             case "KeyA":
                 document.getElementById("SelButton").click();
                 break;
-            
+            case "KeyI":
+                document.getElementById("CPiButton").click();
+                break;
+
             case "KeyZ":
                 document.getElementById("UndoButton").click();
                 break;
