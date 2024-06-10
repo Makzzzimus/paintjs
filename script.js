@@ -160,26 +160,26 @@ function selectTool(t){
             break;
         case "Tex":
             ToolPreferencesFieldset.innerHTML = `<legend>Tool properties</legend> <div> <label>Font size: </label><br> <input id="TexStrokeSlider" type="range" min="1" max="256" value="${textTool.fontSize}" oninput="changeStroke(this)"> <input id="TexStrokeValue" type="number" min="1" max="256" value="${textTool.fontSize}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected font: </label><br> <select id="TexFontSelect" onchange="changeFont(this)"> <option value="Courier New">Courier New</option> <option value="Franklin Gothic Medium">Franklin Gothic Medium</option> <option value="Gill Sans">Gill Sans</option> <option value="Segoe UI">Segoe UI</option> <option value="Times New Roman">Times New Roman</option> <option value="Trebuchet MS">Trebuchet MS</option> <option value="Arial">Arial</option> <option value="Cambria">Cambria</option> <option value="Georgia">Georgia</option> <option value="Verdana">Verdana</option> </select></div> 
-            <div id="TextPropertiesFieldsContainer">
-                <div class="TextPropertiesFields"> 
-                    <div class="TextPropertiesButtons" onclick="changeTextAlignment(this)" id="Left">
-                        <svg class="AlignmentIcons" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+            <div id="PropertiesFieldsContainer">
+                <div class="PropertiesFields"> 
+                    <div class="PropertiesButtons" id="Left" onclick="changeTextAlignment(this)">
+                        <svg class="IconMargin" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path class="LeftSvgElement" fill="#9A949B" d="M25.1,6.1H4.8c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S25.9,6.1,25.1,6.1z"/>
                             <path class="LeftSvgElement" fill="#9A949B" d="M25.1,21.8H4.8c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S25.9,21.8,25.1,21.8z"/>
                             <path class="LeftSvgElement" fill="#9A949B" d="M30.2,14H4.8c-0.8,0-1.5-0.7-1.5-1.5S3.9,11,4.8,11h25.4c0.8,0,1.5,0.7,1.5,1.5S31,14,30.2,14z"/>
                             <path class="LeftSvgElement" fill="#9A949B" d="M30.2,29.7H4.8c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h25.4c0.8,0,1.5,0.7,1.5,1.5S31,29.7,30.2,29.7z"/>
                         </svg>
                     </div> 
-                    <div class="TextPropertiesButtons" onclick="changeTextAlignment(this)" id="Center">
-                        <svg class="AlignmentIcons" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                    <div class="PropertiesButtons" id="Center" onclick="changeTextAlignment(this)">
+                        <svg class="IconMargin" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path class="CenterSvgElement" fill="#9A949B" d="M27.7,6.1H7.3c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S28.5,6.1,27.7,6.1z"/>
                             <path class="CenterSvgElement" fill="#9A949B" d="M27.6,21.8H7.3c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S28.5,21.8,27.6,21.8z"/>
                             <path class="CenterSvgElement" fill="#9A949B" d="M30.2,14H4.8c-0.8,0-1.5-0.7-1.5-1.5S3.9,11,4.8,11h25.4c0.8,0,1.5,0.7,1.5,1.5S31,14,30.2,14z"/>
                             <path class="CenterSvgElement" fill="#9A949B" d="M30.2,29.7H4.8c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h25.4c0.8,0,1.5,0.7,1.5,1.5S31,29.7,30.2,29.7z"/>
                         </svg>
                     </div> 
-                    <div class="TextPropertiesButtons" onclick="changeTextAlignment(this)" id="Right">
-                        <svg class="AlignmentIcons" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                    <div class="PropertiesButtons" id="Right" onclick="changeTextAlignment(this)">
+                        <svg class="IconMargin" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                             <path class="RightSvgElement" fill="#9A949B"  d="M30.2,6.1H9.9C9,6.1,8.4,5.4,8.4,4.6S9,3.1,9.9,3.1h20.3c0.8,0,1.5,0.7,1.5,1.5S31,6.1,30.2,6.1z"/>
                             <path class="RightSvgElement" fill="#9A949B" d="M30.2,21.8H9.9c-0.8,0-1.5-0.7-1.5-1.5s0.7-1.5,1.5-1.5h20.3c0.8,0,1.5,0.7,1.5,1.5S31,21.8,30.2,21.8z"/>
                             <path class="RightSvgElement" fill="#9A949B" d="M30.2,14H4.8c-0.8,0-1.5-0.7-1.5-1.5S3.9,11,4.8,11h25.4c0.8,0,1.5,0.7,1.5,1.5S31,14,30.2,14z"/>
@@ -187,13 +187,13 @@ function selectTool(t){
                         </svg>
                     </div> 
                 </div> 
-                    <div class="TextPropertiesFields">
-                        <div class="TextPropertiesButtons" onclick="changeTextStyle(this)" id="bold">
+                    <div class="PropertiesFields">
+                        <div class="PropertiesButtons" id="bold" onclick="changeTextStyle(this)">
                             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35     35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                                 <path class="BoldSvgElement" fill="#9A949B" class="st0" d="M6.56,4.76C7.18,4.78,8,4.8,9,4.83c1.01,0.02,2.02,0.04,3.02,0.04c1.18,0,2.3-0.01,3.37-0.04c1.07-0.02,1.83-0.04,2.29-0.04c2.98,0,5.2,0.53,6.68,1.58c1.48,1.06,2.21,2.41,2.21,4.07c0,0.84-0.25,1.69-0.76,2.56c-0.5,0.86-1.28,1.63-2.34,2.3c-1.06,0.67-2.42,1.16-4.1,1.48v0.07c2.26,0.17,4.04,0.58,5.36,1.22c1.32,0.65,2.27,1.43,2.84,2.34s0.86,1.86,0.86,2.84c0,1.51-0.4,2.78-1.19,3.82s-1.93,1.82-3.42,2.36s-3.26,0.81-5.33,0.81c-0.58,0-1.4-0.02-2.48-0.05c-1.08-0.04-2.39-0.05-3.92-0.05c-1.06,0-2.09,0.01-3.1,0.02C8,30.17,7.18,30.2,6.56,30.24v-0.72c0.77-0.05,1.34-0.14,1.73-0.29c0.38-0.14,0.64-0.43,0.77-0.86c0.13-0.43,0.2-1.08,0.2-1.94V8.57c0-0.89-0.07-1.54-0.2-1.96S8.66,5.9,8.27,5.75C7.87,5.59,7.3,5.5,6.56,5.48V4.76z M17.21,5.48c-0.94,0-1.54,0.2-1.82,0.61c-0.28,0.41-0.41,1.24-0.41,2.48v17.86c0,0.84,0.07,1.48,0.2,1.91s0.37,0.72,0.72,0.86c0.35,0.14,0.87,0.22,1.57,0.22c1.75,0,3.02-0.55,3.82-1.64s1.19-2.65,1.19-4.66c0-1.85-0.46-3.28-1.39-4.28s-2.45-1.51-4.59-1.51h-3.06v-0.61h3.1c1.13,0,2-0.27,2.61-0.81c0.61-0.54,1.03-1.26,1.26-2.16c0.23-0.9,0.34-1.87,0.34-2.9c0-1.78-0.28-3.11-0.83-4.01C19.36,5.93,18.46,5.48,17.21,5.48z"/>
                             </svg>
                         </div> 
-                        <div class="TextPropertiesButtons" onclick="changeTextStyle(this)" id="italic">
+                        <div class="PropertiesButtons" id="italic" onclick="changeTextStyle(this)">
                             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35     35" style="enable-background:new 0 0 35 35;" xml:space="preserve">
                                 <path class="ItalicSvgElement" fill="#9A949B" class="st0" d="M16.76,26.43c-0.22,0.86-0.31,1.51-0.29,1.94c0.02,0.43,0.23,0.72,0.61,0.86c0.38,0.14,0.98,0.24,1.8,0.29l-0.14,0.72c-0.55-0.05-1.24-0.08-2.07-0.09c-0.83-0.01-1.66-0.02-2.5-0.02c-0.94,0-1.8,0.01-2.59,0.02c-0.79,0.01-1.45,0.04-1.98,0.09l0.18-0.72c0.79-0.05,1.41-0.14,1.85-0.29c0.44-0.14,0.8-0.43,1.06-0.86c0.26-0.43,0.5-1.08,0.72-1.94l4.75-17.86c0.24-0.89,0.34-1.54,0.29-1.96c-0.05-0.42-0.26-0.71-0.63-0.86c-0.37-0.16-0.97-0.25-1.78-0.27l0.18-0.72c0.48,0.02,1.13,0.05,1.94,0.07c0.82,0.02,1.69,0.04,2.63,0.04c0.84,0,1.67-0.01,2.5-0.04c0.83-0.02,1.53-0.05,2.11-0.07l-0.18,0.72c-0.82,0.02-1.45,0.11-1.91,0.27c-0.46,0.16-0.81,0.44-1.06,0.86s-0.5,1.07-0.74,1.96L16.76,26.43z"/>
                             </svg>
@@ -220,8 +220,36 @@ function selectTool(t){
             tippy("#italic",{content: "<strong>Italic (Shift + I)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
             break;
         case "Sel":
-            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
+            document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>Actions</label><br>
+            <div id="PropertiesFieldsContainer">
+                <div class="PropertiesFields">
+                    <div class="PropertiesButtons" id="horizontal" onclick="Fragment.mirror(this)">
+                        <svg class="IconMargin" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35        35"    style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                            <polygon fill="#9A949B" points="14.95,5 14.95,30.02 2.11,30.02"/>
+                            <path fill="#9A949B" d="M14.95,31.02H2.11c-0.35,0-0.67-0.18-0.85-0.48c-0.18-0.3-0.2-0.67-0.04-0.98L14.06,4.54c0.21-0.41,0.67-0.62,1.12-0.52c0.45,0.11,0.77,0.51,0.77,0.97v25.02C15.95,30.57,15.5,31.02,14.95,31.02z M3.75,29.02h10.2V9.14L3.75,29.02z"/>
+                            <polygon fill="#682375" points="20.05,4.82 20.05,29.84 32.89,29.84"/>
+                            <path fill="#682375" d="M32.89,30.84H20.05c-0.55,0-1-0.45-1-1V4.82c0-0.46,0.32-0.86,0.77-0.97c0.45-0.11,0.91,0.1,1.12,0.52l12.83,25.02c0.16,0.31,0.15,0.68-0.04,0.98C33.56,30.66,33.24,30.84,32.89,30.84z M21.05,28.84h10.2L21.05,8.96V28.84z"/>
+                        </svg>
+                    </div>
+                    <div class="PropertiesButtons" id="vertical" onclick="Fragment.mirror(this)">
+                        <svg class="IconMargin" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35         35"    style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                            <polygon  fill="#9A949B" points="29.92,14.86 4.9,14.86 4.9,2.03 	"/>
+                            <path  fill="#9A949B" d="M29.92,15.86H4.9c-0.55,0-1-0.45-1-1V2.03c0-0.35,0.18-0.67,0.48-0.85C4.68,1,5.05,0.98,5.36,1.14l25.02,12.83c0.41,0.21,0.62,0.68,0.52,1.12C30.78,15.55,30.38,15.86,29.92,15.86z M5.9,13.86h19.88L5.9,3.67V13.86z"/>
+                            <polygon fill="#682375" points="30.1,19.97 5.08,19.97 5.08,32.81 	"/>
+                            <path fill="#682375" d="M5.08,33.81c-0.18,0-0.36-0.05-0.52-0.15c-0.3-0.18-0.48-0.5-0.48-0.85V19.97c0-0.55,0.45-1,1-1H30.1c0.46,0,0.86,0.32,0.97,0.77c0.11,0.45-0.1,0.91-0.52,1.12L5.54,33.7C5.39,33.77,5.24,33.81,5.08,33.81z M6.08,20.97v10.2l19.88-10.2H6.08z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="PropertiesFields">
+                    <div class="PropertiesButtons">
+                        
+                    </div>
+                    <div class="PropertiesButtons"></div>
+                </div>
+            </div>`;
             selectionBoxPoints = [];
+            tippy("#horizontal",{content: "<strong>Mirror area horizontally (Shift + H)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
+            tippy("#vertical",{content: "<strong>Mirror area vertically (Shift + V)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
             break;
         case "CPi":
             document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
@@ -926,6 +954,33 @@ const Fragment = {
         const statusTooltip = statusText._tippy;
         statusTooltip.show();
         setTimeout(function(){statusTooltip.hide()}, 1500);
+    },
+    mirror(t){
+        tempCanvas.height = selectionBoxPoints[1][1]-selectionBoxPoints[0][1];
+        tempCanvas.width = selectionBoxPoints[1][0]-selectionBoxPoints[0][0];
+        if (t.id == "horizontal"){
+            tctx.scale(-1, 1);
+            tctx.translate(-tempCanvas.width, 0);
+        }
+        else if(t.id == "vertical"){
+            tctx.scale(1, -1);
+            tctx.translate(0, -tempCanvas.height);
+        }
+        
+        tctx.drawImage(canvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1], 
+            selectionBoxPoints[1][0]-selectionBoxPoints[0][0], 
+            selectionBoxPoints[1][1]-selectionBoxPoints[0][1],
+            0, 0, selectionBoxPoints[1][0]-selectionBoxPoints[0][0], 
+            selectionBoxPoints[1][1]-selectionBoxPoints[0][1],)
+
+        const clearRect = new Path2D();
+        clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fill(clearRect);
+        ctx.globalCompositeOperation = "source-over";
+
+        ctx.drawImage(tempCanvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1]);
+        saveAction([selectionBoxPoints, t.id], "mirrorArea");
     }
 };
 
@@ -1080,6 +1135,33 @@ function undoLastAction(){
                 eraseRect.rect(undoActionsList[i][0][0], undoActionsList[i][0][1], undoActionsList[i][1][0]-undoActionsList[i][0][0], undoActionsList[i][1][1]-undoActionsList[i][0][1])
                 ctx.fill(eraseRect);
                 break;
+            case "mirrorArea":
+                let selectionPoints = undoActionsList[i][0];
+                tempCanvas.height = selectionPoints[1][1]-selectionPoints[0][1];
+                tempCanvas.width = selectionPoints[1][0]-selectionPoints[0][0];
+                if (undoActionsList[i][1] == "horizontal"){
+                    tctx.scale(-1, 1);
+                    tctx.translate(-tempCanvas.width, 0);
+                }
+                else if(undoActionsList[i][1] == "vertical"){
+                    tctx.scale(1, -1);
+                    tctx.translate(0, -tempCanvas.height);
+                }
+                
+                tctx.drawImage(canvas, selectionPoints[0][0], selectionPoints[0][1], 
+                    selectionPoints[1][0]-selectionPoints[0][0], 
+                    selectionPoints[1][1]-selectionPoints[0][1],
+                    0, 0, selectionPoints[1][0]-selectionPoints[0][0], 
+                    selectionPoints[1][1]-selectionPoints[0][1],)
+        
+                const cleanerRect = new Path2D();
+                cleanerRect.rect(selectionPoints[0][0], selectionPoints[0][1], selectionPoints[1][0]-selectionPoints[0][0], selectionPoints[1][1]-selectionPoints[0][1]);
+                ctx.globalCompositeOperation = "destination-out";
+                ctx.fill(cleanerRect);
+                ctx.globalCompositeOperation = "source-over";
+
+                ctx.drawImage(tempCanvas, selectionPoints[0][0], selectionPoints[0][1]);
+                break;
         }
         if (numberOfActionsForDeletion === i){
             FirstActionsImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -1194,6 +1276,33 @@ function redoLastAction(){
             ctx.globalCompositeOperation = "destination-out";
             eraseRect.rect(redoActionList[lastActionIndex][0][0], redoActionList[lastActionIndex][0][1], redoActionList[lastActionIndex][1][0], redoActionList[lastActionIndex][1][1])
             ctx.fill(eraseRect);
+            break;
+        case "mirrorArea":
+            let selectionPoints = redoActionList[lastActionIndex][0];
+            tempCanvas.height = selectionPoints[1][1]-selectionPoints[0][1];
+            tempCanvas.width = selectionPoints[1][0]-selectionPoints[0][0];
+            if (redoActionList[lastActionIndex][1] == "horizontal"){
+                tctx.scale(-1, 1);
+                tctx.translate(-tempCanvas.width, 0);
+            }
+            else if(redoActionList[lastActionIndex][1] == "vertical"){
+                tctx.scale(1, -1);
+                tctx.translate(0, -tempCanvas.height);
+            }
+            
+            tctx.drawImage(canvas, selectionPoints[0][0], selectionPoints[0][1], 
+                selectionPoints[1][0]-selectionPoints[0][0], 
+                selectionPoints[1][1]-selectionPoints[0][1],
+                0, 0, selectionPoints[1][0]-selectionPoints[0][0], 
+                selectionPoints[1][1]-selectionPoints[0][1],)
+        
+            const cleanerRect = new Path2D();
+            cleanerRect.rect(selectionPoints[0][0], selectionPoints[0][1], selectionPoints[1][0]-selectionPoints[0][0], selectionPoints[1][1]-selectionPoints[0][1]);
+            ctx.globalCompositeOperation = "destination-out";
+            ctx.fill(cleanerRect);
+            ctx.globalCompositeOperation = "source-over";
+
+            ctx.drawImage(tempCanvas, selectionPoints[0][0], selectionPoints[0][1]);
             break;
     }
     undoActionsList.push(redoActionList.pop());
@@ -1314,7 +1423,9 @@ function keyUp(e){
                 document.getElementById("CopyButton").click();
                 break;
             case "KeyV":
-                document.getElementById("PasteButton").click();
+                if (!e.shiftKey){
+                    document.getElementById("PasteButton").click();
+                }
                 break;
             case "KeyX":
                 document.getElementById("CutButton").click();
@@ -1364,6 +1475,16 @@ function keyUp(e){
                 case "KeyI":
                     try{
                         document.getElementById("italic").click();
+                    }catch{}
+                    break;
+                case "KeyH":
+                    try{
+                        document.getElementById("horizontal").click();
+                    }catch{}
+                    break;
+                case "KeyV":
+                    try{
+                        document.getElementById("vertical").click();
                     }catch{}
                     break;
                 case "ArrowLeft":

@@ -192,34 +192,31 @@ a {
 #InputFillColor{
     margin-right: 5px;
 }
-#TextPropertiesFieldsContainer{
+
+#PropertiesFieldsContainer{
     display: flex;
     margin-right: 15px;
     margin-left: 15px;
 }
-.TextPropertiesFields{
+.PropertiesFields{
     width: 50%;
     display: flex;
     margin: 8px;
 }
-.TextPropertiesButtons{
-    width: 27px;
-    height: 27px;
+.PropertiesButtons{
+    width: 30px;
+    height: 30px;
     transition: 0.4s all;
     border-radius: 5px;
     background-color: var(--background-layer-high);
     box-shadow: 0px 0px 0px 0px;
     margin: 2px;
 }
-#TextFieldContent{
-    height: 50px;
-
-}
-.TextPropertiesButtons:hover{
+.PropertiesButtons:hover{
     box-shadow: 0px 0px 7px 1px rgba(104,35,117,0.45); 
     transform: scale(1.07);
 }
-.AlignmentIcons{
+.IconMargin{
     margin: 3px;
 }
 
