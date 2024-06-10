@@ -1400,14 +1400,14 @@ function keyUp(e){
                 break;
             case "KeyS":
                 if (!e.altKey){
-                    document.getElementById("SToButton").click();
+                    document.getElementById("SelButton").click();
                 }
                 break; 
             case "KeyT":
                 document.getElementById("TexButton").click();
                 break;  
-            case "KeyA":
-                document.getElementById("SelButton").click();
+            case "KeyH":
+                document.getElementById("SToButton").click();
                 break;
             case "KeyI":
                 document.getElementById("CPiButton").click();
