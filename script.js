@@ -83,6 +83,7 @@ let verticallyMovedDistance = 0;
 let horizontallyMovedDistance = 0;
 let FirstActionsImageData = undefined;
 let actionHistoryLimit = 25;
+let areaBorderThickness = 5;
 
 function pythagoras(a, b){
     return Math.sqrt(a*a+b*b);
@@ -685,8 +686,10 @@ function openPreferencesPopup(){
 function applyPreferences(){
     arrowIncrementDistance = Number(document.getElementById("ArrowIncrementDistanceInput").value);
     actionHistoryLimit = Number(document.getElementById("ActionHistoryLimitInput").value);
+    areaBorderThickness = Number(document.getElementById("AreaBorderThicknessInput").value);
     document.cookie = `AID=${arrowIncrementDistance}; path=/`;
     document.cookie = `AHL=${actionHistoryLimit}; path=/`;
+    document.cookie = `ABT=${areaBorderThickness}; path=/`;
 
     closePopup();
 }
@@ -870,6 +873,7 @@ function loadUserPreferences(){
     let rawCookies = document.cookie.split("; ");
     let arrowIncrementDistanceCookie = undefined;
     let actionHistoryLimitCookie = undefined;
+    let areaBorderThicknessCookie = undefined;
     for (let i=0; i<rawCookies.length; i++){
         if (rawCookies[i].slice(0, 3) == "AID"){
             arrowIncrementDistanceCookie = rawCookies[i];
@@ -877,6 +881,10 @@ function loadUserPreferences(){
         }
         if (rawCookies[i].slice(0, 3) == "AHL"){
             actionHistoryLimitCookie = rawCookies[i];
+            continue;
+        }
+        if (rawCookies[i].slice(0, 3) == "ABT"){
+            areaBorderThicknessCookie = rawCookies[i];
             continue;
         }
     }
@@ -887,6 +895,10 @@ function loadUserPreferences(){
     if (actionHistoryLimitCookie != undefined){
         actionHistoryLimit = Number(actionHistoryLimitCookie.slice(4));
         document.getElementById("ActionHistoryLimitInput").value = actionHistoryLimit;
+    }
+    if (areaBorderThicknessCookie != undefined){
+        areaBorderThickness = Number(areaBorderThicknessCookie.slice(4));
+        document.getElementById("AreaBorderThicknessInput").value = areaBorderThickness;
     }
 }
 
