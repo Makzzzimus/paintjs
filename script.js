@@ -45,6 +45,35 @@ const canvasProperties = {
     backgroundColor: "#000000",
 }
 let shapePoints = [];
+const borderResizeAreas = {
+    areaPoints: {
+        left: [],
+        right: [],
+        top: [],
+        bottom: [],
+    },
+    setBorderResizeAreas(){//idk how to make this method less awful 
+        this.areaPoints.left[0][0] = selectionBoxPoints[0][0]-areaBorderThickness/2;
+        this.areaPoints.left[0][1] = selectionBoxPoints[0][1];
+        this.areaPoints.left[1][0] = selectionBoxPoints[0][0]+areaBorderThickness/2;
+        this.areaPoints.left[1][1] = selectionBoxPoints[1][1];
+
+        this.areaPoints.right[0][0] = selectionBoxPoints[1][0]-areaBorderThickness/2;
+        this.areaPoints.right[0][1] = selectionBoxPoints[0][1];
+        this.areaPoints.right[1][0] = selectionBoxPoints[1][0]+areaBorderThickness/2;
+        this.areaPoints.right[1][1] = selectionBoxPoints[1][1];
+
+        this.areaPoints.top[0][0] = selectionBoxPoints[0][0];
+        this.areaPoints.top[0][1] = selectionBoxPoints[0][1]-areaBorderThickness/2;
+        this.areaPoints.top[1][0] = selectionBoxPoints[1][0];
+        this.areaPoints.top[1][1] = selectionBoxPoints[0][1]+areaBorderThickness/2;
+
+        this.areaPoints.bottom[0][0] = selectionBoxPoints[0][0];
+        this.areaPoints.bottom[0][1] = selectionBoxPoints[1][1]-areaBorderThickness/2;
+        this.areaPoints.bottom[1][0] = selectionBoxPoints[1][0];
+        this.areaPoints.bottom[1][1] = selectionBoxPoints[1][1]+areaBorderThickness/2;
+    }
+}
 let selectionBoxPoints = [];
 let lastRadius = 0;
 const selectedColorPicker = document.getElementById("SelectedColor");
@@ -85,10 +114,10 @@ let FirstActionsImageData = undefined;
 let actionHistoryLimit = 25;
 let areaBorderThickness = 5;
 
+//Functions returning values
 function pythagoras(a, b){
     return Math.sqrt(a*a+b*b);
 }
-
 function rgbToHex(r, g, b) { //thx man https://stackoverflow.com/a/5624139
     return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1);
 }
@@ -248,7 +277,7 @@ function selectTool(t){
                     <div class="PropertiesButtons"></div>
                 </div>
             </div>`;
-            selectionBoxPoints = [];
+            removeSelection();
             tippy("#horizontal",{content: "<strong>Mirror area horizontally (Shift + H)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
             tippy("#vertical",{content: "<strong>Mirror area vertically (Shift + V)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
             break;
@@ -258,6 +287,7 @@ function selectTool(t){
     }
 }
 
+//Set tool properties
 function changeStroke(t){
     if (t.id.slice(-5) == "Value"){
         document.getElementById(`${selectedTool}StrokeSlider`).value = t.value;
@@ -436,6 +466,7 @@ function saveText(t){
     textTool.text = t.value;
 }
 
+//Tool buttons color change
 function changeToolButtonColor(t){
     const ELEMENTS_ARRAY = document.querySelectorAll(`.${t.id.slice(0,3)}SvgElement`);
     for(i=0; i<ELEMENTS_ARRAY.length; i++){
@@ -449,7 +480,7 @@ function reverseToolButtonColor(){
     }
 }
 
-
+//Colors
 function setColorFromLibrary(t){
     if (t.id.slice(0,4) == "User"){
         let rgb = t.style.backgroundColor.split(", ");
@@ -487,7 +518,7 @@ function setFillColorFromPrimary(){
     shapeTool.shapeFillColor = document.getElementById("InputFillColor").value;
 }
 
-
+//Popups
 function openCreateFilePopup(){
     let confirmDeletion = true
     if (canvas.width > 0 || canvas.height > 0){
@@ -497,8 +528,7 @@ function openCreateFilePopup(){
         document.getElementById("BackgroundDim").style.display = "flex";
         document.getElementById("FileCreationPopup").style.display = "block";
     }
-    clearPreviewCanvas();
-    selectionBoxPoints = [];
+    removeSelection();
 }
 function closePopup(){
     document.getElementById("BackgroundDim").style.display = "none";
@@ -529,9 +559,9 @@ function showCanvasBackgroundBox(t){
     }
 }
 
+//Shadows
 function openShadowPropertiesPopup(applyTo, action){
-    clearPreviewCanvas();
-    selectionBoxPoints = [];
+    removeSelection();
     shadowPreviewCanvas.width = 250; //clear canvas
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("ShadowPropertiesPopup").style.display = "block";
@@ -677,9 +707,10 @@ function confirmShadow(applyTo){
     tool.shadowColor = spctx.shadowColor;
 }
 
+//Preferences
 function openPreferencesPopup(){
     clearPreviewCanvas();
-    selectionBoxPoints = [];
+    removeSelection();
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("PreferencesPopup").style.display = "block";
 }
@@ -703,7 +734,7 @@ async function openChangelogPopup(){
     document.getElementById("ChangelogTextarea").value = changelog;
 }
 
-
+//File actions
 function createCanvas(clearHistory){
     let width = canvasProperties.width = document.getElementById("WidthInput").value;
     let height = canvasProperties.height = document.getElementById("HeightInput").value;
@@ -820,6 +851,7 @@ function openFile(action, t){
                 pctx.setLineDash([8, 5]);
                 pctx.stroke(selectionField);
     
+                borderResizeAreas.setBorderResizeAreas();
                 saveAction(img, "insert");
             }
             
@@ -827,6 +859,7 @@ function openFile(action, t){
     }
 }
 
+//Load user saved content
 function loadUserColors(){
     let rawCookies = document.cookie.split("; ");
     let rows = [];
@@ -902,7 +935,6 @@ function loadUserPreferences(){
     }
 }
 
-
 const Fragment = {
     canvasFragment: undefined,
     copy(){
@@ -959,10 +991,8 @@ const Fragment = {
         this.canvasFragment = undefined;
         
         ctx.globalCompositeOperation = "destination-out";
-        const clearRect = new Path2D();
-        clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-        ctx.fill(clearRect);
-        clearPreviewCanvas();
+        clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+        removeSelection();
         const statusTooltip = statusText._tippy;
         statusTooltip.show();
         setTimeout(function(){statusTooltip.hide()}, 1500);
@@ -985,17 +1015,13 @@ const Fragment = {
             0, 0, selectionBoxPoints[1][0]-selectionBoxPoints[0][0], 
             selectionBoxPoints[1][1]-selectionBoxPoints[0][1],)
 
-        const clearRect = new Path2D();
-        clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.fill(clearRect);
+        clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
         ctx.globalCompositeOperation = "source-over";
 
         ctx.drawImage(tempCanvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1]);
         saveAction([selectionBoxPoints, t.id], "mirrorArea");
     }
 };
-
 
 function changeActionButtonStatus(buttonId, status){
     const ELEMENTS_ARRAY = document.querySelectorAll(`.${buttonId}SvgElement`);
@@ -1026,6 +1052,8 @@ function changeActionButtonStatus(buttonId, status){
         button.onclick = undefined;
     }
 }
+
+//Action history
 function saveAction(action, customTool){
     let tool;
     if (customTool != undefined){
@@ -1045,11 +1073,10 @@ function saveAction(action, customTool){
     redoActionPropertiesList = [];
     changeActionButtonStatus("Redo", "off");
 }
-
 function undoLastAction(){
     changeActionButtonStatus("Copy", "off");
     changeActionButtonStatus("Cut", "off");
-    selectionBoxPoints = [];
+    removeSelection();
     let numberOfActionsForDeletion = undefined;
     createCanvas(false);
     if (backgroundImage != null){
@@ -1129,11 +1156,8 @@ function undoLastAction(){
                 break;
             case "Sel":
                 canvasContainer.style.cursor = "crosshair";
-                selectionBoxPoints = [];
-                const clearRect = new Path2D();
-                ctx.globalCompositeOperation = "destination-out";
-                clearRect.rect(undoActionsList[i][2][0], undoActionsList[i][2][1], undoActionsList[i][2][2], undoActionsList[i][2][3])
-                ctx.fill(clearRect);
+                removeSelection();
+                clearAreaContent(undoActionsList[i][2][0], undoActionsList[i][2][1], undoActionsList[i][2][2], undoActionsList[i][2][3]);
                 ctx.globalCompositeOperation = "source-over";
                 ctx.putImageData(undoActionsList[i][0], undoActionsList[i][1][0], undoActionsList[i][1][1]);
                 break;
@@ -1142,10 +1166,7 @@ function undoLastAction(){
                 ctx.drawImage(undoActionsList[i], 0, 0)
                 break;
             case "ClearSelectedArea":
-                const eraseRect = new Path2D();
-                ctx.globalCompositeOperation = "destination-out";
-                eraseRect.rect(undoActionsList[i][0][0], undoActionsList[i][0][1], undoActionsList[i][1][0]-undoActionsList[i][0][0], undoActionsList[i][1][1]-undoActionsList[i][0][1])
-                ctx.fill(eraseRect);
+                clearAreaContent(undoActionsList[i][0][0], undoActionsList[i][0][1], undoActionsList[i][1][0]-undoActionsList[i][0][0], undoActionsList[i][1][1]-undoActionsList[i][0][1]);
                 break;
             case "mirrorArea":
                 let selectionPoints = undoActionsList[i][0];
@@ -1166,10 +1187,7 @@ function undoLastAction(){
                     0, 0, selectionPoints[1][0]-selectionPoints[0][0], 
                     selectionPoints[1][1]-selectionPoints[0][1],)
         
-                const cleanerRect = new Path2D();
-                cleanerRect.rect(selectionPoints[0][0], selectionPoints[0][1], selectionPoints[1][0]-selectionPoints[0][0], selectionPoints[1][1]-selectionPoints[0][1]);
-                ctx.globalCompositeOperation = "destination-out";
-                ctx.fill(cleanerRect);
+                clearAreaContent(selectionPoints[0][0], selectionPoints[0][1], selectionPoints[1][0]-selectionPoints[0][0], selectionPoints[1][1]-selectionPoints[0][1]);
                 ctx.globalCompositeOperation = "source-over";
 
                 ctx.drawImage(tempCanvas, selectionPoints[0][0], selectionPoints[0][1]);
@@ -1271,23 +1289,17 @@ function redoLastAction(){
             break;
         case "Sel":
             canvasContainer.style.cursor = "crosshair";
-            selectionBoxPoints = [];
-            const clearRect = new Path2D();
-            ctx.globalCompositeOperation = "destination-out";
-            clearRect.rect(redoActionList[redoActionList.length - 1][2][0], redoActionList[redoActionList.length - 1][2][1], redoActionList[redoActionList.length - 1][2][2], redoActionList[redoActionList.length - 1][2][3])
-            ctx.fill(clearRect);
+            removeSelection();
+            clearAreaContent(redoActionList[lastActionIndex][2][0], redoActionList[lastActionIndex][2][1], redoActionList[lastActionIndex][2][2], redoActionList[lastActionIndex][2][3]);
             ctx.globalCompositeOperation = "source-over";
-            ctx.putImageData(redoActionList[redoActionList.length - 1][0], redoActionList[redoActionList.length - 1][1][0], redoActionList[redoActionList.length - 1][1][1]);
+            ctx.putImageData(redoActionList[lastActionIndex][0], redoActionList[lastActionIndex][1][0], redoActionList[lastActionIndex][1][1]);
             break;
         case "insert":
             ctx.globalCompositeOperation = "source-over";
             ctx.drawImage(redoActionList[lastActionIndex], 0, 0);
             break;
         case "ClearSelectedArea":
-            const eraseRect = new Path2D();
-            ctx.globalCompositeOperation = "destination-out";
-            eraseRect.rect(redoActionList[lastActionIndex][0][0], redoActionList[lastActionIndex][0][1], redoActionList[lastActionIndex][1][0], redoActionList[lastActionIndex][1][1])
-            ctx.fill(eraseRect);
+            clearAreaContent(redoActionList[lastActionIndex][0][0], redoActionList[lastActionIndex][0][1], redoActionList[lastActionIndex][1][0], redoActionList[lastActionIndex][1][1]);
             break;
         case "mirrorArea":
             let selectionPoints = redoActionList[lastActionIndex][0];
@@ -1308,10 +1320,7 @@ function redoLastAction(){
                 0, 0, selectionPoints[1][0]-selectionPoints[0][0], 
                 selectionPoints[1][1]-selectionPoints[0][1],)
         
-            const cleanerRect = new Path2D();
-            cleanerRect.rect(selectionPoints[0][0], selectionPoints[0][1], selectionPoints[1][0]-selectionPoints[0][0], selectionPoints[1][1]-selectionPoints[0][1]);
-            ctx.globalCompositeOperation = "destination-out";
-            ctx.fill(cleanerRect);
+            clearAreaContent(selectionPoints[0][0], selectionPoints[0][1], selectionPoints[1][0]-selectionPoints[0][0], selectionPoints[1][1]-selectionPoints[0][1])
             ctx.globalCompositeOperation = "source-over";
 
             ctx.drawImage(tempCanvas, selectionPoints[0][0], selectionPoints[0][1]);
@@ -1334,7 +1343,7 @@ function redoLastAction(){
     }
 }
 
-
+//Keyboard actions handling
 function keyDown(e){
     if (textNodeContent != undefined){
         isWriting = (document.activeElement == textNodeContent);
@@ -1372,10 +1381,7 @@ function keyDown(e){
             (selectionBoxPoints[1][1] + verticalMoveDistance) > 0 && (selectionBoxPoints[1][1] + verticalMoveDistance) < canvas.height+1){
                 movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
         
-                let clearRect = new Path2D();
-                clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-                ctx.globalCompositeOperation = "destination-out";
-                ctx.fill(clearRect);
+                clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
     
                 ctx.putImageData(movedCanvasFragment, selectionBoxPoints[0][0] += horizontalMoveDistance, selectionBoxPoints[0][1] += verticalMoveDistance)
     
@@ -1443,19 +1449,15 @@ function keyUp(e){
                 document.getElementById("CutButton").click();
                 break;
             case "Escape":
-                selectionBoxPoints = [];
+                removeSelection();
                 canvasContainer.style.cursor = "crosshair"
                 changeActionButtonStatus("Copy", "off");
                 changeActionButtonStatus("Cut", "off");
-                clearPreviewCanvas();
                 break;
             case "Backspace":
             case "Delete":
                 if (selectionBoxPoints != []){
-                    const clearRect = new Path2D();
-                    clearRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-                    ctx.globalCompositeOperation = "destination-out";
-                    ctx.fill(clearRect);
+                    clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
     
                     saveAction(selectionBoxPoints, "ClearSelectedArea");
                 }
@@ -1548,7 +1550,7 @@ function keyUp(e){
     }
 }
 
-
+//Drawing
 function drawStroke(X,Y){
     ctx.lineTo(X, Y);
     ctx.stroke();
@@ -1559,6 +1561,21 @@ function resetPolygon(){
     polygon = new Path2D();
     clearPreviewCanvas();
 }
+function removeSelection(){
+    selectionBoxPoints = [];
+    for (let sideAreaPoints in borderResizeAreas.areaPoints){
+        sideAreaPoints = [];
+    }
+    clearPreviewCanvas();
+}
+function clearAreaContent(...points){
+    const areaToClean = new Path2D();
+    ctx.globalCompositeOperation = "destination-out";
+    areaToClean.rect(points[0], points[1], points[2], points[3]);
+    ctx.fill(areaToClean);
+}
+
+//Handle mouse/pointer actions
 function getCursorLocation(event){
     let rect = event.target.getBoundingClientRect();
     cursorX = Math.round(event.clientX - rect.left);
@@ -1663,30 +1680,13 @@ function getCursorLocation(event){
             pctx.stroke(selectionBox);
         }
         if (selectionBoxPoints.length == 2 && isMovingFragment == false){
-            let greaterCoordinates = [];
-            let lesserCoordinates = [];
-            if (Number(selectionBoxPoints[0][0])>Number(selectionBoxPoints[1][0])){
-                greaterCoordinates.push(selectionBoxPoints[0][0]);
-                lesserCoordinates.push(selectionBoxPoints[1][0])
-            }
-            else{
-                greaterCoordinates.push(selectionBoxPoints[1][0]);
-                lesserCoordinates.push(selectionBoxPoints[0][0])
-            }
-            if (Number(selectionBoxPoints[0][1])>Number(selectionBoxPoints[1][1])){
-                greaterCoordinates.push(selectionBoxPoints[0][1]);
-                lesserCoordinates.push(selectionBoxPoints[1][1])
-            }
-            else{
-                greaterCoordinates.push(selectionBoxPoints[1][1]);
-                lesserCoordinates.push(selectionBoxPoints[0][1])
-            }
-            if ((cursorX>lesserCoordinates[0] && cursorX<greaterCoordinates[0]) && (cursorY>lesserCoordinates[1] && cursorY<greaterCoordinates[1])){
+            if ((cursorX>selectionBoxPoints[0][0] && cursorX<selectionBoxPoints[1][0]) && (cursorY>selectionBoxPoints[0][1] && cursorY<selectionBoxPoints[1][1])){ //Set "grab" cursor when pointer is inside a selection area
                 canvasContainer.style.cursor = "grab";
             }
             else{
                 canvasContainer.style.cursor = "crosshair";
             }
+
         }
     }
     if (isMouseDown == true && canvasContainer.style.cursor == "grab" && selectedTool == "Sel"){
@@ -1711,9 +1711,11 @@ function getCursorLocation(event){
             pctx.strokeStyle = "rgba(0,0,75,0.7)"
             pctx.setLineDash([8, 5]);
             pctx.stroke(selectionBox);
-    
+            
+            removeSelection()
             selectionBoxPoints = [[cursorX-distanceXY[0], cursorY-distanceXY[1]], [(cursorX-distanceXY[0])+(selectionBoxPoints[1][0]-selectionBoxPoints[0][0]), (cursorY-distanceXY[1])+(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])]];
             distanceXY = [];
+            borderResizeAreas.setBorderResizeAreas();
         }
     }
     if (selectedTool == "Tex"){
@@ -1839,7 +1841,7 @@ function mouseDown(){
         case "Sel":
             if (canvasContainer.style.cursor != "grab"){
                 if (selectionBoxPoints.length != 1){
-                    selectionBoxPoints = [];
+                    removeSelection();
                     selectionBoxPoints.push([cursorX, cursorY]);
                     changeActionButtonStatus("Copy", "off");
                     changeActionButtonStatus("Cut", "off");
@@ -1847,11 +1849,12 @@ function mouseDown(){
                 else{
                     selectionBoxPoints.push([cursorX, cursorY]);
                     const selectionBox = new Path2D();
-                    selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
-                    pctx.strokeStyle = "rgba(0,0,75,0.8)"
+                    selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+                    pctx.strokeStyle = "rgba(0,0,75,0.8)";
                     pctx.setLineDash([8, 5]);
 
                     pctx.stroke(selectionBox);
+                    borderResizeAreas.setBorderResizeAreas();
 
                     changeActionButtonStatus("Copy", "on");
                     changeActionButtonStatus("Cut", "on");
@@ -1872,11 +1875,9 @@ function mouseDown(){
             else{
                 movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
                 ctx.globalCompositeOperation = "destination-out";
-                const eraseRect = new Path2D();
-                eraseRect.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+                clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
                 distanceXY[0] = cursorX - selectionBoxPoints[0][0];
                 distanceXY[1] = cursorY - selectionBoxPoints[0][1];
-                ctx.fill(eraseRect);
             }
         break;
         case "Tex":
