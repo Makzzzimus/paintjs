@@ -256,18 +256,18 @@ function selectTool(t){
                 <div class="PropertiesFields">
                     <div class="PropertiesButtons" id="horizontal" onclick="Fragment.mirror(this)">
                         <svg class="IconMargin" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35        35"    style="enable-background:new 0 0 35 35;" xml:space="preserve">
-                            <polygon fill="#9A949B" points="14.95,5 14.95,30.02 2.11,30.02"/>
-                            <path fill="#9A949B" d="M14.95,31.02H2.11c-0.35,0-0.67-0.18-0.85-0.48c-0.18-0.3-0.2-0.67-0.04-0.98L14.06,4.54c0.21-0.41,0.67-0.62,1.12-0.52c0.45,0.11,0.77,0.51,0.77,0.97v25.02C15.95,30.57,15.5,31.02,14.95,31.02z M3.75,29.02h10.2V9.14L3.75,29.02z"/>
-                            <polygon fill="#682375" points="20.05,4.82 20.05,29.84 32.89,29.84"/>
-                            <path fill="#682375" d="M32.89,30.84H20.05c-0.55,0-1-0.45-1-1V4.82c0-0.46,0.32-0.86,0.77-0.97c0.45-0.11,0.91,0.1,1.12,0.52l12.83,25.02c0.16,0.31,0.15,0.68-0.04,0.98C33.56,30.66,33.24,30.84,32.89,30.84z M21.05,28.84h10.2L21.05,8.96V28.84z"/>
+                            <polygon class="MirrorSvgElement" fill="#c169d3" points="14.95,5 14.95,30.02 2.11,30.02"/>
+                            <path class="MirrorSvgElement" fill="#c169d3" d="M14.95,31.02H2.11c-0.35,0-0.67-0.18-0.85-0.48c-0.18-0.3-0.2-0.67-0.04-0.98L14.06,4.54c0.21-0.41,0.67-0.62,1.12-0.52c0.45,0.11,0.77,0.51,0.77,0.97v25.02C15.95,30.57,15.5,31.02,14.95,31.02z M3.75,29.02h10.2V9.14L3.75,29.02z"/>
+                            <polygon class="MirrorSvgElement" fill="#682375" points="20.05,4.82 20.05,29.84 32.89,29.84"/>
+                            <path class="MirrorSvgElement" fill="#682375" d="M32.89,30.84H20.05c-0.55,0-1-0.45-1-1V4.82c0-0.46,0.32-0.86,0.77-0.97c0.45-0.11,0.91,0.1,1.12,0.52l12.83,25.02c0.16,0.31,0.15,0.68-0.04,0.98C33.56,30.66,33.24,30.84,32.89,30.84z M21.05,28.84h10.2L21.05,8.96V28.84z"/>
                         </svg>
                     </div>
                     <div class="PropertiesButtons" id="vertical" onclick="Fragment.mirror(this)">
                         <svg class="IconMargin" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35         35"    style="enable-background:new 0 0 35 35;" xml:space="preserve">
-                            <polygon  fill="#9A949B" points="29.92,14.86 4.9,14.86 4.9,2.03 	"/>
-                            <path  fill="#9A949B" d="M29.92,15.86H4.9c-0.55,0-1-0.45-1-1V2.03c0-0.35,0.18-0.67,0.48-0.85C4.68,1,5.05,0.98,5.36,1.14l25.02,12.83c0.41,0.21,0.62,0.68,0.52,1.12C30.78,15.55,30.38,15.86,29.92,15.86z M5.9,13.86h19.88L5.9,3.67V13.86z"/>
-                            <polygon fill="#682375" points="30.1,19.97 5.08,19.97 5.08,32.81 	"/>
-                            <path fill="#682375" d="M5.08,33.81c-0.18,0-0.36-0.05-0.52-0.15c-0.3-0.18-0.48-0.5-0.48-0.85V19.97c0-0.55,0.45-1,1-1H30.1c0.46,0,0.86,0.32,0.97,0.77c0.11,0.45-0.1,0.91-0.52,1.12L5.54,33.7C5.39,33.77,5.24,33.81,5.08,33.81z M6.08,20.97v10.2l19.88-10.2H6.08z"/>
+                            <polygon class="MirrorSvgElement" fill="#c169d3" points="29.92,14.86 4.9,14.86 4.9,2.03 	"/>
+                            <path class="MirrorSvgElement" fill="#c169d3" d="M29.92,15.86H4.9c-0.55,0-1-0.45-1-1V2.03c0-0.35,0.18-0.67,0.48-0.85C4.68,1,5.05,0.98,5.36,1.14l25.02,12.83c0.41,0.21,0.62,0.68,0.52,1.12C30.78,15.55,30.38,15.86,29.92,15.86z M5.9,13.86h19.88L5.9,3.67V13.86z"/>
+                            <polygon class="MirrorSvgElement" fill="#682375" points="30.1,19.97 5.08,19.97 5.08,32.81 	"/>
+                            <path class="MirrorSvgElement" fill="#682375" d="M5.08,33.81c-0.18,0-0.36-0.05-0.52-0.15c-0.3-0.18-0.48-0.5-0.48-0.85V19.97c0-0.55,0.45-1,1-1H30.1c0.46,0,0.86,0.32,0.97,0.77c0.11,0.45-0.1,0.91-0.52,1.12L5.54,33.7C5.39,33.77,5.24,33.81,5.08,33.81z M6.08,20.97v10.2l19.88-10.2H6.08z"/>
                         </svg>
                     </div>
                 </div>
@@ -802,7 +802,7 @@ function saveFile(){
         statusText.innerHTML = `${finalName} - rePaint`;
     }
     else if(statusText.innerHTML.slice(0, 7) == "rePaint"){
-        alert("❌Canvas doesn't exist. Nothing to download");
+        alert("❌Nothing to download. Canvas doesn't exist. ");
     }
     else{
         finalName = statusText.innerHTML.slice(0, statusText.innerHTML.length - 10);
@@ -958,22 +958,29 @@ const Fragment = {
     async paste(){
         const clipboardContents = await navigator.clipboard.read();
         for (const item of clipboardContents) {
-            const blob = await item.getType("image/png");
-            const img = new Image();
-            img.src = URL.createObjectURL(blob);
-            img.onload = () => {
-                ctx.globalCompositeOperation = "source-over";
-                ctx.drawImage(img, 0, 0);
-                document.getElementById("SelButton").click();
-
-                const selectionBox = new Path2D();
-                selectionBox.rect(0, 0, img.width, img.height);
-                pctx.strokeStyle = "rgba(0,0,75,0.7)"
-                pctx.setLineDash([8, 5]);
-                pctx.stroke(selectionBox);
-                selectionBoxPoints = [[0, 0], [img.width, img.height]];
-                changeActionButtonStatus("Copy", "on");
-                changeActionButtonStatus("Cut", "on");
+            if (canvas.width != 0){
+                try{
+                    const blob = await item.getType("image/png");
+                    const img = new Image();
+                    img.src = URL.createObjectURL(blob);
+                    img.onload = () => {
+                        ctx.globalCompositeOperation = "source-over";
+                        ctx.drawImage(img, 0, 0);
+                        document.getElementById("SelButton").click();
+    
+                        const selectionBox = new Path2D();
+                        selectionBox.rect(0, 0, img.width, img.height);
+                        pctx.strokeStyle = "rgba(0,0,75,0.7)"
+                        pctx.setLineDash([8, 5]);
+                        pctx.stroke(selectionBox);
+                        selectionBoxPoints = [[0, 0], [img.width, img.height]];
+                        changeActionButtonStatus("Copy", "on");
+                        changeActionButtonStatus("Cut", "on");
+                    }
+                }catch{alert("❌The last clipboard item isn't an image/png");}
+            }
+            else{
+                alert("❌Insertion action is impossible. Canvas doesn't exist");
             }
         }
     },
@@ -999,28 +1006,33 @@ const Fragment = {
         setTimeout(function(){statusTooltip.hide()}, 1500);
     },
     mirror(t){
-        tempCanvas.height = selectionBoxPoints[1][1]-selectionBoxPoints[0][1];
-        tempCanvas.width = selectionBoxPoints[1][0]-selectionBoxPoints[0][0];
-        if (t.id == "horizontal"){
+        if(selectionBoxPoints != ""){
+            tempCanvas.height = selectionBoxPoints[1][1]-selectionBoxPoints[0][1];
+            tempCanvas.width = selectionBoxPoints[1][0]-selectionBoxPoints[0][0];
+            if (t.id == "horizontal"){
             tctx.scale(-1, 1);
             tctx.translate(-tempCanvas.width, 0);
-        }
-        else if(t.id == "vertical"){
+            }
+            else if(t.id == "vertical"){
             tctx.scale(1, -1);
             tctx.translate(0, -tempCanvas.height);
-        }
-        
-        tctx.drawImage(canvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1], 
+            }
+
+            tctx.drawImage(canvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1], 
             selectionBoxPoints[1][0]-selectionBoxPoints[0][0], 
             selectionBoxPoints[1][1]-selectionBoxPoints[0][1],
             0, 0, selectionBoxPoints[1][0]-selectionBoxPoints[0][0], 
-            selectionBoxPoints[1][1]-selectionBoxPoints[0][1],)
+                selectionBoxPoints[1][1]-selectionBoxPoints[0][1],)
 
-        clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
-        ctx.globalCompositeOperation = "source-over";
+            clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0]  [1])
+            ctx.globalCompositeOperation = "source-over";
 
-        ctx.drawImage(tempCanvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1]);
-        saveAction([selectionBoxPoints, t.id], "mirrorArea");
+            ctx.drawImage(tempCanvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1]);
+            saveAction([selectionBoxPoints, t.id], "mirrorArea");
+        }
+        else{
+            alert("❌Nothing to mirror. The selection area wasn't created.");
+        }
     }
 };
 
