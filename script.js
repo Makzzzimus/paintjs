@@ -47,31 +47,32 @@ const canvasProperties = {
 let shapePoints = [];
 const borderResizeAreas = {
     areaPoints: {
-        left: [],
-        right: [],
-        top: [],
-        bottom: [],
+        left: [[],[]],
+        right: [[],[]],
+        top: [[],[]],
+        bottom: [[],[]],
     },
+    pointerInArea: undefined,
     setBorderResizeAreas(){//idk how to make this method less awful 
-        this.areaPoints.left[0][0] = selectionBoxPoints[0][0]-areaBorderThickness/2;
+        this.areaPoints.left[0][0] = selectionBoxPoints[0][0]-areaBorderThickness;
         this.areaPoints.left[0][1] = selectionBoxPoints[0][1];
-        this.areaPoints.left[1][0] = selectionBoxPoints[0][0]+areaBorderThickness/2;
+        this.areaPoints.left[1][0] = selectionBoxPoints[0][0];
         this.areaPoints.left[1][1] = selectionBoxPoints[1][1];
 
-        this.areaPoints.right[0][0] = selectionBoxPoints[1][0]-areaBorderThickness/2;
+        this.areaPoints.right[0][0] = selectionBoxPoints[1][0];
         this.areaPoints.right[0][1] = selectionBoxPoints[0][1];
-        this.areaPoints.right[1][0] = selectionBoxPoints[1][0]+areaBorderThickness/2;
+        this.areaPoints.right[1][0] = selectionBoxPoints[1][0]+areaBorderThickness;
         this.areaPoints.right[1][1] = selectionBoxPoints[1][1];
 
         this.areaPoints.top[0][0] = selectionBoxPoints[0][0];
-        this.areaPoints.top[0][1] = selectionBoxPoints[0][1]-areaBorderThickness/2;
+        this.areaPoints.top[0][1] = selectionBoxPoints[0][1]-areaBorderThickness;
         this.areaPoints.top[1][0] = selectionBoxPoints[1][0];
-        this.areaPoints.top[1][1] = selectionBoxPoints[0][1]+areaBorderThickness/2;
+        this.areaPoints.top[1][1] = selectionBoxPoints[0][1];
 
         this.areaPoints.bottom[0][0] = selectionBoxPoints[0][0];
-        this.areaPoints.bottom[0][1] = selectionBoxPoints[1][1]-areaBorderThickness/2;
+        this.areaPoints.bottom[0][1] = selectionBoxPoints[1][1];
         this.areaPoints.bottom[1][0] = selectionBoxPoints[1][0];
-        this.areaPoints.bottom[1][1] = selectionBoxPoints[1][1]+areaBorderThickness/2;
+        this.areaPoints.bottom[1][1] = selectionBoxPoints[1][1]+areaBorderThickness;
     }
 }
 let selectionBoxPoints = [];
@@ -112,7 +113,7 @@ let verticallyMovedDistance = 0;
 let horizontallyMovedDistance = 0;
 let FirstActionsImageData = undefined;
 let actionHistoryLimit = 25;
-let areaBorderThickness = 5;
+let areaBorderThickness = 15;
 
 //Functions returning values
 function pythagoras(a, b){
@@ -1623,6 +1624,58 @@ function getCursorLocation(event){
                     break;
             }
         }
+        if (selectedTool == "Sel" && canvasContainer.style.cursor != "grab" && canvasContainer.style.cursor != "crosshair"){
+            const distanceForPointsToMove = {x:0, y:0};
+            tempCanvas.height = selectionBoxPoints[1][1]-selectionBoxPoints[0][1];
+            tempCanvas.width = selectionBoxPoints[1][0]-selectionBoxPoints[0][0];
+            switch (borderResizeAreas.pointerInArea){
+                case "left":
+                    distanceForPointsToMove.x = cursorX-selectionBoxPoints[0][0];
+                    selectionBoxPoints[0][0]+=(distanceForPointsToMove.x+areaBorderThickness/2);
+                    //tctx.scale((selectionBoxPoints[0][0]-distanceForPointsToMove.x)/selectionBoxPoints[0][0], 1);
+                    //tctx.translate(selectionBoxPoints[0][0], 0);
+                    break;
+                case "right":
+                    distanceForPointsToMove.x = cursorX-selectionBoxPoints[1][0];
+                    selectionBoxPoints[1][0]+=(distanceForPointsToMove.x-areaBorderThickness/2);
+
+                    break;
+                case "top":
+                    distanceForPointsToMove.y = cursorY-selectionBoxPoints[0][1];
+                    selectionBoxPoints[0][1]+=(distanceForPointsToMove.y+areaBorderThickness/2);
+
+                    break;
+                case "bottom":
+                    distanceForPointsToMove.y = cursorY-selectionBoxPoints[1][1];
+                    selectionBoxPoints[1][1]+=(distanceForPointsToMove.y-areaBorderThickness/2);
+                    
+                    break;
+                default:
+                    borderResizeAreas.pointerInArea = undefined;
+                    break;
+            }
+            clearPreviewCanvas();
+            const NewSelectionArea = new Path2D();
+            NewSelectionArea.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], (selectionBoxPoints[1][0]-selectionBoxPoints[0][0]), selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+            pctx.strokeStyle = "rgba(0,0,75,0.7)";
+            pctx.setLineDash([8, 5]);
+            pctx.stroke(NewSelectionArea);
+            borderResizeAreas.setBorderResizeAreas();
+
+            
+
+            // tctx.drawImage(canvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1], 
+            //     selectionBoxPoints[1][0]-selectionBoxPoints[0][0], 
+            //     selectionBoxPoints[1][1]-selectionBoxPoints[0][1],
+            //     0, 0, selectionBoxPoints[1][0]-selectionBoxPoints[0][0], 
+            //     selectionBoxPoints[1][1]-selectionBoxPoints[0][1],)
+
+            // //clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+            // ctx.globalCompositeOperation = "source-over";
+            
+            // pctx.drawImage(tempCanvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1]);
+            // //saveAction([selectionBoxPoints, t.id], "mirrorArea");
+        }
     }
     else{
         if (selectedTool == "PBr" || selectedTool == "Era"){
@@ -1679,12 +1732,30 @@ function getCursorLocation(event){
             pctx.setLineDash([8, 5]);
             pctx.stroke(selectionBox);
         }
+
         if (selectionBoxPoints.length == 2 && isMovingFragment == false){
             if ((cursorX>selectionBoxPoints[0][0] && cursorX<selectionBoxPoints[1][0]) && (cursorY>selectionBoxPoints[0][1] && cursorY<selectionBoxPoints[1][1])){ //Set "grab" cursor when pointer is inside a selection area
                 canvasContainer.style.cursor = "grab";
             }
+            else if ((cursorX>borderResizeAreas.areaPoints.left[0][0] && cursorX<borderResizeAreas.areaPoints.left[1][0]) && (cursorY>borderResizeAreas.areaPoints.left[0][1] && cursorY<borderResizeAreas.areaPoints.left[1][1])){
+                canvasContainer.style.cursor = "ew-resize";
+                borderResizeAreas.pointerInArea = "left";
+            }
+            else if((cursorX>borderResizeAreas.areaPoints.right[0][0] && cursorX<borderResizeAreas.areaPoints.right[1][0]) && (cursorY>borderResizeAreas.areaPoints.right[0][1] && cursorY<borderResizeAreas.areaPoints.right[1][1])){
+                canvasContainer.style.cursor = "ew-resize";
+                borderResizeAreas.pointerInArea = "right";
+            }
+            else if ((cursorX>borderResizeAreas.areaPoints.top[0][0] && cursorX<borderResizeAreas.areaPoints.top[1][0]) && (cursorY>borderResizeAreas.areaPoints.top[0][1] && cursorY<borderResizeAreas.areaPoints.top[1][1])){
+                canvasContainer.style.cursor = "ns-resize";
+                borderResizeAreas.pointerInArea = "top";
+            }
+            else if ((cursorX>borderResizeAreas.areaPoints.bottom[0][0] && cursorX<borderResizeAreas.areaPoints.bottom[1][0]) && (cursorY>borderResizeAreas.areaPoints.bottom[0][1] && cursorY<borderResizeAreas.areaPoints.bottom[1][1])){
+                canvasContainer.style.cursor = "ns-resize";
+                borderResizeAreas.pointerInArea = "bottom";
+            }
             else{
                 canvasContainer.style.cursor = "crosshair";
+                borderResizeAreas.pointerInArea = undefined
             }
 
         }
@@ -1692,7 +1763,7 @@ function getCursorLocation(event){
     if (isMouseDown == true && canvasContainer.style.cursor == "grab" && selectedTool == "Sel"){
         isMovingFragment = true;
     }
-    if (isMovingFragment == true && movedCanvasFragment != undefined){
+    if (isMovingFragment == true && movedCanvasFragment != undefined && canvasContainer.style.cursor == "grab"){
         if (isMouseDown == true){
             clearPreviewCanvas();
             pctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
@@ -1712,7 +1783,6 @@ function getCursorLocation(event){
             pctx.setLineDash([8, 5]);
             pctx.stroke(selectionBox);
             
-            removeSelection()
             selectionBoxPoints = [[cursorX-distanceXY[0], cursorY-distanceXY[1]], [(cursorX-distanceXY[0])+(selectionBoxPoints[1][0]-selectionBoxPoints[0][0]), (cursorY-distanceXY[1])+(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])]];
             distanceXY = [];
             borderResizeAreas.setBorderResizeAreas();
@@ -1839,7 +1909,7 @@ function mouseDown(){
             }
         break;
         case "Sel":
-            if (canvasContainer.style.cursor != "grab"){
+            if (canvasContainer.style.cursor == "crosshair"){
                 if (selectionBoxPoints.length != 1){
                     removeSelection();
                     selectionBoxPoints.push([cursorX, cursorY]);
@@ -1854,7 +1924,6 @@ function mouseDown(){
                     pctx.setLineDash([8, 5]);
 
                     pctx.stroke(selectionBox);
-                    borderResizeAreas.setBorderResizeAreas();
 
                     changeActionButtonStatus("Copy", "on");
                     changeActionButtonStatus("Cut", "on");
@@ -1870,9 +1939,10 @@ function mouseDown(){
                         selectionBoxPoints[0][1] = selectionBoxPoints[1][1];
                         selectionBoxPoints[1][1] = temp[1];
                     }
+                    borderResizeAreas.setBorderResizeAreas();
                 }
             }
-            else{
+            else if(canvasContainer.style.cursor !== "crosshair" && canvasContainer.style.cursor != "ns-resize" && canvasContainer.style.cursor != "ew-resize"){
                 movedCanvasFragment = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
                 ctx.globalCompositeOperation = "destination-out";
                 clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
