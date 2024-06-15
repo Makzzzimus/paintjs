@@ -141,6 +141,7 @@ function selectTool(t){
     ctx.shadowBlur = 0;
     ctx.strokeStyle = selectedColorPicker.value;
     clearPreviewCanvas();
+    removeSelection()
     if (selectedTool === null){
         document.getElementById("ToolPreferencesBox").style.opacity = 1;
         document.getElementById("ToolPreferencesBox").style.transform = "scale(1)";
@@ -272,15 +273,25 @@ function selectTool(t){
                     </div>
                 </div>
                 <div class="PropertiesFields">
-                    <div class="PropertiesButtons">
-                        
+                    <div class="PropertiesButtons" id="counterclockwise" onclick="Fragment.rotate(this)">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35         35"    style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                            <path fill="#682375" d="M15.69,32.29c3.71,0,7.2-1.45,9.83-4.07c5.42-5.42,5.42-14.24,0-19.65c-2.62-2.62-6.12-4.07-9.83-4.07c-2.61,0-5.1,0.71-7.27,2.04V4.21c0-0.83-0.67-1.5-1.5-1.5s-1.5,0.67-1.5,1.5v5.4c0,0.04,0,0.08,0,0.12c0.02,0.3,0.13,0.57,0.3,0.8c0.06,0.08,0.12,0.15,0.2,0.21c0.26,0.23,0.59,0.37,0.97,0.38c0,0,0,0,0,0l5.51,0.1c0.83,0.04,1.51-0.64,1.53-1.47c0-0.01,0-0.02,0-0.03c0-0.82-0.65-1.48-1.47-1.5l-0.69-0.01c1.23-0.47,2.55-0.72,3.91-0.72c2.91,0,5.65,1.13,7.71,3.19c4.25,4.25,4.25,11.16,0,15.41c-2.06,2.06-4.8,3.19-7.71,3.19s-5.65-1.13-7.71-3.19c-0.59-0.59-1.54-0.59-2.12,0s-0.59,1.54,0,2.12C8.48,30.84,11.98,32.29,15.69,32.29z"/>
+                            <path fill="#682375" d="M12.75,24.18c-0.33-0.21-0.57-0.55-0.66-0.94l-1.64-7.41c-0.09-0.39-0.01-0.79,0.2-1.13s0.55-0.57,0.94-0.66L19,12.4c0.8-0.17,1.61,0.33,1.79,1.14l1.64,7.41c0.18,0.81-0.33,1.61-1.14,1.79l-7.41,1.64c-0.11,0.02-0.22,0.04-0.32,0.04C13.27,24.41,12.99,24.33,12.75,24.18z M18.19,15.66l-4.48,0.99l0.99,4.48l4.48-0.99L18.19,15.66z"/>
+                        </svg>
                     </div>
-                    <div class="PropertiesButtons"></div>
+                    <div class="PropertiesButtons" id="clockwise" onclick="Fragment.rotate(this)">
+                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 35         35"    style="enable-background:new 0 0 35 35;" xml:space="preserve">
+                            <path fill="#682375" d="M19.31,32.29c-3.71,0-7.2-1.45-9.83-4.07c-5.42-5.42-5.42-14.24,0-19.65c2.62-2.62,6.12-4.07,9.83-4.07c2.61,0,5.1,0.71,7.27,2.04V4.21c0-0.83,0.67-1.5,1.5-1.5s1.5,0.67,1.5,1.5v5.4c0,0.04,0,0.08,0,0.12c-0.02,0.3-0.13,0.57-0.3,0.8c-0.06,0.08-0.12,0.15-0.2,0.21c-0.26,0.23-0.59,0.37-0.97,0.38c0,0,0,0,0,0l-5.51,0.1c-0.83,0.04-1.51-0.64-1.53-1.47c0-0.01,0-0.02,0-0.03c0-0.82,0.65-1.48,1.47-1.5l0.69-0.01c-1.23-0.47-2.55-0.72-3.91-0.72c-2.91,0-5.65,1.13-7.71,3.19c-4.25,4.25-4.25,11.16,0,15.41c2.06,2.06,4.8,3.19,7.71,3.19s5.65-1.13,7.71-3.19c0.59-0.59,1.54-0.59,2.12,0s0.59,1.54,0,2.12C26.52,30.84,23.02,32.29,19.31,32.29z"/>
+                            <path fill="#682375" d="M21.44,24.41c-0.11,0-0.22-0.01-0.32-0.04l-7.41-1.64c-0.81-0.18-1.32-0.98-1.14-1.79l1.64-7.41c0.18-0.81,0.98-1.31,1.79-1.14l7.41,1.64c0.39,0.09,0.73,0.32,0.94,0.66s0.29,0.74,0.2,1.13l-1.64,7.41c-0.09,0.39-0.32,0.73-0.66,0.94C22.01,24.33,21.73,24.41,21.44,24.41z M15.82,20.13l4.48,0.99l0.99-4.48l-4.48-0.99L15.82,20.13z"/>
+                        </svg>
+                    </div>
                 </div>
             </div>`;
             removeSelection();
-            tippy("#horizontal",{content: "<strong>Mirror area horizontally (Shift + H)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
-            tippy("#vertical",{content: "<strong>Mirror area vertically (Shift + V)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
+            tippy("#horizontal",{content: "<strong>Mirror the area horizontally (Shift + H)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
+            tippy("#vertical",{content: "<strong>Mirror the area vertically (Shift + V)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
+            tippy("#clockwise",{content: "<strong>Rotate the area by 90° clockwise (Shift + R)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
+            tippy("#counterclockwise",{content: "<strong>Rotate the area by 90° counterclockwise (Shift + T)</strong>", delay: [400, 100], animation: "shift-toward", allowHTML: true,});
             break;
         case "CPi":
             document.getElementById("ToolPreferencesFieldset").innerHTML = `<legend>Tool properties</legend><br><label>This tool has no properties</label>`;
@@ -844,19 +855,13 @@ function openFile(action, t){
             else if(action == "insert"){
                 ctx.globalCompositeOperation = "source-over";
                 ctx.drawImage(img, 0 ,0);
-                clearPreviewCanvas();
                 selectionBoxPoints = [[0, 0],[img.width, img.height]]
-                const selectionField = new Path2D();
-                selectionField.rect(0, 0, img.width, img.height);
-                pctx.strokeStyle = "rgba(0,0,75,0.8)";
-                pctx.setLineDash([8, 5]);
-                pctx.stroke(selectionField);
-    
-                borderResizeAreas.setBorderResizeAreas();
+                createSelectionArea();
                 saveAction(img, "insert");
             }
             
         };
+        document.getElementById("SelButton").click();
     }
 }
 
@@ -967,15 +972,9 @@ const Fragment = {
                         ctx.globalCompositeOperation = "source-over";
                         ctx.drawImage(img, 0, 0);
                         document.getElementById("SelButton").click();
-    
-                        const selectionBox = new Path2D();
-                        selectionBox.rect(0, 0, img.width, img.height);
-                        pctx.strokeStyle = "rgba(0,0,75,0.7)"
-                        pctx.setLineDash([8, 5]);
-                        pctx.stroke(selectionBox);
+
                         selectionBoxPoints = [[0, 0], [img.width, img.height]];
-                        changeActionButtonStatus("Copy", "on");
-                        changeActionButtonStatus("Cut", "on");
+                        createSelectionArea();
                     }
                 }catch{alert("❌The last clipboard item isn't an image/png");}
             }
@@ -1004,6 +1003,8 @@ const Fragment = {
         const statusTooltip = statusText._tippy;
         statusTooltip.show();
         setTimeout(function(){statusTooltip.hide()}, 1500);
+        changeActionButtonStatus("Copy", "off");
+        ChangeActionButtonStatus("Cut", "off");
     },
     mirror(t){
         if(selectionBoxPoints != ""){
@@ -1031,7 +1032,63 @@ const Fragment = {
             saveAction([selectionBoxPoints, t.id], "mirrorArea");
         }
         else{
-            alert("❌Nothing to mirror. The selection area wasn't created.");
+            alert("❌Nothing to mirror. The selection area is undefined.");
+        }
+    },
+    rotate(t){
+        if(selectionBoxPoints != ""){
+            let longerLength;
+            let shorterLength;
+            if ((selectionBoxPoints[1][0]-selectionBoxPoints[0][0])>(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])){
+                longerLength = selectionBoxPoints[1][0]-selectionBoxPoints[0][0];
+                shorterLength = selectionBoxPoints[1][1]-selectionBoxPoints[0][1];
+            }
+            else{
+                longerLength = selectionBoxPoints[1][1]-selectionBoxPoints[0][1];
+                shorterLength = selectionBoxPoints[1][0]-selectionBoxPoints[0][0];
+            }
+            tempCanvas.height = tempCanvas.width = longerLength;
+            if (t.id == "clockwise"){
+                tctx.translate(Math.floor(tempCanvas.width/2), Math.floor(tempCanvas.height/2));
+                tctx.rotate(Math.PI/2);
+                
+            }
+            else if(t.id == "counterclockwise"){
+                tctx.translate(Math.floor(tempCanvas.width/2), Math.floor(tempCanvas.height/2));
+                tctx.rotate(Math.PI*1.5);
+            }
+
+            tctx.drawImage(canvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1], 
+            selectionBoxPoints[1][0]-selectionBoxPoints[0][0], 
+            selectionBoxPoints[1][1]-selectionBoxPoints[0][1],
+            Math.floor(-(selectionBoxPoints[1][0]-selectionBoxPoints[0][0])/2),
+            Math.floor(-(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])/2),
+            selectionBoxPoints[1][0]-selectionBoxPoints[0][0], 
+            selectionBoxPoints[1][1]-selectionBoxPoints[0][1],)
+
+            clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0]  [1])
+            ctx.globalCompositeOperation = "source-over";
+            ctx.drawImage(tempCanvas, selectionBoxPoints[0][0], selectionBoxPoints[0][1]);
+            saveAction([structuredClone(selectionBoxPoints), t.id], "rotateArea");
+
+            let lengthOfEmptySpace = longerLength-shorterLength;
+            if ((selectionBoxPoints[1][0]-selectionBoxPoints[0][0])>(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])){
+                selectionBoxPoints[0][0]+=Math.floor(lengthOfEmptySpace/2);
+                selectionBoxPoints[1][0]-=Math.floor(lengthOfEmptySpace/2);
+                selectionBoxPoints[1][1] = selectionBoxPoints[0][1] + longerLength;
+                console.log('true :>> ', true);
+            }
+            else{
+                selectionBoxPoints[0][0];
+                selectionBoxPoints[1][0]+=lengthOfEmptySpace;
+                selectionBoxPoints[0][1]+=Math.floor(lengthOfEmptySpace/2);
+                selectionBoxPoints[1][1] = selectionBoxPoints[0][1] + shorterLength;
+                console.log('false :>> ', false);
+            }
+            createSelectionArea();
+        }
+        else{
+            alert("❌Nothing to rotate. The selection area is undefined.");
         }
     }
 };
@@ -1205,6 +1262,40 @@ function undoLastAction(){
 
                 ctx.drawImage(tempCanvas, selectionPoints[0][0], selectionPoints[0][1]);
                 break;
+            case "rotateArea":
+                let rotationSelectionPoints = undoActionsList[i][0];
+                let longerLength;
+                let shorterLength;
+                if ((rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0])>(rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1])){
+                    longerLength = rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0];
+                    shorterLength = rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1];
+                }
+                else{
+                    longerLength = rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1];
+                    shorterLength = rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0];
+                }
+                tempCanvas.height = tempCanvas.width = longerLength;
+                if (undoActionsList[i][1] == "clockwise"){
+                    tctx.translate(Math.floor(tempCanvas.width/2), Math.floor(tempCanvas.height/2));
+                    tctx.rotate(Math.PI/2);
+                }
+                else if(undoActionsList[i][1] == "counterclockwise"){
+                    tctx.translate(Math.floor(tempCanvas.width/2), Math.floor(tempCanvas.height/2));
+                    tctx.rotate(Math.PI*1.5);
+                }
+            
+                tctx.drawImage(canvas, rotationSelectionPoints[0][0], rotationSelectionPoints[0][1], 
+                rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0], 
+                rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1],
+                Math.floor(-(rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0])/2),
+                Math.floor(-(rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1])/2),
+                rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0], 
+                rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1],)
+                
+                clearAreaContent(rotationSelectionPoints[0][0], rotationSelectionPoints[0][1], rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0], rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1])
+                ctx.globalCompositeOperation = "source-over";
+                ctx.drawImage(tempCanvas, rotationSelectionPoints[0][0], rotationSelectionPoints[0][1]);
+                break;
         }
         if (numberOfActionsForDeletion === i){
             FirstActionsImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -1338,6 +1429,40 @@ function redoLastAction(){
 
             ctx.drawImage(tempCanvas, selectionPoints[0][0], selectionPoints[0][1]);
             break;
+        case "rotateArea":
+            let rotationSelectionPoints = redoActionList[lastActionIndex][0];
+            let longerLength;
+            let shorterLength;
+            if ((rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0])>(rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1])){
+                longerLength = rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0];
+                shorterLength = rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1];
+            }
+            else{
+                longerLength = rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1];
+                shorterLength = rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0];
+            }
+            tempCanvas.height = tempCanvas.width = longerLength;
+            if (redoActionList[lastActionIndex][1] == "clockwise"){
+                tctx.translate(Math.floor(tempCanvas.width/2), Math.floor(tempCanvas.height/2));
+                tctx.rotate(Math.PI/2);
+            }
+            else if(redoActionList[lastActionIndex][1] == "counterclockwise"){
+                tctx.translate(Math.floor(tempCanvas.width/2), Math.floor(tempCanvas.height/2));
+                tctx.rotate(Math.PI*1.5);
+            }
+        
+            tctx.drawImage(canvas, rotationSelectionPoints[0][0], rotationSelectionPoints[0][1], 
+            rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0], 
+            rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1],
+            Math.floor(-(rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0])/2),
+            Math.floor(-(rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1])/2),
+            rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0], 
+            rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1],)
+            
+            clearAreaContent(rotationSelectionPoints[0][0], rotationSelectionPoints[0][1], rotationSelectionPoints[1][0]-rotationSelectionPoints[0][0], rotationSelectionPoints[1][1]-rotationSelectionPoints[0][1])
+            ctx.globalCompositeOperation = "source-over";
+            ctx.drawImage(tempCanvas, rotationSelectionPoints[0][0], rotationSelectionPoints[0][1]);
+            break;
     }
     undoActionsList.push(redoActionList.pop());
     const beforeRedoToolProperties = redoActionPropertiesList.pop();
@@ -1398,12 +1523,7 @@ function keyDown(e){
     
                 ctx.putImageData(movedCanvasFragment, selectionBoxPoints[0][0] += horizontalMoveDistance, selectionBoxPoints[0][1] += verticalMoveDistance)
     
-                clearPreviewCanvas();
-                const selectionBox = new Path2D();
-                selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], (selectionBoxPoints[1][0] += horizontalMoveDistance) - selectionBoxPoints[0][0], (selectionBoxPoints[1][1] += verticalMoveDistance) - selectionBoxPoints[0][1])
-                pctx.strokeStyle = "rgba(0,0,75,0.8)"
-                pctx.setLineDash([8, 5]);
-                pctx.stroke(selectionBox);
+                createSelectionArea(selectionBoxPoints[0][0], selectionBoxPoints[0][1], (selectionBoxPoints[1][0] += horizontalMoveDistance) - selectionBoxPoints[0][0], (selectionBoxPoints[1][1] += verticalMoveDistance) - selectionBoxPoints[0][1])
             }
             else{
                 alert("❌The selection area cannot extend beyond the canvas boundaries");
@@ -1435,7 +1555,7 @@ function keyUp(e){
                 }
                 break; 
             case "KeyT":
-                document.getElementById("TexButton").click();
+                if(!e.shiftKey){document.getElementById("TexButton").click();}
                 break;  
             case "KeyH":
                 document.getElementById("SToButton").click();
@@ -1514,6 +1634,16 @@ function keyUp(e){
                         document.getElementById("vertical").click();
                     }catch{}
                     break;
+                case "KeyT":
+                    try{
+                        document.getElementById("counterclockwise").click();
+                    }catch{}
+                    break;
+                case "KeyR":
+                    try{
+                        document.getElementById("clockwise").click();
+                    }catch{}
+                    break;
                 case "ArrowLeft":
                     try{
                         document.getElementById("Left").click();
@@ -1550,7 +1680,7 @@ function keyUp(e){
         }
         if (e.code.slice(0, 5) == "Arrow"){
             let selectionBoxPointsBeforeMovement = [];
-            selectionBoxPointsBeforeMovement.push([selectionBoxPoints[0][0] - horizontallyMovedDistance, selectionBoxPoints[0][1] - verticallyMovedDistance]);
+            try{selectionBoxPointsBeforeMovement.push([selectionBoxPoints[0][0] - horizontallyMovedDistance, selectionBoxPoints[0][1] - verticallyMovedDistance]);
             selectionBoxPointsBeforeMovement.push([selectionBoxPoints[1][0] - horizontallyMovedDistance, selectionBoxPoints[1][1] - verticallyMovedDistance]);
 
             saveAction([movedCanvasFragment, [selectionBoxPoints[0][0], selectionBoxPoints[0][1]],
@@ -1558,7 +1688,7 @@ function keyUp(e){
                 selectionBoxPointsBeforeMovement[1][0]-selectionBoxPointsBeforeMovement[0][0],
                 selectionBoxPointsBeforeMovement[1][1]-selectionBoxPointsBeforeMovement[0][1]]]);
                 
-            horizontallyMovedDistance = verticallyMovedDistance = 0;
+            horizontallyMovedDistance = verticallyMovedDistance = 0;}catch{console.error("Selected area is undefined")}
         }
     }
 }
@@ -1586,6 +1716,37 @@ function clearAreaContent(...points){
     ctx.globalCompositeOperation = "destination-out";
     areaToClean.rect(points[0], points[1], points[2], points[3]);
     ctx.fill(areaToClean);
+}
+function createSelectionArea(x,y,w,h){
+    clearPreviewCanvas();
+    const selectionBox = new Path2D();
+    if (x == undefined){
+        selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
+    }
+    else{
+        selectionBox.rect(x,y,w,h);
+    }
+    
+    pctx.strokeStyle = "rgba(0,0,75,0.8)";
+    pctx.setLineDash([8, 5]);
+
+    pctx.stroke(selectionBox);
+
+    changeActionButtonStatus("Copy", "on");
+    changeActionButtonStatus("Cut", "on");
+
+    let temp = [];  //Sort selection box point. selectionBoxPoints[0] must be in a left top corner, while selectionBoxPoints[1] in right bottom
+    if (selectionBoxPoints[0][0] > selectionBoxPoints[1][0]){
+        temp[0] = selectionBoxPoints[0][0];
+        selectionBoxPoints[0][0] = selectionBoxPoints[1][0];
+        selectionBoxPoints[1][0] = temp[0];
+    }
+    if (selectionBoxPoints[0][1] > selectionBoxPoints[1][1]){
+        temp[1] = selectionBoxPoints[0][1];
+        selectionBoxPoints[0][1] = selectionBoxPoints[1][1];
+        selectionBoxPoints[1][1] = temp[1];
+    }
+    borderResizeAreas.setBorderResizeAreas();
 }
 
 //Handle mouse/pointer actions
@@ -1666,13 +1827,7 @@ function getCursorLocation(event){
                     borderResizeAreas.pointerInArea = undefined;
                     break;
             }
-            clearPreviewCanvas();
-            const NewSelectionArea = new Path2D();
-            NewSelectionArea.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], (selectionBoxPoints[1][0]-selectionBoxPoints[0][0]), selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-            pctx.strokeStyle = "rgba(0,0,75,0.7)";
-            pctx.setLineDash([8, 5]);
-            pctx.stroke(NewSelectionArea);
-            borderResizeAreas.setBorderResizeAreas();
+            createSelectionArea();
 
             
 
@@ -1783,21 +1938,14 @@ function getCursorLocation(event){
         }
         else{
             isMovingFragment = false;
-            clearPreviewCanvas();
             ctx.globalCompositeOperation = "source-over";
             ctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
     
             saveAction([movedCanvasFragment, [cursorX-distanceXY[0], cursorY-distanceXY[1]], [selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]]]);
-    
-            const selectionBox = new Path2D();
-            selectionBox.rect(cursorX-distanceXY[0], cursorY-distanceXY[1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1])
-            pctx.strokeStyle = "rgba(0,0,75,0.7)"
-            pctx.setLineDash([8, 5]);
-            pctx.stroke(selectionBox);
-            
+
             selectionBoxPoints = [[cursorX-distanceXY[0], cursorY-distanceXY[1]], [(cursorX-distanceXY[0])+(selectionBoxPoints[1][0]-selectionBoxPoints[0][0]), (cursorY-distanceXY[1])+(selectionBoxPoints[1][1]-selectionBoxPoints[0][1])]];
+            createSelectionArea();
             distanceXY = [];
-            borderResizeAreas.setBorderResizeAreas();
         }
     }
     if (selectedTool == "Tex"){
@@ -1930,28 +2078,7 @@ function mouseDown(){
                 }
                 else{
                     selectionBoxPoints.push([cursorX, cursorY]);
-                    const selectionBox = new Path2D();
-                    selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
-                    pctx.strokeStyle = "rgba(0,0,75,0.8)";
-                    pctx.setLineDash([8, 5]);
-
-                    pctx.stroke(selectionBox);
-
-                    changeActionButtonStatus("Copy", "on");
-                    changeActionButtonStatus("Cut", "on");
-
-                    let temp = [];  //Sort selection box point. selectionBoxPoints[0] must be in a left bottom corner, while selectionBoxPoints[1] in right top
-                    if (selectionBoxPoints[0][0] > selectionBoxPoints[1][0]){
-                        temp[0] = selectionBoxPoints[0][0];
-                        selectionBoxPoints[0][0] = selectionBoxPoints[1][0];
-                        selectionBoxPoints[1][0] = temp[0];
-                    }
-                    if (selectionBoxPoints[0][1] > selectionBoxPoints[1][1]){
-                        temp[1] = selectionBoxPoints[0][1];
-                        selectionBoxPoints[0][1] = selectionBoxPoints[1][1];
-                        selectionBoxPoints[1][1] = temp[1];
-                    }
-                    borderResizeAreas.setBorderResizeAreas();
+                    createSelectionArea();
                 }
             }
             else if(canvasContainer.style.cursor !== "crosshair" && canvasContainer.style.cursor != "ns-resize" && canvasContainer.style.cursor != "ew-resize"){
