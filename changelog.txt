@@ -1,3 +1,23 @@
+v1.1.0
+    -Added
+        *Color picker tool
+        *The selection of the canvas background color 
+        *Text and shape opacity property
+        *Action history limit
+        *Popup confirmation hotkey (Enter)
+
+        *The ability to move a selected area with arrows
+        *The ability to resize a selection field
+        *The ability to flip (mirror) a selected area
+        *The ability to rotate a selected area
+    
+    -Changed
+        *The favicon and the repo name
+        *Some tools hotkeys
+        *Stroke behavior of the shape
+
+    -Fixed many bugs
+
 v1.0.1
     -Added favicon
     -Page tittle dynamically changes to the opened file name
