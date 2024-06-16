@@ -2137,9 +2137,9 @@ function mouseUp(){
     isMouseDown = false;
 }
 
-document.addEventListener("contextmenu", event => {
-    event.preventDefault();
-});
+// document.addEventListener("contextmenu", event => {
+//     event.preventDefault();
+// });
 //addEventListener("paste", (event) => {document.getElementById("PasteButton").click();});
 document.addEventListener("keyup", keyUp, false);
 document.addEventListener("keydown", keyDown, false);
