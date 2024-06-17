@@ -1076,14 +1076,12 @@ const Fragment = {
                 selectionBoxPoints[0][0]+=Math.floor(lengthOfEmptySpace/2);
                 selectionBoxPoints[1][0]-=Math.floor(lengthOfEmptySpace/2);
                 selectionBoxPoints[1][1] = selectionBoxPoints[0][1] + longerLength;
-                console.log('true :>> ', true);
             }
             else{
                 selectionBoxPoints[0][0];
                 selectionBoxPoints[1][0]+=lengthOfEmptySpace;
                 selectionBoxPoints[0][1]+=Math.floor(lengthOfEmptySpace/2);
                 selectionBoxPoints[1][1] = selectionBoxPoints[0][1] + shorterLength;
-                console.log('false :>> ', false);
             }
             createSelectionArea();
         }
@@ -1192,7 +1190,7 @@ function undoLastAction(){
                         strokeShape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1])
                         for (let i=1; i<undoShapePoints.length; i++){
                             strokeShape.lineTo(undoShapePoints[i][0], undoShapePoints[i][1]);
-                            ctx.stroke(shape);
+                            ctx.stroke(strokeShape);
                         }
                         strokeShape.closePath();
                         break;
@@ -1534,7 +1532,9 @@ function keyDown(e){
         case "Enter":
             let confirmButtons = document.querySelectorAll(".FinishPopupButton");
             for (let i=0; i<confirmButtons.length; i++){
-                try{confirmButtons[i].click()}catch{};
+                if (confirmButtons[i].parentElement.style.display != "none"){
+                    confirmButtons[i].click();
+                }
             }
     }
 }
@@ -1934,7 +1934,6 @@ function getCursorLocation(event){
         if (isMouseDown == true){
             clearPreviewCanvas();
             pctx.putImageData(movedCanvasFragment, cursorX-distanceXY[0], cursorY-distanceXY[1]);
-            console.log(distanceXY)
         }
         else{
             isMovingFragment = false;
@@ -2137,10 +2136,10 @@ function mouseUp(){
     isMouseDown = false;
 }
 
-// document.addEventListener("contextmenu", event => {
-//     event.preventDefault();
-// });
-//addEventListener("paste", (event) => {document.getElementById("PasteButton").click();});
+document.addEventListener("contextmenu", event => {
+    event.preventDefault();
+});
+//addEventListener("paste", event => {document.getElementById("PasteButton").click();});
 document.addEventListener("keyup", keyUp, false);
 document.addEventListener("keydown", keyDown, false);
 tippy("[data-tippy-content]",{
