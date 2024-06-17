@@ -8,7 +8,8 @@
     <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/makzzzimus/repaint">
     <img alt="GitHub last commit" src="https://img.shields.io/badge/made_with-love-red">
 </div>
-<img alt="GitHub last commit" src="https://github.com/Makzzzimus/repaint/ReadmeAssets/uipreview.png">
+
+![UI screenshot](/ReadmeAssets/uipreview.png)
 
 ## Features
 RePaint includes most of MS Paint features 🔹 and also adds some new ones, such as:
