@@ -130,6 +130,15 @@ function hexToRgb(rawhex) { //ty https://stackoverflow.com/a/11508164
     let b = bigint & 255;
     return r + ", " + g + ", " + b;
 }
+function invertRgb(r, g, b, a){
+    r = (255 - r);
+    g = (255 - g);
+    b = (255 - b);
+    if (a == 0){
+        r = g = b = 55;
+    }
+    return `${r},${g},${b}`
+}
 function enforceLimits(min, max, isFloat, value){
     if (isFloat == false){
         value = Math.floor(value);
@@ -1771,16 +1780,22 @@ function clearAreaContent(...points){
 function createSelectionArea(x,y,w,h){
     clearPreviewCanvas();
     const selectionBox = new Path2D();
+    let xd1; // 1st point data (color)
+    let xd2; // 2nd point data (color)
     if (x == undefined){
+        xd1 = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], 1, 1).data;
+        xd2 = ctx.getImageData(selectionBoxPoints[1][0], selectionBoxPoints[1][1], 1, 1).data;
         selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
     }
     else{
+        xd1 = ctx.getImageData(x, y, 1, 1).data;
+        xd2 = ctx.getImageData(x+w, y+h, 1, 1).data;
         selectionBox.rect(x,y,w,h);
     }
-    
-    pctx.strokeStyle = "rgba(0,0,75,0.8)";
-    pctx.setLineDash([8, 5]);
 
+    pctx.lineWidth = 2;
+    pctx.strokeStyle = `rgba(${invertRgb((xd1[0]+xd2[0])/2, (xd1[1]+xd2[1])/2, (xd1[2]+xd2[2])/2, (xd1[3]+xd2[3])/2)},1)`; // Finding average color of points and inverting them
+    pctx.setLineDash([8, 5]);
     pctx.stroke(selectionBox);
 
     changeActionButtonStatus("Copy", "on");
@@ -1945,8 +1960,10 @@ function getCursorLocation(event){
         if (selectionBoxPoints.length == 1){
             clearPreviewCanvas();
             const selectionBox = new Path2D();
-            selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], cursorX-selectionBoxPoints[0][0], cursorY-selectionBoxPoints[0][1])
-            pctx.strokeStyle = "rgba(0,0,75,0.7)"
+            selectionBox.rect(selectionBoxPoints[0][0], selectionBoxPoints[0][1], cursorX-selectionBoxPoints[0][0], cursorY-selectionBoxPoints[0][1]);
+            let xd = ctx.getImageData(selectionBoxPoints[0][0], selectionBoxPoints[0][1], 1, 1).data;
+            pctx.lineWidth = 2;
+            pctx.strokeStyle = `rgba(${invertRgb(xd[0], xd[1], xd[2], xd[3])},0.7)`;
             pctx.setLineDash([8, 5]);
             pctx.stroke(selectionBox);
         }
