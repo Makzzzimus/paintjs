@@ -1223,11 +1223,20 @@ function undoLastAction(){
         switch (actionType){
             case "PBr":
             case "Era":
+                let isNewPath = false;
                 ctx.beginPath();
                 for(j=0; j<undoActionsList[i].length; j++){
                     let cursorLocations = undoActionsList[i][j].split("; ");
+                    if (isNewPath == true){
+                        ctx.beginPath();
+                        ctx.moveTo(cursorLocations[0], cursorLocations[1]);
+                        isNewPath = false;
+                    }
                     ctx.lineTo(cursorLocations[0], cursorLocations[1]);
                     ctx.stroke();
+                    if (cursorLocations[2] == "true"){
+                        isNewPath = true;
+                    }
                 }
                 break;
             case "STo":
@@ -1390,11 +1399,20 @@ function redoLastAction(){
     switch (actionType){
         case "PBr":
         case "Era":
+            let isNewPath = false;
             ctx.beginPath();
             for(j=0; j<redoActionList[lastActionIndex].length; j++){
                 let cursorLocations = redoActionList[lastActionIndex][j].split("; ");
+                if (isNewPath == true){
+                    ctx.beginPath();
+                    ctx.moveTo(cursorLocations[0], cursorLocations[1]);
+                    isNewPath = false;
+                }
                 ctx.lineTo(cursorLocations[0], cursorLocations[1]);
                 ctx.stroke();
+                if (cursorLocations[2] == "true"){
+                    isNewPath = true;
+                }
             }
             break;
         case "STo":
@@ -1754,10 +1772,10 @@ function keyUp(e){
 }
 
 //Drawing
-function drawStroke(X,Y){
+function drawStroke(X,Y,isNewPath){
     ctx.lineTo(X, Y);
     ctx.stroke();
-    lineList.push(`${X}; ${Y}`);
+    lineList.push(`${X}; ${Y}; ${isNewPath}`);
 }
 function resetPolygon(){
     shapePoints = [];
@@ -1813,6 +1831,22 @@ function createSelectionArea(x,y,w,h){
         selectionBoxPoints[1][1] = temp[1];
     }
     borderResizeAreas.setBorderResizeAreas();
+}
+function pauseStroke(){
+    if (isMouseDown && (selectedTool == "PBr" || selectedTool == "Era")){
+        let pointsDistance = {x:0, y:0};
+        let i = lineList.length-1; //lineList index
+    
+        pointsDistance.x = lineList[i].split("; ")[0] - lineList[i-1].split("; ")[0];
+        pointsDistance.y = lineList[i].split("; ")[1] - lineList[i-1].split("; ")[1];
+
+        drawStroke(Number(lineList[i].split("; ")[0]) + pointsDistance.x*5, Number(lineList[i].split("; ")[1]) + pointsDistance.y*5, true);
+    }
+}
+function continueStroke(){
+    if (isMouseDown && (selectedTool == "PBr" || selectedTool == "Era")){
+        ctx.beginPath();
+    }
 }
 
 //Handle mouse/pointer actions
