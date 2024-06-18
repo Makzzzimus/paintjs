@@ -130,6 +130,19 @@ function hexToRgb(rawhex) { //ty https://stackoverflow.com/a/11508164
     let b = bigint & 255;
     return r + ", " + g + ", " + b;
 }
+function enforceLimits(min, max, isFloat, value){
+    if (isFloat == false){
+        value = Math.floor(value);
+    }
+    if (value >= max){
+        value = max;
+    }
+    else if(value <= min){
+        value = min;
+    }
+    return value;
+}
+
 
 function selectTool(t){
     let ToolPreferencesFieldset = document.getElementById("ToolPreferencesFieldset");
@@ -301,27 +314,32 @@ function selectTool(t){
 
 //Set tool properties
 function changeStroke(t){
+    switch(selectedTool){
+        case "PBr":
+            paintBrush.stroke = enforceLimits(1, 72, false, t.value);
+            t.value = paintBrush.stroke;
+            ctx.lineWidth = paintBrush.stroke;
+            break;
+        case "Era":
+            eraser.stroke = enforceLimits(1, 72, false, t.value);
+            t.value = eraser.stroke
+            ctx.lineWidth = eraser.stroke;
+            break;
+        case "STo":
+            shapeTool.stroke = enforceLimits(1, 72, false, t.value);
+            t.value = shapeTool.stroke;
+            ctx.lineWidth = shapeTool.stroke;
+            break;
+        case "Tex":
+            textTool.fontSize = enforceLimits(1, 256, false, t.value);
+            t.value = textTool.fontSize;
+            break;
+    }
     if (t.id.slice(-5) == "Value"){
         document.getElementById(`${selectedTool}StrokeSlider`).value = t.value;
     }
     else{
         document.getElementById(`${selectedTool}StrokeValue`).value = t.value;
-    }
-    if (selectedTool == "PBr"){
-        paintBrush.stroke = t.value
-        ctx.lineWidth = paintBrush.stroke;
-    }
-    if (selectedTool == "Era"){
-        eraser.stroke = t.value
-        ctx.lineWidth = eraser.stroke;
-    }
-    if (selectedTool == "STo"){
-        shapeTool.stroke = t.value
-        ctx.lineWidth = shapeTool.stroke;
-    }
-    if (selectedTool == "Tex"){
-        textTool.fontSize = t.value
-        //ctx.lineWidth = shapeTool.stroke;
     }
 }
 function changeShape(t){
@@ -532,6 +550,7 @@ function setFillColorFromPrimary(){
 
 //Popups
 function openCreateFilePopup(){
+    document.activeElement.blur();
     let confirmDeletion = true
     if (canvas.width > 0 || canvas.height > 0){
         confirmDeletion = confirm("⚠The previous canvas will be erased. Are you sure you want to continue?");
@@ -542,18 +561,28 @@ function openCreateFilePopup(){
     }
     removeSelection();
 }
-function closePopup(){
-    document.getElementById("BackgroundDim").style.display = "none";
-    document.getElementById("FileCreationPopup").style.display = "none";
-    document.getElementById("ShadowPropertiesPopup").style.display = "none";
-    document.getElementById("PreferencesPopup").style.display = "none";
-    document.getElementById("ChangelogPopup").style.display = "none";
+function closePopup(boolean){
+    if(boolean){
+        let isConfirmed = confirm("⚠Preferences have not been saved. Are you sure you want to continue?")
+        if (isConfirmed){
+            loadUserPreferences();
+            closePopup();
+        }
+    }
+    else{
+        document.getElementById("BackgroundDim").style.display = "none";
+        document.getElementById("FileCreationPopup").style.display = "none";
+        document.getElementById("ShadowPropertiesPopup").style.display = "none";
+        document.getElementById("PreferencesPopup").style.display = "none";
+        document.getElementById("ChangelogPopup").style.display = "none";
 
-    document.getElementById("WidthInput").value = canvasProperties.width;
-    document.getElementById("HeightInput").value = canvasProperties.height;
-    document.getElementById("TransparentCanvasCheckbox").checked = canvasProperties.isTransparentBackground;
-    document.getElementById("CanvasBackgroundInput").value = canvasProperties.backgroundColor;
-    showCanvasBackgroundBox(document.getElementById("TransparentCanvasCheckbox"));
+        document.getElementById("WidthInput").value = canvasProperties.width;
+        document.getElementById("HeightInput").value = canvasProperties.height;
+        document.getElementById("TransparentCanvasCheckbox").checked = canvasProperties.isTransparentBackground;
+        document.getElementById("CanvasBackgroundInput").value = canvasProperties.backgroundColor;
+        showCanvasBackgroundBox(document.getElementById("TransparentCanvasCheckbox"));
+    }
+    
 }
 function swapValues(){
     let temp = document.getElementById("HeightInput").value;
@@ -574,6 +603,7 @@ function showCanvasBackgroundBox(t){
 //Shadows
 function openShadowPropertiesPopup(applyTo, action){
     removeSelection();
+    document.activeElement.blur();
     shadowPreviewCanvas.width = 250; //clear canvas
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("ShadowPropertiesPopup").style.display = "block";
@@ -657,15 +687,19 @@ function openShadowPropertiesPopup(applyTo, action){
     else if (action == "modify"){
         if (shadowCheckbox.checked){
             //console.log(`rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`)
+            shadowOpacityInput.value = enforceLimits(0, 100, false, shadowOpacityInput.value);
             spctx.shadowColor = `rgba(${hexToRgb(shadowColorInput.value)}, ${shadowOpacityInput.value/100})`;
-            spctx.shadowBlur = shadowBlurInput.value;
+            spctx.shadowBlur = enforceLimits(0, 100, false, shadowBlurInput.value);
+            shadowBlurInput.value = spctx.shadowBlur
         }
         else{
             spctx.shadowColor = "rgba(0, 0, 0, 0)";
             spctx.shadowBlur = 0;
         }
-        spctx.shadowOffsetX = offsetXInput.value;
-        spctx.shadowOffsetY = offsetYInput.value;
+        spctx.shadowOffsetX = enforceLimits(-999, 999, false, offsetXInput.value);
+        offsetXInput.value = spctx.shadowOffsetX;
+        spctx.shadowOffsetY = enforceLimits(-999, 999, false, offsetYInput.value);
+        offsetYInput.value = spctx.shadowOffsetY;
         if (applyTo == "text"){
             let textStyles = "";
             if (textTool.bold){textStyles += "bold "};
@@ -721,20 +755,36 @@ function confirmShadow(applyTo){
 
 //Preferences
 function openPreferencesPopup(){
+    document.activeElement.blur();
     clearPreviewCanvas();
     removeSelection();
     document.getElementById("BackgroundDim").style.display = "flex";
     document.getElementById("PreferencesPopup").style.display = "block";
 }
 function applyPreferences(){
-    arrowIncrementDistance = Number(document.getElementById("ArrowIncrementDistanceInput").value);
-    actionHistoryLimit = Number(document.getElementById("ActionHistoryLimitInput").value);
-    areaBorderThickness = Number(document.getElementById("AreaBorderThicknessInput").value);
+    let arrowIncrementDistanceInput = document.getElementById("ArrowIncrementDistanceInput");
+    let ActionHistoryLimitInput = document.getElementById("ActionHistoryLimitInput");
+    let AreaBorderThicknessInput = document.getElementById("AreaBorderThicknessInput");
+
+    arrowIncrementDistance = enforceLimits(0.1, 999, true, arrowIncrementDistanceInput.value);
+    arrowIncrementDistanceInput.value = arrowIncrementDistance;
+
+    actionHistoryLimit = enforceLimits(5, 250, false, ActionHistoryLimitInput.value);
+    ActionHistoryLimitInput.value = actionHistoryLimit;
+
+    areaBorderThickness = enforceLimits(5, 50, false, AreaBorderThicknessInput.value);
+    AreaBorderThicknessInput.value = areaBorderThickness;
+
     document.cookie = `AID=${arrowIncrementDistance}; path=/`;
     document.cookie = `AHL=${actionHistoryLimit}; path=/`;
     document.cookie = `ABT=${areaBorderThickness}; path=/`;
 
     closePopup();
+}
+function resetUserPreferences(){
+    document.getElementById("ArrowIncrementDistanceInput").value = 1;
+    document.getElementById("ActionHistoryLimitInput").value = 25;
+    document.getElementById("AreaBorderThicknessInput").value = 12;
 }
 async function openChangelogPopup(){
     document.getElementById("BackgroundDim").style.display = "flex";
@@ -748,8 +798,8 @@ async function openChangelogPopup(){
 
 //File actions
 function createCanvas(clearHistory){
-    let width = canvasProperties.width = document.getElementById("WidthInput").value;
-    let height = canvasProperties.height = document.getElementById("HeightInput").value;
+    let width = canvasProperties.width = enforceLimits(8, Infinity, false, document.getElementById("WidthInput").value);
+    let height = canvasProperties.height = enforceLimits(8, Infinity, false, document.getElementById("HeightInput").value);
     canvasContainer.style.width = width+"px";
     canvasContainer.style.height = height+"px";
     canvas.width = previewCanvas.width = width;
@@ -1532,8 +1582,9 @@ function keyDown(e){
         case "Enter":
             let confirmButtons = document.querySelectorAll(".FinishPopupButton");
             for (let i=0; i<confirmButtons.length; i++){
-                if (confirmButtons[i].parentElement.style.display != "none"){
+                if (confirmButtons[i].parentElement.style.display != "none" && confirmButtons[i].parentElement.style.display != ""){
                     confirmButtons[i].click();
+                    break;
                 }
             }
     }

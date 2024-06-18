@@ -236,11 +236,11 @@
                 <div id="SizeInputs" class="PopupContentGroup">
                     <div class="InputBox">
                         <label>Canvas Width</label><br>
-                        <input type="number" id="WidthInput" min="1" value="800">
+                        <input type="number" id="WidthInput" min="8" value="800">
                     </div>
                     <div class="InputBox">
                         <label>Canvas Height</label><br>
-                        <input type="number" id="HeightInput" min="1" value="600">
+                        <input type="number" id="HeightInput" min="8" value="600">
                     </div>
                 </div>
                 <div id="Other" class="PopupContentGroup">
@@ -278,11 +278,11 @@
                     </div>
                     <div class="InputBox">
                         <label>Shadow offset by X</label><br>
-                        <input type="number" id="OffsetXInput" value="5">
+                        <input type="number" id="OffsetXInput" value="5" min="-999" max="999">
                     </div>
                     <div class="InputBox">
                         <label>Shadow offset by Y</label><br>
-                        <input type="number" id="OffsetYInput" value="5">
+                        <input type="number" id="OffsetYInput" value="5" min="-999" max="999">
                     </div>
                     <div class="InputBox">
                         <label>Shadow Blur</label><br>
@@ -301,20 +301,17 @@
             <button class="FinishPopupButton" id="ApplyShadowButton">Apply</button><br>
             <button class="CancelButton" onclick="closePopup()">Cancel</button>
         </div>
-        <div id="PreferencesPopup" class="PopupWindow" style="width: 350px; height: 500px;">
+        <div id="PreferencesPopup" class="PopupWindow" style="width: 350px; height: 550px;">
             <h2>Preferences</h2>
             <div class="PopupOptions">
                 <div id="SizeInputs" class="PopupContentGroup">
                     <div class="InputBox">
-                        <Button onclick="openChangelogPopup()">Changelog</Button>
-                    </div>
-                    <div class="InputBox">
                         <label>Arrow increment distance (pixels)</label><br>
-                        <input id="ArrowIncrementDistanceInput" type="number" min="0" max="9999" value="1">
+                        <input id="ArrowIncrementDistanceInput" type="number" min="0.1" max="999" value="1" step="0.1">
                     </div>
                     <div class="InputBox">
-                        <label>Interaction area thickness of selection box borders</label><br>
-                        <input id="AreaBorderThicknessInput" type="number" min="1" max="50" value="5">
+                        <label>Interaction area thickness of selection field borders</label><br>
+                        <input id="AreaBorderThicknessInput" type="number" min="5" max="50" value="12">
                     </div>
                     <div class="InputBox">
                         <label>Action history limit</label><br>
@@ -322,6 +319,9 @@
                         <p style="margin-top: 0px;">It is not recommended to set a limit of more than 50 actions</p>
                     </div>
                     <br>
+                    <div class="InputBox">
+                        <Button onclick="openChangelogPopup()">Changelog</Button>
+                    </div>
                     <div class="InputBox">
                         <input type="text" readonly value="1.1 ()">
                         <br><a href="https://github.com/Makzzzimus/rePaint" target="_blank">Github</a>
@@ -331,7 +331,8 @@
             <br>
 
             <button class="FinishPopupButton" id="ApplyPreferencesButton" onclick="applyPreferences()">Apply</button><br>
-            <!-- <button class="CancelButton" onclick="closePopup()">Reset to default</button> -->
+            <button class="CancelButton" onclick="closePopup(true)">Cancel</button><br>
+            <button class="CancelButton" onclick="resetUserPreferences()">Reset to default</button>
         </div>
         <!-- increase changelog's width -->
         <div id="ChangelogPopup" class="PopupWindow" style="width: 600px; height: 500px;">
