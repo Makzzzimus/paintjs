@@ -114,7 +114,7 @@ let horizontallyMovedDistance = 0;
 let FirstActionsImageData = undefined;
 let actionHistoryLimit = 25;
 let areaBorderThickness = 15;
-
+let isHoldingShift = false;
 //Functions returning values
 function pythagoras(a, b){
     return Math.sqrt(a*a+b*b);
@@ -1614,6 +1614,13 @@ function keyDown(e){
                     break;
                 }
             }
+            break;
+        case "Shift":
+            isHoldingShift = true;
+            break;
+    }
+    if(e.keyCode == 16){
+        isHoldingShift = true;
     }
 }
 function keyUp(e){
@@ -1672,7 +1679,10 @@ function keyUp(e){
     
                     saveAction(selectionBoxPoints, "ClearSelectedArea");
                 }
-                break    
+                break;
+            case "Shift":
+                isHoldingShift = false;
+                break;
         }
         if (e.altKey){
             switch (e.code){
@@ -1767,6 +1777,9 @@ function keyUp(e){
                 selectionBoxPointsBeforeMovement[1][1]-selectionBoxPointsBeforeMovement[0][1]]]);
                 
             horizontallyMovedDistance = verticallyMovedDistance = 0;}catch{console.error("Selected area is undefined")}
+        }
+        if(e.keyCode == 16){
+            isHoldingShift = false;
         }
     }
 }
@@ -1970,7 +1983,7 @@ function getCursorLocation(event){
         }
     }
     if ((selectedTool == "STo" && shapePoints.length == 1) || (selectedTool == "STo" && shapeTool.shape == "polygon" && shapePoints.length > 0 && shapePoints.length != document.getElementById("InputCorners").value)){
-        let shape = new Path2D();
+        const shape = new Path2D();
         switch (shapeTool.shape){
             case "rectangle":
                 clearPreviewCanvas();
@@ -1982,8 +1995,20 @@ function getCursorLocation(event){
                 break;
             case "line":
                 clearPreviewCanvas();
-                shape.moveTo(shapePoints[0][0],shapePoints[0][1])
-                shape.lineTo(cursorX, cursorY)
+                shape.moveTo(shapePoints[0][0],shapePoints[0][1]);
+                console.log( Math.abs(cursorY-shapePoints[0][1]));
+                if (isHoldingShift){
+                    if (Math.abs(cursorY-shapePoints[0][1])>Math.abs(cursorX-shapePoints[0][0])){
+                        shape.lineTo(shapePoints[0][0], cursorY);
+                    }
+                    else{
+                        shape.lineTo(cursorX, shapePoints[0][1]);
+                    }
+                }
+                else{
+                    shape.lineTo(cursorX, cursorY);
+                }
+                
                 break;
             case "polygon":
                 clearPreviewCanvas();
@@ -2112,7 +2137,19 @@ function mouseDown(){
                             break;
                         case "line":
                             strokeShape.moveTo(shapePoints[0][0],shapePoints[0][1]);
-                            strokeShape.lineTo(shapePoints[1][0],shapePoints[1][1]);
+                            if (isHoldingShift){
+                                if (Math.abs(cursorY-shapePoints[0][1])>Math.abs(cursorX-shapePoints[0][0])){
+                                    strokeShape.lineTo(shapePoints[0][0], shapePoints[1][1]);
+                                    shapePoints[1][0] = shapePoints[0][0];
+                                }
+                                else{
+                                    strokeShape.lineTo(shapePoints[1][0], shapePoints[0][1]);
+                                    shapePoints[1][1] = shapePoints[0][1];
+                                }
+                            }
+                            else{
+                                strokeShape.lineTo(shapePoints[1][0], shapePoints[1][1]);
+                            }
                             break;
                     }
                     shapeTool.opacity = document.getElementById("ShapeOpacityInput").value / 100;
