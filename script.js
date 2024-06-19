@@ -1191,7 +1191,7 @@ function saveAction(action, customTool){
     }
     undoActionsList.push(action);
 
-    let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, tool, shapeTool.shape, shapeTool.fillShape,  shapeTool.shapeFillColor, lastRadius, ctx.font, ctx.textAlign, ctx.shadowOffsetX, ctx.shadowOffsetY, ctx.shadowBlur, ctx.shadowColor, textTool.textOpacity, shapeTool.opacity];
+    let lastActionProperties = [ctx.strokeStyle, ctx.lineCap, ctx.lineJoin, ctx.lineWidth, ctx.globalCompositeOperation, tool, shapeTool.shape, shapeTool.fillShape,  shapeTool.shapeFillColor, lastRadius, ctx.font, ctx.textAlign, ctx.shadowOffsetX, ctx.shadowOffsetY, ctx.shadowBlur, ctx.shadowColor, textTool.textOpacity, shapeTool.opacity, isHoldingShift];
     undoActionPropertiesList.push(lastActionProperties);
     console.log("Tool properties saved");
 
@@ -1241,10 +1241,25 @@ function undoLastAction(){
                 break;
             case "STo":
                 let undoShapePoints = undoActionsList[i];
+                let wasHoldingShift = undoActionPropertiesList[i][18];
                 const strokeShape = new Path2D();
                 switch (actionShape){
                     case "rectangle":
-                        strokeShape.rect(undoShapePoints[0][0], undoShapePoints[0][1], undoShapePoints[1][0]-undoShapePoints[0][0], undoShapePoints[1][1]-undoShapePoints[0][1]);
+                        if(wasHoldingShift){
+                            if(Math.abs(undoShapePoints[1][0]-undoShapePoints[0][0]) > Math.abs(undoShapePoints[1][1]-undoShapePoints[0][1])){
+                                squareSide = Math.abs(undoShapePoints[1][0]-undoShapePoints[0][0]);
+                            }
+                            else{
+                                squareSide = Math.abs(undoShapePoints[1][1]-undoShapePoints[0][1]);
+                            }
+                            strokeShape.rect(undoShapePoints[0][0], undoShapePoints[0][1],
+                                ((undoShapePoints[1][0]-undoShapePoints[0][0])/Math.abs(undoShapePoints[1][0]-undoShapePoints[0][0]))*squareSide, 
+                                ((undoShapePoints[1][1]-undoShapePoints[0][1])/Math.abs(undoShapePoints[1][1]-undoShapePoints[0][1]))*squareSide);
+                        
+                        }
+                        else{
+                            strokeShape.rect(undoShapePoints[0][0], undoShapePoints[0][1], undoShapePoints[1][0]-undoShapePoints[0][0], undoShapePoints[1][1]-undoShapePoints[0][1]);    
+                        }
                         break;
                     case "circle":
                         let radius = undoActionPropertiesList[i][9];
@@ -1271,10 +1286,25 @@ function undoLastAction(){
                     ctx.shadowBlur = 0;
                     switch (actionShape){
                         case "rectangle":
-                            fillShape.rect(undoShapePoints[0][0]+ctx.lineWidth/2,
-                                undoShapePoints[0][1]+ctx.lineWidth/2,
-                                undoShapePoints[1][0]-undoShapePoints[0][0]-ctx.lineWidth,
-                                undoShapePoints[1][1]-undoShapePoints[0][1]-ctx.lineWidth);
+                            if(wasHoldingShift){
+                                if(Math.abs(undoShapePoints[1][0]-undoShapePoints[0][0]) > Math.abs(undoShapePoints[1][1]-undoShapePoints[0][1])){
+                                    squareSide = Math.abs(undoShapePoints[1][0]-undoShapePoints[0][0]);
+                                }
+                                else{
+                                    squareSide = Math.abs(undoShapePoints[1][1]-undoShapePoints[0][1]);
+                                }
+                                fillShape.rect(undoShapePoints[0][0]+ctx.lineWidth/2, undoShapePoints[0][1]+ctx.lineWidth/2,
+                                    (((undoShapePoints[1][0]-undoShapePoints[0][0])/Math.abs(undoShapePoints[1][0]-undoShapePoints[0][0]))*squareSide)-ctx.lineWidth, 
+                                    (((undoShapePoints[1][1]-undoShapePoints[0][1])/Math.abs(undoShapePoints[1][1]-undoShapePoints[0][1]))*squareSide)-ctx.lineWidth);
+                            
+                            }
+                            else{
+                                fillShape.rect(undoShapePoints[0][0]+ctx.lineWidth/2,
+                                    undoShapePoints[0][1]+ctx.lineWidth/2,
+                                    undoShapePoints[1][0]-undoShapePoints[0][0]-ctx.lineWidth,
+                                    undoShapePoints[1][1]-undoShapePoints[0][1]-ctx.lineWidth);
+                            }
+                            
                             break;
                         case "circle":
                             let radius = undoActionPropertiesList[i][9]-ctx.lineWidth/2;
@@ -1417,10 +1447,24 @@ function redoLastAction(){
             break;
         case "STo":
             let redoShapePoints = redoActionList[lastActionIndex];
+            let wasHoldingShift = redoActionPropertiesList[lastActionPropIndex][18];
             const strokeShape = new Path2D();
             switch (actionShape){
                 case "rectangle":
-                    strokeShape.rect(redoShapePoints[0][0], redoShapePoints[0][1], redoShapePoints[1][0]-redoShapePoints[0][0], redoShapePoints[1][1]-redoShapePoints[0][1]);
+                    if(wasHoldingShift){
+                        if(Math.abs(redoShapePoints[1][0]-redoShapePoints[0][0]) > Math.abs(redoShapePoints[1][1]-redoShapePoints[0][1])){
+                            squareSide = Math.abs(redoShapePoints[1][0]-redoShapePoints[0][0]);
+                        }
+                        else{
+                            squareSide = Math.abs(redoShapePoints[1][1]-redoShapePoints[0][1]);
+                        }
+                        strokeShape.rect(redoShapePoints[0][0], redoShapePoints[0][1],
+                            ((redoShapePoints[1][0]-redoShapePoints[0][0])/Math.abs(redoShapePoints[1][0]-redoShapePoints[0][0]))*squareSide, 
+                            ((redoShapePoints[1][1]-redoShapePoints[0][1])/Math.abs(redoShapePoints[1][1]-redoShapePoints[0][1]))*squareSide);
+                    }
+                    else{
+                        strokeShape.rect(redoShapePoints[0][0], redoShapePoints[0][1], redoShapePoints[1][0]-redoShapePoints[0][0], redoShapePoints[1][1]-redoShapePoints[0][1]);
+                    }
                     break;
                 case "circle":
                     let radius = redoActionPropertiesList[redoActionPropertiesList.length - 1][9];
@@ -1447,10 +1491,24 @@ function redoLastAction(){
                 ctx.shadowBlur = 0;
                 switch (actionShape){
                     case "rectangle":
-                        fillShape.rect(redoShapePoints[0][0]+ctx.lineWidth/2,
-                        redoShapePoints[0][1]+ctx.lineWidth/2,
-                        redoShapePoints[1][0]-redoShapePoints[0][0]-ctx.lineWidth,
-                        redoShapePoints[1][1]-redoShapePoints[0][1]-ctx.lineWidth);
+                        if(wasHoldingShift){
+                            if(Math.abs(redoShapePoints[1][0]-redoShapePoints[0][0]) > Math.abs(redoShapePoints[1][1]-redoShapePoints[0][1])){
+                                squareSide = Math.abs(redoShapePoints[1][0]-redoShapePoints[0][0]);
+                            }
+                            else{
+                                squareSide = Math.abs(redoShapePoints[1][1]-redoShapePoints[0][1]);
+                            }
+                            fillShape.rect(redoShapePoints[0][0], redoShapePoints[0][1],
+                                ((redoShapePoints[1][0]-redoShapePoints[0][0])/Math.abs(redoShapePoints[1][0]-redoShapePoints[0][0]))*squareSide, 
+                                ((redoShapePoints[1][1]-redoShapePoints[0][1])/Math.abs(redoShapePoints[1][1]-redoShapePoints[0][1]))*squareSide);
+                        }
+                        else{
+                            fillShape.rect(redoShapePoints[0][0]+ctx.lineWidth/2,
+                                redoShapePoints[0][1]+ctx.lineWidth/2,
+                                redoShapePoints[1][0]-redoShapePoints[0][0]-ctx.lineWidth,
+                                redoShapePoints[1][1]-redoShapePoints[0][1]-ctx.lineWidth);
+                        }
+                        
                         break;
                     case "circle":
                         let radius = redoActionPropertiesList[lastActionPropIndex][9]-ctx.lineWidth/2;
@@ -1987,7 +2045,22 @@ function getCursorLocation(event){
         switch (shapeTool.shape){
             case "rectangle":
                 clearPreviewCanvas();
+                if(isHoldingShift){
+                    let squareSide;
+                    if(Math.abs(cursorX-shapePoints[0][0]) > Math.abs(cursorY-shapePoints[0][1])){
+                        squareSide = Math.abs(cursorX-shapePoints[0][0]);
+                    }
+                    else{
+                        squareSide = Math.abs(cursorY-shapePoints[0][1]);
+                    }
+                    shape.rect(shapePoints[0][0], shapePoints[0][1],
+                        ((cursorX-shapePoints[0][0])/Math.abs(cursorX-shapePoints[0][0]))*squareSide, 
+                        ((cursorY-shapePoints[0][1])/Math.abs(cursorY-shapePoints[0][1]))*squareSide);
+                }
+                else{
                 shape.rect(shapePoints[0][0], shapePoints[0][1], cursorX-shapePoints[0][0], cursorY-shapePoints[0][1]);
+                }
+
                 break;
             case "circle":
                 clearPreviewCanvas();
@@ -2128,7 +2201,21 @@ function mouseDown(){
                                 shapePoints[0][1] = shapePoints[1][1];
                                 shapePoints[1][1] = temp[1];
                             }
-                            strokeShape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
+                            if(isHoldingShift){
+                                let squareSide;
+                                if(Math.abs(shapePoints[1][0]-shapePoints[0][0]) > Math.abs(shapePoints[1][1]-shapePoints[0][1])){
+                                    squareSide = Math.abs(shapePoints[1][0]-shapePoints[0][0]);
+                                }
+                                else{
+                                    squareSide = Math.abs(shapePoints[1][1]-shapePoints[0][1]);
+                                }
+                                strokeShape.rect(shapePoints[0][0], shapePoints[0][1],
+                                    ((shapePoints[1][0]-shapePoints[0][0])/Math.abs(shapePoints[1][0]-shapePoints[0][0]))*squareSide, 
+                                    ((shapePoints[1][1]-shapePoints[0][1])/Math.abs(shapePoints[1][1]-shapePoints[0][1]))*squareSide);
+                            }
+                            else{
+                                strokeShape.rect(shapePoints[0][0], shapePoints[0][1], shapePoints[1][0]-shapePoints[0][0], shapePoints[1][1]-shapePoints[0][1]);
+                            }
                             break;
                         case "circle":
                             let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]));
@@ -2161,10 +2248,28 @@ function mouseDown(){
                         const fillShape = new Path2D();
                         switch (shapeTool.shape){
                             case "rectangle":
-                                fillShape.rect(shapePoints[0][0]+ctx.lineWidth/2,
-                                shapePoints[0][1]+ctx.lineWidth/2,
-                                (shapePoints[1][0]-shapePoints[0][0])-ctx.lineWidth,
-                                (shapePoints[1][1]-shapePoints[0][1])-ctx.lineWidth);
+                                if(isHoldingShift){
+                                    let squareSide;
+                                    if(Math.abs(shapePoints[1][0]-shapePoints[0][0]) > Math.abs(shapePoints[1][1]-shapePoints[0][1])){
+                                        squareSide = Math.abs(shapePoints[1][0]-shapePoints[0][0]);
+                                    }
+                                    else{
+                                        squareSide = Math.abs(shapePoints[1][1]-shapePoints[0][1]);
+                                    }
+                                    fillShape.rect(shapePoints[0][0]+ctx.lineWidth/2, shapePoints[0][1]+ctx.lineWidth/2,
+                                        (((shapePoints[1][0]-shapePoints[0][0])/Math.abs(shapePoints[1][0]-shapePoints[0][0]))*squareSide)-ctx.lineWidth, 
+                                        (((shapePoints[1][1]-shapePoints[0][1])/Math.abs(shapePoints[1][1]-shapePoints[0][1]))*squareSide)-ctx.lineWidth);
+                                    shapePoints[1][0] = (shapePoints[1][0]/Math.abs(shapePoints[1][0])*squareSide)+shapePoints[0][0];
+                                    shapePoints[1][1] = (shapePoints[1][1]/Math.abs(shapePoints[1][1])*squareSide)+shapePoints[0][1];
+                                }
+                                else{
+                                    fillShape.rect(shapePoints[0][0]+ctx.lineWidth/2,
+                                    shapePoints[0][1]+ctx.lineWidth/2,
+                                    (shapePoints[1][0]-shapePoints[0][0])-ctx.lineWidth,
+                                    (shapePoints[1][1]-shapePoints[0][1])-ctx.lineWidth);
+                                }
+
+                                
                                 break;
                             case "circle":
                                 let radius = pythagoras(Math.abs(shapePoints[0][0]-shapePoints[1][0]), Math.abs(shapePoints[0][1]-shapePoints[1][1]))-ctx.lineWidth/2;
