@@ -1288,7 +1288,7 @@ function undoLastAction(){
                 ctx.font = undoActionPropertiesList[i][10];
                 ctx.textAlign = undoActionPropertiesList[i][11];
                 ctx.fillStyle = `rgba(${hexToRgb(ctx.strokeStyle)}, ${undoActionPropertiesList[i][16]})`;
-                ctx.fillText(undoActionsList[i][0], undoActionsList[i][1], undoActionsList[i][2]);
+                fillMultilineText(ctx, undoActionsList[i][0], undoActionsList[i][1], undoActionsList[i][2]);
                 break;
             case "Sel":
                 canvasContainer.style.cursor = "crosshair";
@@ -1464,7 +1464,7 @@ function redoLastAction(){
             ctx.font = redoActionPropertiesList[lastActionIndex][10];
             ctx.textAlign = redoActionPropertiesList[lastActionIndex][11];
             ctx.fillStyle = `rgba(${hexToRgb(ctx.strokeStyle)}, ${redoActionPropertiesList[lastActionPropIndex][16]})`;;
-            ctx.fillText(redoActionList[lastActionIndex][0], redoActionList[lastActionIndex][1], redoActionList[lastActionIndex][2]);
+            fillMultilineText(ctx, redoActionList[lastActionIndex][0], redoActionList[lastActionIndex][1], redoActionList[lastActionIndex][2]);
             break;
         case "Sel":
             canvasContainer.style.cursor = "crosshair";
@@ -1848,6 +1848,12 @@ function continueStroke(){
         ctx.beginPath();
     }
 }
+function fillMultilineText(context, text, x, y){
+    let strings = text.split("\n");
+    for (let i=0; i<strings.length; i++){
+        context.fillText(strings[i], x, y+(i*textTool.fontSize));
+    }
+}
 
 //Handle mouse/pointer actions
 function getCursorLocation(event){
@@ -2058,7 +2064,7 @@ function getCursorLocation(event){
             pctx.fillStyle = "rgba(0, 0, 0, 0.65)";
             pctx.font = `${textStyles} ${textTool.fontSize}px ${textTool.font}`;
             pctx.textAlign = (textTool.textAlignment.toLowerCase());
-            pctx.fillText(textTool.text, cursorX, cursorY);
+            fillMultilineText(pctx, textTool.text, cursorX, cursorY);
         }
     }
 }
@@ -2206,7 +2212,7 @@ function mouseDown(){
                 ctx.shadowBlur = textTool.shadowBlur;
                 ctx.shadowColor =  textTool.shadowColor;
     
-                ctx.fillText(textTool.text, cursorX, cursorY);
+                fillMultilineText(ctx, textTool.text, cursorX, cursorY);
                 clearPreviewCanvas();
                 saveAction([textTool.text, cursorX, cursorY]);
                 textNodeContent.value = "";
