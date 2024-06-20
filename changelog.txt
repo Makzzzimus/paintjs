@@ -1,3 +1,11 @@
+v1.1
+    -Added reset to default and cancel buttons to preferences
+    -Added the ability to draw a square and a straight line when holding down Shift
+    -Long text can now be split and rendered as multi-line text.
+    -Improved selection field and shape preview visibility 
+    -Fixed brush and eraser tools drawing a line when reentering canvas
+    -Fixed bugs related to the Enter keypress
+    -Some other major bugs have been fixed.
 v1.0
     -Added
         *Color picker tool
