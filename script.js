@@ -1275,7 +1275,6 @@ function undoLastAction(){
                         strokeShape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1])
                         for (let i=1; i<undoShapePoints.length; i++){
                             strokeShape.lineTo(undoShapePoints[i][0], undoShapePoints[i][1]);
-                            ctx.stroke(strokeShape);
                         }
                         strokeShape.closePath();
                         break;
@@ -1311,6 +1310,13 @@ function undoLastAction(){
                         case "circle":
                             let radius = undoActionPropertiesList[i][9]-ctx.lineWidth/2;
                             fillShape.arc(undoShapePoints[0][0], undoShapePoints[0][1], radius, 0, 2*Math.PI, false);
+                            break;
+                        case "polygon":
+                            fillShape.moveTo(undoShapePoints[0][0], undoShapePoints[0][1])
+                            for (let i=1; i<undoShapePoints.length; i++){
+                                fillShape.lineTo(undoShapePoints[i][0], undoShapePoints[i][1]);
+                            }
+                            fillShape.closePath();
                             break;
                     }
                     ctx.fill(fillShape);
@@ -1479,8 +1485,7 @@ function redoLastAction(){
                 case "polygon":
                     strokeShape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1])
                     for (let i=1; i<redoShapePoints.length; i++){
-                        shape.lineTo(redoShapePoints[i][0], redoShapePoints[i][1]);
-                        ctx.stroke(shape);
+                        strokeShape.lineTo(redoShapePoints[i][0], redoShapePoints[i][1]);
                     }
                     strokeShape.closePath();
                     break;
@@ -1489,7 +1494,7 @@ function redoLastAction(){
             if (redoActionPropertiesList[lastActionPropIndex][7] == true){
                 ctx.fillStyle = `rgba(${hexToRgb(redoActionPropertiesList[lastActionPropIndex][8])}, ${redoActionPropertiesList[lastActionPropIndex][17]})`;
                 const fillShape = new Path2D();
-                ctx.shadowColor = "rgba(0, 0, 0, 0)"
+                ctx.shadowColor = "rgba(0, 0, 0, 0)";
                 ctx.shadowBlur = 0;
                 switch (actionShape){
                     case "rectangle":
@@ -1516,6 +1521,13 @@ function redoLastAction(){
                         let radius = redoActionPropertiesList[lastActionPropIndex][9]-ctx.lineWidth/2;
                         fillShape.arc(redoShapePoints[0][0], redoShapePoints[0][1], radius, 0, 2*Math.PI, false);
                         break;
+                    case "polygon":
+                        fillShape.moveTo(redoShapePoints[0][0], redoShapePoints[0][1])
+                        for (let i=1; i<redoShapePoints.length; i++){
+                            fillShape.lineTo(redoShapePoints[i][0], redoShapePoints[i][1]);
+                        }
+                        fillShape.closePath();
+                    break;
                 }
                 ctx.fill(fillShape);
             }
@@ -2092,7 +2104,8 @@ function getCursorLocation(event){
                 break;
         }
         pctx.setLineDash([]);
-        pctx.strokeStyle = "rgba(0,0,0,0.7)"
+        let xd = ctx.getImageData(shapePoints[0][0], shapePoints[0][1], 1, 1).data;
+        pctx.strokeStyle =  `rgba(${invertRgb(xd[0], xd[1], xd[2], xd[3])},0.7)`;
         pctx.stroke(shape);
 
     }
@@ -2294,29 +2307,33 @@ function mouseDown(){
                 }
                 else if(shapePoints.length != 0 && shapePoints.length != corners-1){
                     shapePoints.push([cursorX, cursorY]);
-                    shapeTool.opacity = document.getElementById("ShapeOpacityInput").value / 100;
-                    ctx.strokeStyle = `rgba(${hexToRgb(selectedColorPicker.value)}, ${shapeTool.opacity})`;
                     polygon.lineTo(cursorX, cursorY);
-                    ctx.stroke(polygon);
                 }
                 else if (shapePoints.length == corners-1){
                     ctx.shadowOffsetX = shapeTool.shadowOffsetX;
                     ctx.shadowOffsetY = shapeTool.shadowOffsetY;
                     ctx.shadowBlur = shapeTool.shadowBlur;
-                    ctx.shadowColor =  shapeTool.shadowColor;
-    
+
                     polygon.lineTo(cursorX, cursorY);
                     polygon.closePath();
+
                     shapeTool.opacity = document.getElementById("ShapeOpacityInput").value / 100;
+
+                    ctx.shadowColor =  shapeTool.shadowColor;
                     ctx.strokeStyle = `rgba(${hexToRgb(selectedColorPicker.value)}, ${shapeTool.opacity})`;
-                    ctx.stroke(polygon)
+
+                    ctx.stroke(polygon);
+
                     if (shapeTool.fillShape == true){
+                        ctx.shadowColor =  "rgba(0,0,0,0)";
                         ctx.fillStyle = `rgba(${hexToRgb(shapeTool.shapeFillColor)}, ${shapeTool.opacity})`;
                         ctx.fill(polygon);
                     }
                     shapePoints.push([cursorX, cursorY]);
                     polygon = new Path2D();
+                    ctx.shadowColor =  shapeTool.shadowColor;
                 }
+
             }
         break;
         case "Sel":
