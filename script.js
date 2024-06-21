@@ -2083,7 +2083,6 @@ function getCursorLocation(event){
             case "line":
                 clearPreviewCanvas();
                 shape.moveTo(shapePoints[0][0],shapePoints[0][1]);
-                console.log( Math.abs(cursorY-shapePoints[0][1]));
                 if (isHoldingShift){
                     if (Math.abs(cursorY-shapePoints[0][1])>Math.abs(cursorX-shapePoints[0][0])){
                         shape.lineTo(shapePoints[0][0], cursorY);
