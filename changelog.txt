@@ -1,4 +1,4 @@
-v1.1
+v1.1 (21/06/24)
     -Added reset to default and cancel buttons to preferences
     -Added the ability to draw a square and a straight line when holding down Shift
     -Long text can now be split and rendered as multi-line text.
@@ -6,7 +6,7 @@ v1.1
     -Fixed brush and eraser tools drawing a line when reentering canvas
     -Fixed bugs related to the Enter keypress
     -Some other major bugs have been fixed.
-v1.0
+v1.0 (16/06/24)
     -Added
         *Color picker tool
         *The selection of the canvas background color 
@@ -26,13 +26,10 @@ v1.0
 
     -Fixed many bugs
     
-v0.2
-    -Fixed bug
-
-v0.1
+v0.1 (2/06/24)
     -Added favicon
     -Page tittle dynamically changes to the opened file name
 
-v0.0
+v0.0 (1/06/24)
     -Made github repo public
     -Launched github pages

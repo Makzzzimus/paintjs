@@ -212,7 +212,7 @@ function selectTool(t){
                 document.getElementById("InputCorners").style.display = "inline";
             }
             changeShape();
-            tippy("#SelectShapeToolShape",{content: "If you hold down <strong>SHIFT</strong>, you can draw special shapes. A <strong>STRAIGHT LINE</strong> if the selected shape is a line, and a <strong>SQUARE</strong> if the selected shape is a rectangle. (When drawing a square aim for the corner of 2-nd point. Otherwise square can be placed in different place.)", delay: [50, 100], animation: "shift-toward", allowHTML: true,})
+            tippy("#SelectShapeToolShape",{content: "Hold down <strong>SHIFT</strong>, to draw special shapes. Line as selected shape + SHIFT = <strong>STRAIGHT LINE</strong><br>Rectangle as selected shape + SHIFT = <strong>SQUARE</strong><br>", delay: [50, 100], animation: "shift-toward", allowHTML: true,})
             break;
         case "Tex":
             ToolPreferencesFieldset.innerHTML = `<legend>Tool properties</legend> <div> <label>Font size: </label><br> <input id="TexStrokeSlider" type="range" min="1" max="256" value="${textTool.fontSize}" oninput="changeStroke(this)"> <input id="TexStrokeValue" type="number" min="1" max="256" value="${textTool.fontSize}" onchange="changeStroke(this)"><br> </div> <div> <label>Selected font: </label><br> <select id="TexFontSelect" onchange="changeFont(this)"> <option value="Courier New">Courier New</option> <option value="Franklin Gothic Medium">Franklin Gothic Medium</option> <option value="Gill Sans">Gill Sans</option> <option value="Segoe UI">Segoe UI</option> <option value="Times New Roman">Times New Roman</option> <option value="Trebuchet MS">Trebuchet MS</option> <option value="Arial">Arial</option> <option value="Cambria">Cambria</option> <option value="Georgia">Georgia</option> <option value="Verdana">Verdana</option> </select></div> 
@@ -1945,7 +1945,7 @@ function getCursorLocation(event){
     let rect = event.target.getBoundingClientRect();
     cursorX = Math.round(event.clientX - rect.left);
     cursorY = Math.round(event.clientY - rect.top);
-    cursorLocationInput.value = `${cursorX}, ${cursorY}`;
+    cursorLocationInput.value = `${cursorX}; ${cursorY}`;
     if (isMouseDown == true){
         if (selectedTool == "PBr" || selectedTool == "Era"){
             let tool = undefined;
