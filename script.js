@@ -1746,7 +1746,7 @@ function keyUp(e){
                 break;
             case "Backspace":
             case "Delete":
-                if (selectionBoxPoints != []){
+                if (selectionBoxPoints != ""){
                     clearAreaContent(selectionBoxPoints[0][0], selectionBoxPoints[0][1], selectionBoxPoints[1][0]-selectionBoxPoints[0][0], selectionBoxPoints[1][1]-selectionBoxPoints[0][1]);
     
                     saveAction(selectionBoxPoints, "ClearSelectedArea");
